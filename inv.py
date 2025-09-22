@@ -93,7 +93,7 @@ class InventoryCog(commands.Cog):
 
         view.add_item(army)
         view.add_item(enterprise)
-        await ctx.reply(f'`{give_country(ctx.author.mention)}` конкрентизируйте', view=view, ephemeral=True)
+        await ctx.reply(f'`{await give_country(ctx.author.mention) if await give_country(ctx.author.mention) else ctx.author.nick}` конкрентизируйте', view=view, ephemeral=True)
 
 
 

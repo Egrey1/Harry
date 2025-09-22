@@ -10,6 +10,7 @@ async def load_extensions():
     await bot.load_extension('inv')
     await bot.load_extension('shop')
     await bot.load_extension('items_move')
+    await bot.load_extension('items_update')
 
 
 
@@ -26,6 +27,7 @@ async def on_ready():
 
 if __name__ == "__main__":
     bot.run(TOKEN)
+    
 
 
      
