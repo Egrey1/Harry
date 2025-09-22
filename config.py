@@ -68,6 +68,6 @@ DATABASE_COUNTRIES = 'databases/countries.db'
 
 CURRENCY = '£'
 
-TOKEN = 'MTM0NDU2NzUzMzgyNjYwNTA5OA.GqT2rs.kNF9tEqc5jT0j1E3IRH70zsUslX1aHuynm3fDs'
+TOKEN = open('TOKEN.txt').readline()
 intents = Intents.all()
 PREFIX = 'detri!'
