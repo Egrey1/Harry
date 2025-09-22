@@ -78,8 +78,7 @@ class ItemsCog(commands.Cog):
 
     async def select_callback(self, interaction: Interaction, country1, country2):
         # Получаем предмет и смотрим сколько их у него и сколько он может передать 
-        item = ''.join(interaction.data['values']) 
-        await interaction.response.defer(ephemeral= True)
+        item = ''.join(interaction.data['values'])
         had = await get_inventory(country1) 
         had = had[item]
 
@@ -103,7 +102,6 @@ class ItemsCog(commands.Cog):
         interaction = None
         if is_interaction:
             interaction = ctx.interaction
-            await interaction.response.defer(ephemeral= True) 
 
 		# Проверяем,являются ли пользователи стрснами 
         if not country1:
@@ -123,8 +121,8 @@ class ItemsCog(commands.Cog):
         inv = await get_inventory(country1)
         options = []
         for name, count in inv.items():
-            if name not in ('name', 'Пехота', 'Морпехота', 'Десантник', 'Кавалерия'):
-                options.append(SelectOption(label=f'{name} - {count}шт.', value=name))
+            if name not in ('name', 'Пехота', 'Морпехота', 'Десантник', 'Кавалерия') and count:
+                options.append(SelectOption(label=f'{name} - {int(count)}шт.', value=name))
 
 
         # Создаем объект 
@@ -135,9 +133,9 @@ class ItemsCog(commands.Cog):
 		# Отправляем сообщение. Если была введена слеш команда, то отправляем только ему()
         view.add_item(select)
         if is_interaction:
-            interaction.followup.send('Выберите что хотите передать, но только тихо....', ephemeral= True, view= view)
+            await interaction.response.send_message('Выберите что хотите передать, но только тихо....', ephemeral= True, view= view)
         else:
-            ctx.send('Выберите что передать', view= view)
+            await ctx.send('Выберите что передать', view= view)
 
 
 

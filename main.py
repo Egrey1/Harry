@@ -19,7 +19,7 @@ async def on_ready():
     await load_extensions()
     await bot.tree.sync()
     print(f'Бот {bot.user} успешно запущен!')
-    print(f'ID бота: {bot.user.id}') # pyright: ignore[reportOptionalMemberAccess]
+    print(f'ID бота: {bot.user.id}') 
     print('------')
 
 
