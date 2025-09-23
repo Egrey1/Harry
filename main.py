@@ -11,6 +11,7 @@ async def load_extensions():
     await bot.load_extension('shop')
     await bot.load_extension('items_move')
     await bot.load_extension('items_update')
+    await bot.load_extension('channel_update')
 
 
 
