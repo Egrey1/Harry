@@ -91,8 +91,8 @@ class ShopCog(commands.Cog):
         connect.close()
         return tuple(result)
 
-    @commands.command()
-    async def shop(self, ctx: commands.Context):
+    @commands.hybrid_command()
+    async def shop(self, ctx: commands.Context) -> None:
         factories = await self.give_all_factories()
         embed_desc = ''
 
@@ -103,6 +103,9 @@ class ShopCog(commands.Cog):
         embed = Embed(title='Все предприятия на продажу: ', description=embed_desc)
 
 		# Выводим
+        if ctx.interaction:
+            await ctx.interaction.response.send_message(embed=embed)
+            return None
         await ctx.send(embed=embed)
 
     async def buy_callback(self, interaction: Interaction) -> None:

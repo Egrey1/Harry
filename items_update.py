@@ -37,7 +37,7 @@ class UpdaterCog(commands.Cog):
         return result
 
     @tasks.loop(hours=1)
-    # @tasks.loop(seconds=10)
+    # @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
         connect = con(DATABASE_PATH)
         cursor = connect.cursor()

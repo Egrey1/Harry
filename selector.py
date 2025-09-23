@@ -3,6 +3,7 @@ import discord.ui as ui
 from discord.ext import commands
 from config import DATABASE_ROLE_PICKER as DATABASE_PATH
 from config import give_country
+from config import RP_ROLES as roles_id
 from sqlite3 import connect as con
 from sqlite3 import Row
 
@@ -129,19 +130,21 @@ class SelectorCog(commands.Cog):
     
     @commands.hybrid_command(description='Снимает с вас регистрацию со страны')
     async def unreg(self, ctx: commands.Context) -> None:
-        roles_id = (1353608772458905671, 1361802354059378708, 1357681946276266044, 1357679628243959862, 1353894726847430766, 1358783484046348471, 1357679674410664076, 1353893297260593223, 1358763645538009119, 1344519261216964710)
         
         if ctx.interaction:
             await ctx.interaction.response.defer(ephemeral=True)
+        else:
+            await ctx.send('Ожидайте снятия ролей, это не займет много времени')
 
         user = ctx.author
-        for id in roles_id:
+        for id in roles_id.values():
             try:
                 role = ctx.guild.get_role(id) 
                 await user.remove_roles(role) 
             except:
-                pass
-        await user.add_roles(ctx.guild.get_role(1344519330091503628))  
+                continue
+        unreg = ctx.guild.get_role(1344519330091503628)
+        await user.add_roles(unreg)  
         try:
             await user.edit(nick='') 
         except:
