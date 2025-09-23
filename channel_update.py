@@ -49,7 +49,7 @@ class ChannelUpdaterCog(commands.Cog):
         await self.bot.wait_until_ready()
         print('Выполняется')
     @update_channel.before_loop(send_i_do)
-    async def pass_module(self): 
+    async def pass_module(self):
         pass
         
 
