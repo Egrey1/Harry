@@ -1,10 +1,6 @@
 from discord.ext import commands, tasks
-from discord import Guild
-from config import DATABASE_COUNTRIES as DATABASE_PATH
 from config import CHANNEL_FOR_UPDATE_ID as CHANNEL_ID
-from config import GUILD
-from sqlite3 import connect as con
-from sqlite3 import Row
+from config import GUILD, game_started
 
     
 
@@ -39,6 +35,9 @@ class ChannelUpdaterCog(commands.Cog):
     @tasks.loop(hours=1)
     # @tasks.loop(seconds=10) # for test
     async def update_channel(self):
+        if not game_started:
+            return
+        
         print('Бзиньк')
         guild = self.bot.get_guild(GUILD)
         channel = guild.get_channel(CHANNEL_ID)

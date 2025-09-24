@@ -5,7 +5,7 @@ from discord.ext import commands
 from sqlite3 import connect as con
 from sqlite3 import Row
 
-from config import CURRENCY, give_country, get_cost, get_money
+from config import CURRENCY, give_country, get_cost, get_money, game_started
 from config import DATABASE_COUNTRIES as DATABASE_PATH
 
 
@@ -124,6 +124,8 @@ class ShopCog(commands.Cog):
 
     @commands.hybrid_command()
     async def buy(self, ctx: commands.Context):
+        if not game_started:
+            return
         options = []
 
         # Добавляем в список все фабрики

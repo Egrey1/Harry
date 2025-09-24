@@ -5,7 +5,7 @@ from discord.ext import commands
 from sqlite3 import connect as con
 from sqlite3 import Row
 
-from config import CURRENCY, give_country, get_inventory
+from config import give_country, get_inventory, game_started
 from config import DATABASE_COUNTRIES as DATABASE_PATH
 
 
@@ -93,6 +93,9 @@ class ItemsCog(commands.Cog):
     @commands.hybrid_command (name= 'give', description='Передать вооружение стране')
     @app_commands.describe(member='Кому передать')
     async def give(self, ctx: commands.Context, member: Member):
+        if not game_started:
+            return
+        
         # Получаем названия их стран если они ими являются
         country1 = await give_country(ctx.author.mention)
         country2 = await give_country(member.mention)

@@ -1,7 +1,6 @@
-import discord.ui as ui
 from discord.ext import commands, tasks
 from config import DATABASE_COUNTRIES as DATABASE_PATH
-from config import give_country
+from config import game_started
 from sqlite3 import connect as con
 from sqlite3 import Row
 
@@ -39,6 +38,9 @@ class UpdaterCog(commands.Cog):
     @tasks.loop(hours=1)
     # @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
+        print('Инвентарь обновляется')
+        if not game_started:
+            return
         connect = con(DATABASE_PATH)
         cursor = connect.cursor()
 
@@ -65,7 +67,7 @@ class UpdaterCog(commands.Cog):
         await self.bot.wait_until_ready()
     @update_inventories.before_loop(send_i_do)
     async def pass_module(self):
-        print('Выполняется')
+        pass
         
 
     async def to_items(self, factories_have: tuple[dict[str, any]]) -> tuple[dict[str, any]]:
