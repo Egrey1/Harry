@@ -1,16 +1,14 @@
 from discord import Member
-from discord.ui import Modal, TextInput, View, Select
 from discord.ext import commands
 
 from sqlite3 import connect as con
-from sqlite3 import Row
 
-from config import CURRENCY, give_country, GUILD
+from config import GUILD, game_state
 from config import RP_ROLES as roles_id
 from config import DATABASE_COUNTRIES as DATABASE_COUNTRIES_PATH
 from config import DATABASE_ROLE_PICKER as DATABASE_ROLE_PICKER_PATH
 
-class ShopCog(commands.Cog):
+class GameCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.guild = bot.get_guild(GUILD)
@@ -45,6 +43,9 @@ class ShopCog(commands.Cog):
     @commands.hybrid_command(description='Начинает или заканчивает вайп')
     @commands.has_permissions(administrator=True)
     async def vipe(self, ctx: commands.Context):
+        if ctx.interaction:
+            await ctx.interaction.response.defer(ephemeral=True)
+
         connect = con(DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
@@ -57,12 +58,38 @@ class ShopCog(commands.Cog):
         connect.close()
 
         for member in result:
-            self.unreg_function(self.guild.get_member(int(member[2:-1])))
+            await self.unreg_function(self.guild.get_member(int(member[0][2:-1])))
+        
+        connect = con(DATABASE_COUNTRIES_PATH)
+        cursor = connect.cursor()
 
+        cursor.execute(f"DELETE FROM country_factories")
+        cursor.execute("""
+                       INSERT INTO country_factories
+                       SELECT *
+                       FROM country_factories_default
+                       """)
+        connect.commit()
+
+        cursor.execute("DELETE FROM countries_inventory")
+        cursor.execute("""
+                       INSERT INTO countries_inventory
+                       SELECT *
+                       FROM countries_inventory_default
+                       """)
+        connect.commit()
+        connect.close()
+
+        game_state['game_started'] = not game_state['game_started']
+
+        if ctx.interaction:
+            await ctx.interaction.followup.send('Новый вайп начался!' if game_state['game_started'] else 'Этот вайп закончился!', ephemeral=False)
+        else:
+            await ctx.send('Новый вайп начался!' if game_state['game_started'] else 'Этот вайп закончился!')
         
 
 
 
 
 async def setup(bot):
-    await bot.add_cog(ShopCog(bot))
+    await bot.add_cog(GameCog(bot))

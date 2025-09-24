@@ -1,6 +1,6 @@
 from discord.ext import commands, tasks
 from config import DATABASE_COUNTRIES as DATABASE_PATH
-from config import game_started
+from config import game_state
 from sqlite3 import connect as con
 from sqlite3 import Row
 
@@ -38,9 +38,10 @@ class UpdaterCog(commands.Cog):
     @tasks.loop(hours=1)
     # @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
-        print('Инвентарь обновляется')
-        if not game_started:
+        if not game_state['game_started']:
             return
+        
+        print('Инвентарь обновляется')
         connect = con(DATABASE_PATH)
         cursor = connect.cursor()
 

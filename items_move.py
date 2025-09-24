@@ -3,9 +3,8 @@ from discord.ui import Modal, TextInput, View, Select
 from discord.ext import commands
 
 from sqlite3 import connect as con
-from sqlite3 import Row
 
-from config import give_country, get_inventory, game_started
+from config import give_country, get_inventory, game_state
 from config import DATABASE_COUNTRIES as DATABASE_PATH
 
 
@@ -93,7 +92,7 @@ class ItemsCog(commands.Cog):
     @commands.hybrid_command (name= 'give', description='Передать вооружение стране')
     @app_commands.describe(member='Кому передать')
     async def give(self, ctx: commands.Context, member: Member):
-        if not game_started:
+        if not game_state['game_started']:
             return
         
         # Получаем названия их стран если они ими являются

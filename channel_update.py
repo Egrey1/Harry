@@ -1,6 +1,6 @@
 from discord.ext import commands, tasks
 from config import CHANNEL_FOR_UPDATE_ID as CHANNEL_ID
-from config import GUILD, game_started
+from config import GUILD, game_state
 
     
 
@@ -35,7 +35,7 @@ class ChannelUpdaterCog(commands.Cog):
     @tasks.loop(hours=1)
     # @tasks.loop(seconds=10) # for test
     async def update_channel(self):
-        if not game_started:
+        if not game_state['game_started']:
             return
         
         print('Бзиньк')

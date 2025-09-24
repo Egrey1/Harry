@@ -2,7 +2,7 @@ import discord
 import discord.ui as ui
 from discord.ext import commands
 from config import DATABASE_ROLE_PICKER as DATABASE_PATH
-from config import give_country, game_started
+from config import give_country, game_state
 from config import RP_ROLES as roles_id
 from sqlite3 import connect as con
 from sqlite3 import Row
@@ -111,8 +111,8 @@ class SelectorCog(commands.Cog):
         if not ctx.interaction:
             return
 
-        if not game_started:
-            ctx.interaction.response.send_message('Дождитесь начала вайпа!', ephemeral= True)
+        if not game_state['game_started']:
+            await ctx.interaction.response.send_message('Дождитесь начала вайпа!', ephemeral= True)
 
         countries = await self.give_all_countries()  
         options = []
