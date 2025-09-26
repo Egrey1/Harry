@@ -12,6 +12,8 @@
     5. !shop
     
     6. !give
+
+    7. !vipe
     
   And updaters 
   
