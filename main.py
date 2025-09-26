@@ -12,6 +12,7 @@ async def load_extensions():
     await bot.load_extension('items_update')
     await bot.load_extension('channel_update')
     await bot.load_extension('game')
+    await bot.load_extension('admin_commands')
 
 
 
