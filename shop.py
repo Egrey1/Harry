@@ -132,7 +132,6 @@ class ShopCog(commands.Cog):
         for factory in await self.give_all_factories():
             options.append(SelectOption(label=factory[0] + ' - ' + CURRENCY + str(factory[1]), value=factory[0]))
         
-        # Создаем объект View 
         view = View()
         select = Select(placeholder='Выберите предмет для покупки', options=options)
         select.callback = self.buy_callback
