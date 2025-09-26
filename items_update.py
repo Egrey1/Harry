@@ -128,7 +128,10 @@ class UpdaterCog(commands.Cog):
         for i in a:
             result.append(dict(i))
         return tuple(result)
-        
+    
+    @commands.command(name='collect')
+    async def no_collect(self, ctx: commands.Context):
+        ctx.reply('У нас нет этой команды! Деньги и армия обновляется автоматически!')
 
 
         
