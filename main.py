@@ -13,6 +13,7 @@ async def load_extensions():
     await bot.load_extension('channel_update')
     await bot.load_extension('game')
     await bot.load_extension('admin_commands')
+    await bot.load_extension('os_commands')
 
 
 
