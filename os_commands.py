@@ -1,7 +1,7 @@
 from discord.ext.commands import Bot, Cog, hybrid_command, has_permissions, Context
 from os import name
 from sys import executable, argv
-from subprocess import Popen, CREATE_NEW_CONSOLE
+from subprocess import Popen
 
 class OsCommands(Cog):
     def __init__(self, bot : Bot):
@@ -16,10 +16,11 @@ class OsCommands(Cog):
             await ctx.send("Перезапуск бота...")
         
         # Запускаем новый процесс перед закрытием текущего
-        if name == 'nt':  # Windows
+        try:  # Windows
+            from subprocess import CREATE_NEW_CONSOLE
             Popen([executable] + argv, 
                             creationflags= CREATE_NEW_CONSOLE)
-        else:  # Linux/Mac
+        except:  # Linux/Mac
             Popen([executable] + argv, start_new_session=True)
         
         # Корректно закрываем бота
