@@ -115,10 +115,23 @@ class SelectorCog(commands.Cog):
         if not game_state['game_started']:
             await ctx.interaction.response.send_message('Дождитесь начала вайпа!', ephemeral= True)
             return None
-        PAGE_SIZE = 25
         countries = await self.give_all_countries()  
 
-        options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
+        PAGE_SIZE = 25
+        try:
+            options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
+            
+            if not options:
+                if ctx.interaction:
+                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                else:
+                    await ctx.send('Неправильно введена страница', view= view)
+                return None
+        except:
+            if ctx.interaction:
+                await ctx.interaction.response.send_message('Неправильно введена страница')
+            else:
+                await ctx.send('Неправильно введена страница', view= view)
         
         view = ui.View()
         select = ui.Select(placeholder='Выберите страну', options=options)
