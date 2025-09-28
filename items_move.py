@@ -141,14 +141,6 @@ class ItemsCog(commands.Cog):
 
 
 
-    
-
-    
-
-    
-
-
-
 
 async def setup(bot):
     await bot.add_cog(ItemsCog(bot))

@@ -1,4 +1,4 @@
-import discord
+from discord import SelectOption, Member, app_commands, Interaction
 import discord.ui as ui
 from discord.ext import commands
 from config import DATABASE_ROLE_PICKER as DATABASE_PATH
@@ -53,7 +53,7 @@ class SelectorCog(commands.Cog):
 
     
     # Основная логика  файла
-    async def picker_callback(self, interaction: discord.Interaction) -> None:
+    async def picker_callback(self, interaction: Interaction) -> None:
         country_name = ''.join(interaction.data['values']) 
         picker = await self.give_roles(country_name)
         await interaction.response.defer(ephemeral=True)
@@ -106,18 +106,19 @@ class SelectorCog(commands.Cog):
 
 
     @commands.hybrid_command(name='reg', description='Зарегистрироваться за страну')
-    async def send_role_picker(self, ctx: commands.Context) -> None:
+    @app_commands.describe(page='На какую страницу переключить селектор')
+    async def send_role_picker(self, ctx: commands.Context, page: int = 1) -> None:
         # Создаем сообщение со списком
         if not ctx.interaction:
             return
 
         if not game_state['game_started']:
             await ctx.interaction.response.send_message('Дождитесь начала вайпа!', ephemeral= True)
-
+            return None
+        PAGE_SIZE = 25
         countries = await self.give_all_countries()  
-        options = []
-        for country in countries:
-            options.append(discord.SelectOption(label=country, value=country))
+
+        options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
         
         view = ui.View()
         select = ui.Select(placeholder='Выберите страну', options=options)
@@ -177,7 +178,7 @@ class SelectorCog(commands.Cog):
         await ctx.send('Вы больше не страна')
     
     @commands.Cog.listener()
-    async def on_member_remove(self, user: discord.Member):
+    async def on_member_remove(self, user: Member):
         connect = con(DATABASE_PATH)
         cursor = connect.cursor()
 

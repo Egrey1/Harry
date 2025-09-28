@@ -9,7 +9,7 @@ from sqlite3 import Row
     
 
 class UpdaterCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.update_inventories.start()
     

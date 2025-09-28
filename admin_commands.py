@@ -124,12 +124,25 @@ class AdminCog(commands.Cog):
     
     @commands.hybrid_command (name= 'add', description='Дать стране новые заводы')
     @commands.has_permissions(administrator= True)
-    async def add(self, ctx: commands.Context):
+    @app_commands.describe(page='Выберите страницу')
+    async def add(self, ctx: commands.Context, page: int = 1):
         countries = await self.give_all_countries()
         
-        options = []
-        for country in countries:
-            options.append(SelectOption(label= country, value= country))
+        PAGE_SIZE = 25
+        try:
+            options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
+            
+            if not options:
+                if ctx.interaction:
+                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                else:
+                    await ctx.send('Неправильно введена страница', view= view)
+                return None
+        except:
+            if ctx.interaction:
+                await ctx.interaction.response.send_message('Неправильно введена страница')
+            else:
+                await ctx.send('Неправильно введена страница', view= view)
         
         view = View()
         select = Select(placeholder= 'Какой стране дать?', options= options)
@@ -171,13 +184,26 @@ class AdminCog(commands.Cog):
 
     @commands.hybrid_command(name='surrend', description='Объявить о капитуляции для страны')
     @commands.has_permissions(administrator= True)
-    async def surrend(self, ctx: commands.Context):
+    @app_commands.describe(page='Выберите страницу')
+    async def surrend(self, ctx: commands.Context, page: int = 1):
         countries = await self.give_all_non_surrend_countries()
         
-        options = []
-        for country in countries:
-            options.append(SelectOption(label= country, value= country))
-        
+        PAGE_SIZE = 25
+        try:
+            options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
+            
+            if not options:
+                if ctx.interaction:
+                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                else:
+                    await ctx.send('Неправильно введена страница', view= view)
+                return None
+        except:
+            if ctx.interaction:
+                await ctx.interaction.response.send_message('Неправильно введена страница')
+            else:
+                await ctx.send('Неправильно введена страница', view= view)
+
         view = View()
         select = Select(placeholder= 'Кто этот лох?', options= options)
         select.callback = self.surrend_callback
@@ -190,13 +216,25 @@ class AdminCog(commands.Cog):
     
     @commands.hybrid_command(name='surrend', description='Объявить о капитуляции для страны')
     @commands.has_permissions(administrator= True)
-    async def surrend(self, ctx: commands.Context):
+    @app_commands.describe(page='Выберите страницу')
+    async def surrend(self, ctx: commands.Context, page: int = 1):
         countries = await self.give_all_surrend_countries()
         
-        options = []
-        for country in countries:
-            options.append(SelectOption(label= country, value= country))
-        
+        PAGE_SIZE = 25
+        try:
+            options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
+            
+            if not options:
+                if ctx.interaction:
+                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                else:
+                    await ctx.send('Неправильно введена страница', view= view)
+                return None
+        except:
+            if ctx.interaction:
+                await ctx.interaction.response.send_message('Неправильно введена страница')
+            else:
+                await ctx.send('Неправильно введена страница', view= view)        
         view = View()
         select = Select(placeholder= 'Опять кто-то из пепла восстает?', options= options)
         select.callback = self.no_surrend_callback

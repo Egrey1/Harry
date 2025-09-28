@@ -122,7 +122,7 @@ class ShopCog(commands.Cog):
         await interaction.response.send_modal(modal)
 
 
-    @commands.hybrid_command()
+    @commands.hybrid_command(name='buy', description='Купить фабрику')
     async def buy(self, ctx: commands.Context):
         if not game_state['game_started']:
             return
