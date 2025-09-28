@@ -35,8 +35,8 @@ class UpdaterCog(commands.Cog):
             result.append(dict(i)) 
         return result
 
-    @tasks.loop(hours=1)
-    # @tasks.loop(seconds=10) # for test
+    # @tasks.loop(hours=1)
+    @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
         if not game_state['game_started']:
             return
@@ -46,7 +46,7 @@ class UpdaterCog(commands.Cog):
         cursor = connect.cursor()
 
 
-        inv_update = await self.give_items()
+        inv_update = await self.give_items() #
 
 
         for country in inv_update:
@@ -78,18 +78,27 @@ class UpdaterCog(commands.Cog):
 
 
         cursor.execute(f"""
-                       SELECT produces_key, count
+                       SELECT name, produces_key, count
                        FROM factories
                        """)
+        # 
         a = cursor.fetchall()
         connect.close()
         result = []
 
+        # Что производит и количество
+        tmp = []
+        for i in a:
+            tmp.append(dict(i)) 
+        a = tuple(tmp)
+
         for j in factories_have:
             b = {}
             b['name'] = j['name']
-            for i in a:
-                b[i[0]] = i[1]
+            for factory in a:
+                if factory['produces_key'] != 'Деньги':
+                    b[factory['produces_key']] = factory['count'] * j[factory['name']]
+            b['Деньги'] = a[-1]['count'] * j[a[-1]['name']] + a[-2]['count'] * j[a[-2]['name']]
             result.append(b)
             
         return tuple(result)
