@@ -164,7 +164,9 @@ class AdminCog(commands.Cog):
                        SET surrender = ' '
                        WHERE name = '{country}'
                        """)
+        
         connect.commit()
+        connect.close()
 
         interaction.response.send_message('Страна подписана как сдавшиеся!')
     
@@ -179,8 +181,9 @@ class AdminCog(commands.Cog):
                        WHERE name = '{country}'
                        """)
         connect.commit()
+        connect.close()
 
-        interaction.response.send_message('Страна подписана как сдавшиеся!')
+        interaction.response.send_message('Страна подписана как не сдавшиеся!')
 
     @commands.hybrid_command(name='surrend', description='Объявить о капитуляции для страны')
     @commands.has_permissions(administrator= True)
@@ -214,10 +217,10 @@ class AdminCog(commands.Cog):
         else:
             await ctx.send('Введите какая страна сдалась', view= view)
     
-    @commands.hybrid_command(name='surrend', description='Объявить о капитуляции для страны')
+    @commands.hybrid_command(name='nosurrend', description='Объявить о декапитуляции для страны')
     @commands.has_permissions(administrator= True)
     @app_commands.describe(page='Выберите страницу')
-    async def surrend(self, ctx: commands.Context, page: int = 1):
+    async def nosurrend(self, ctx: commands.Context, page: int = 1):
         countries = await self.give_all_surrend_countries()
         
         PAGE_SIZE = 25
