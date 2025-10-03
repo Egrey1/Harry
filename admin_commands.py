@@ -7,6 +7,41 @@ from sqlite3 import Row
 
 from config import DATABASE_COUNTRIES as DATABASE_PATH
 from config import DATABASE_ROLE_PICKER as ROLE_PICKER_PATH
+from config import RP_ROLES as roles_id
+from config import give_country
+
+async def unreg_function(country: str, interaction: Interaction) -> None:
+
+        if not country:
+            return None
+        user = interaction.user
+        for id in roles_id.values():
+            try:
+                role = interaction.guild.get_role(id) 
+                await user.remove_roles(role) 
+            except:
+                continue
+        # unreg = interaction.guild.get_role(1344519330091503628)
+        # await user.add_roles(unreg)  
+        try:
+            await user.edit(nick='') 
+        except:
+            pass
+        
+
+        
+        connect = con(DATABASE_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute(f"""
+                        UPDATE roles
+                        SET is_busy = null
+                        WHERE is_busy = '{user.mention}'
+                        """)
+        connect.commit()
+        connect.close()
+    
+
 
 
 
@@ -104,7 +139,7 @@ class AdminCog(commands.Cog):
         cursor.execute(f"""
                         SELECT name
                         FROM roles
-                        WHERE surrender IS NOT NULL
+                        WHERE surrender IS NULL
                         """)
         result = tuple([row[0] for row in cursor.fetchall()])  
         connect.close()
@@ -116,7 +151,7 @@ class AdminCog(commands.Cog):
         cursor.execute(f"""
                         SELECT name
                         FROM roles
-                        WHERE surrender IS NULL
+                        WHERE surrender IS NOT NULL
                         """)
         result = tuple([row[0] for row in cursor.fetchall()])  
         connect.close()
@@ -155,6 +190,8 @@ class AdminCog(commands.Cog):
             await ctx.send('Пока что выдать можно только фабрики', view= view)
     
     async def surrend_callback(self, interaction: Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         country = ''.join(interaction.data['values'])
         connect = con(ROLE_PICKER_PATH)
         cursor = connect.cursor()
@@ -165,12 +202,16 @@ class AdminCog(commands.Cog):
                        WHERE name = '{country}'
                        """)
         
+        await unreg_function(await give_country(interaction.user.mention), interaction)
+        
         connect.commit()
         connect.close()
 
-        interaction.response.send_message('Страна подписана как сдавшиеся!')
+        await interaction.followup.send('Страна подписана как сдавшиеся!', ephemeral=True)
     
     async def no_surrend_callback(self, interaction: Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         country = ''.join(interaction.data['values'])
         connect = con(ROLE_PICKER_PATH)
         cursor = connect.cursor()
@@ -183,7 +224,7 @@ class AdminCog(commands.Cog):
         connect.commit()
         connect.close()
 
-        interaction.response.send_message('Страна подписана как не сдавшиеся!')
+        await interaction.followup.send('Страна подписана как не сдавшиеся!', ephemeral=True)
 
     @commands.hybrid_command(name='surrend', description='Объявить о капитуляции для страны')
     @commands.has_permissions(administrator= True)
@@ -197,15 +238,15 @@ class AdminCog(commands.Cog):
             
             if not options:
                 if ctx.interaction:
-                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                    await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
                 else:
-                    await ctx.send('Неправильно введена страница', view= view)
+                    await ctx.send('Неправильно введена страница или список пуст')
                 return None
         except:
             if ctx.interaction:
-                await ctx.interaction.response.send_message('Неправильно введена страница')
+                await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
             else:
-                await ctx.send('Неправильно введена страница', view= view)
+                await ctx.send('Неправильно введена страница или список пуст')
 
         view = View()
         select = Select(placeholder= 'Кто этот лох?', options= options)
@@ -217,7 +258,7 @@ class AdminCog(commands.Cog):
         else:
             await ctx.send('Введите какая страна сдалась', view= view)
     
-    @commands.hybrid_command(name='nosurrend', description='Объявить о декапитуляции для страны')
+    @commands.hybrid_command(name='nosurrend', description='Снять метку капитуляции')
     @commands.has_permissions(administrator= True)
     @app_commands.describe(page='Выберите страницу')
     async def nosurrend(self, ctx: commands.Context, page: int = 1):
@@ -229,15 +270,15 @@ class AdminCog(commands.Cog):
             
             if not options:
                 if ctx.interaction:
-                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                    await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
                 else:
-                    await ctx.send('Неправильно введена страница', view= view)
+                    await ctx.send('Неправильно введена страница или список пуст')
                 return None
         except:
             if ctx.interaction:
-                await ctx.interaction.response.send_message('Неправильно введена страница')
+                await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
             else:
-                await ctx.send('Неправильно введена страница', view= view)        
+                await ctx.send('Неправильно введена страница или список пуст')        
         view = View()
         select = Select(placeholder= 'Опять кто-то из пепла восстает?', options= options)
         select.callback = self.no_surrend_callback

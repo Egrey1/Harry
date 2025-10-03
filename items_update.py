@@ -35,8 +35,8 @@ class UpdaterCog(commands.Cog):
             result.append(dict(i)) 
         return result
 
-    # @tasks.loop(hours=1)
-    @tasks.loop(seconds=10) # for test
+    @tasks.loop(hours=1)
+    # @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
         if not game_state['game_started']:
             return

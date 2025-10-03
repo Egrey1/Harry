@@ -105,7 +105,7 @@ class ItemsCog(commands.Cog):
         if is_interaction:
             interaction = ctx.interaction
 
-		# Проверяем,являются ли пользователи стрснами 
+		# Проверяем,являются ли пользователи странами 
         if not country1:
             if is_interaction:
                 await interaction.followup.send('Вы не страна!', ephemeral= True) 
@@ -138,6 +138,7 @@ class ItemsCog(commands.Cog):
             await interaction.response.send_message('Выберите что хотите передать, но только тихо....', ephemeral= True, view= view)
         else:
             await ctx.send('Выберите что передать', view= view)
+    
 
 
 

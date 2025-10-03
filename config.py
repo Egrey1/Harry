@@ -75,4 +75,4 @@ game_state = {'game_started': True}
 
 TOKEN = open('TOKEN.txt').readline()
 intents = Intents.all()
-PREFIX = 'detri!'
+PREFIX = '!'
