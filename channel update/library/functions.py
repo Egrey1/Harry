@@ -1,6 +1,6 @@
 from .modules import match
 
-async def increment_iteration(self, text: str) -> str:
+async def increment_iteration(text: str) -> str:
     pattern = r'(.*?)(\d+)/(\d+)\s+(\d+)(.*)'
     match = match(pattern, text)
     
