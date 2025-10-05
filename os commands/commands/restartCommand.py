@@ -1,11 +1,7 @@
-from discord.ext.commands import Bot, Cog, hybrid_command, has_permissions, Context
-from os import name
-from sys import executable, argv
-from subprocess import Popen
+from ..library.modules import (hybrid_command, has_permissions, Context,
+                               Popen, executable, argv)
 
-class OsCommands(Cog):
-    def __init__(self, bot : Bot):
-        self.bot = bot
+class RestartCommand:
     
     @hybrid_command(name='restart', description='Перезагрузка бота. Обновляет его код')
     @has_permissions(administrator= True)
@@ -25,8 +21,3 @@ class OsCommands(Cog):
         
         # Корректно закрываем бота
         await self.bot.close()
-
-
-
-async def setup(bot: Bot):
-    await bot.add_cog(OsCommands(bot))
