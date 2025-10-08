@@ -14,6 +14,7 @@ async def load_extensions():
     await bot.load_extension('game')
     await bot.load_extension('admin commands')
     await bot.load_extension('os commands')
+    await bot.load_extension('rofl commands')
 
 
 

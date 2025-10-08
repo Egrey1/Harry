@@ -12,3 +12,4 @@ async def give_all_factories() -> tuple:
     result = cursor.fetchall()
     connect.close()
     return tuple(result)
+

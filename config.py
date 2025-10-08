@@ -62,7 +62,22 @@ async def get_inventory(country: str) -> dict:
 
     return dict(res) if res else {}
 
+# Возвращает всю информацию по ролям для страны
+async def get_country_info(country: str) -> dict:
+    from sqlite3 import Row
 
+    connect = con(DATABASE_ROLE_PICKER)
+    connect.row_factory = Row
+    cursor = connect.cursor()
+    cursor.execute(f"""
+                    SELECT *
+                    FROM roles
+                    WHERE name = '{country}'
+                   """)
+    res = cursor.fetchone()
+    connect.close()
+
+    return dict(res) if res else {}
 
 DATABASE_ROLE_PICKER = 'databases/role-picker.db'
 DATABASE_COUNTRIES = 'databases/countries.db'

@@ -3,7 +3,7 @@ from sqlite3 import Row
 
 
 from config import DATABASE_COUNTRIES as DATABASE_PATH
-from config import CURRENCY, give_country, get_money, get_cost, game_state
+from config import CURRENCY, give_country, get_money, get_cost, get_country_info, game_state
 
 
 from discord import Embed, Interaction, SelectOption
