@@ -71,7 +71,7 @@ async def set_upd(coutry_items: tuple[dict[str, any]]) -> None:
     cursor = connect.cursor()
 
     for items in coutry_items:
-        if not have_sea(items['name']):
+        if not await have_sea(items['name']):
             ships = ['Подлодка', 'Эсминец', 'Крейсер', 'Линкор']
             for ship in ships:
                 items[ship] = 0
