@@ -1,6 +1,6 @@
-from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select
+from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Button
 from ..library.functions import give_all_countries
-from ..library.callbacks.addCallback import factory_ask
+from ..library.callbacks.addCallback import factory_ask, army_ask
 
 class AddCommand:
     @hybrid_command (name= 'add', description='Дать стране новые заводы')
@@ -26,9 +26,23 @@ class AddCommand:
                 await ctx.send('Неправильно введена страница', view= view)
         
         view = View()
+        #-----------------IF YOU ENDED COMMENT OR DELETE THIS-----------------------------------------------
         select = Select(placeholder= 'Какой стране дать?', options= options)
         select.callback = factory_ask
         view.add_item(select)
+        #---------------------------------------------------------------------------------------------------
+
+
+
+        #---------------------------AND UNCOMMENT THIS------------------------------------------------------
+        # army = Button(label='Армия', emoji='🪖')
+        # army.callback = army_ask
+        # enterprise = Button(label='Предприятия', emoji='🏭')
+        # enterprise.callback = factory_ask
+
+        # view.add_item(army, enterprise)
+        #---------------------------------------------------------------------------------------------------
+        
         
         if ctx.interaction:
             await ctx.interaction.response.send_message('Пока что выдать можно только фабрики', view= view, ephemeral=True)

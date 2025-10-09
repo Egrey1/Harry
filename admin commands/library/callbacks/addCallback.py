@@ -1,31 +1,45 @@
-from ..modules import Interaction, SelectOption, View, Select
+from ..modules import Interaction, SelectOption, View, Select, give_country
 from ..functions import give_all_factories
 from ..modals.addModal import Quantity
 
+async def army_ask(interaction: Interaction):
+    # Your code here
+    
+    pass
+
+async def army_add(interaction: Interaction):
+    item = interaction.data['values'][0] # soldier
+    country = await give_country(interaction.user.mention) # Germany
+    itemType = 'army'
+
+    modal = Quantity(item, country, itemType)
+    await interaction.response.send_modal(modal)
+
 async def factory_ask(interaction: Interaction):
-    await interaction.response.defer(ephemeral=True) #added "await" here
+    # don't use it. My mistake
+    # await interaction.response.defer(ephemeral=True) #added "await" here
     country = ''.join(interaction.data['values'])
-    print(country)
     
     factories = await give_all_factories()
     options = []
     
     for factory in factories:
         options.append(SelectOption(label= factory['name'], value= factory['name']))
-        print(factory['name'])
     
     view = View()
     select = Select(placeholder= 'Выберите фабрику', options= options)
-    select.callback = lambda interaction: select_callback(interaction, country)
+    select.callback = factory_add
     view.add_item(select)
     
-    await interaction.response.send_message(f'Страна `{country}`', view= view, ephemeral='True')
-    #await interaction.response.defer(ephemeral=True)
+    # only this
+    await interaction.response.send_message(f'Страна `{country}`', view= view, ephemeral=True)
 
-async def select_callback(interaction: Interaction, country):
+async def factory_add(interaction: Interaction):
     # Получаем название страны 
     item = ''.join(interaction.data['values'])
+    country = await give_country(interaction.user.mention)
+    itemType = 'factory'
 
     # Создаем модальное окно
-    modal = Quantity(item, country)
+    modal = Quantity(item, country, itemType)
     await interaction.response.send_modal(modal)
