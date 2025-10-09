@@ -3,7 +3,7 @@ from ..functions import give_all_factories
 from ..modals.addModal import Quantity
 
 async def factory_ask(interaction: Interaction):
-    interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=True) #added "await" here
     country = ''.join(interaction.data['values'])
     print(country)
     
@@ -20,6 +20,7 @@ async def factory_ask(interaction: Interaction):
     view.add_item(select)
     
     await interaction.response.send_message(f'Страна `{country}`', view= view, ephemeral='True')
+    #await interaction.response.defer(ephemeral=True)
 
 async def select_callback(interaction: Interaction, country):
     # Получаем название страны 
