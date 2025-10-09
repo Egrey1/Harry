@@ -1,10 +1,10 @@
-from .modules import hybrid_command, has_permissions, SelectOption, View, Select, Context, describe
-from .functions import give_all_countries
-from .callbacks.getInventory import getinventory
+from ..library.modules import hybrid_command, has_permissions, SelectOption, View, Select, Context, describe
+from ..library.functions import give_all_countries
+from ..library.callbacks.getInventory import getinventory
 
 class GetInventoryCommand:
 
-    @hybrid_command(name="getinventory", description="Команда для получения инвентаря страны")
+    @hybrid_command(name="getinv", description="Команда для получения инвентаря страны")
     @has_permissions(administrator=True)
     @describe(page='Выберите страницу')
     async def getinventory(self, ctx: Context, page: int = 1):
@@ -27,6 +27,7 @@ class GetInventoryCommand:
                 await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
             else:
                 await ctx.send('Неправильно введена страница или список пуст')
+
 
         view = View()
         select = Select(placeholder='Выберите страну, чтобы получить её инвентарь', options=options)

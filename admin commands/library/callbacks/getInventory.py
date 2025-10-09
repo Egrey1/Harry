@@ -1,14 +1,15 @@
-from ..modules import Interaction, get_inventory, CURRENCY
+from ..modules import Interaction, get_inventory, CURRENCY, Embed
 
 async def getinventory(interaction: Interaction):
     country = interaction.data['values'][0]
 
     inventory = await get_inventory(country)
-    mes = f"Баланс {CURRENCY}{inventory['Деньги']}\n\n"
+    embed_desc = ''
 
     for name, count in inventory.items():
         if name not in ['name', 'Деньги'] and int(count) > 0:
-            mes += f"{name}: {count}\n"
+            embed_desc += f"{name} - {int(count)}\n\n"
     
-    await interaction.response.send_message(mes, ephemeral=True)
+    embed = Embed(title=f'Баланс страны {country}: {CURRENCY}{inventory['Деньги']}', description=embed_desc)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
