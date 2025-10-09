@@ -4,6 +4,9 @@ from ..modals.addModal import Quantity
 
 async def army_ask(interaction: Interaction):
     # Your code here
+    # I don't exactly get how this is supposed to work
+    #country = ''.join(interaction.data['values'])
+    #army = await give_country(interaction.user.mention)
     
     pass
 

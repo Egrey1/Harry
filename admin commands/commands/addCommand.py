@@ -35,12 +35,12 @@ class AddCommand:
 
 
         #---------------------------AND UNCOMMENT THIS------------------------------------------------------
-        # army = Button(label='Армия', emoji='🪖')
-        # army.callback = army_ask
-        # enterprise = Button(label='Предприятия', emoji='🏭')
-        # enterprise.callback = factory_ask
+        #army = Button(label='Армия', emoji='🪖')
+        #army.callback = army_ask
+        #enterprise = Button(label='Предприятия', emoji='🏭')
+        #enterprise.callback = factory_ask
 
-        # view.add_item(army, enterprise)
+        #view.add_item(army, enterprise)
         #---------------------------------------------------------------------------------------------------
         
         
