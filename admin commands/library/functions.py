@@ -52,6 +52,25 @@ async def give_all_factories() -> tuple:
     
     return tuple(result)
 
+# It should work, I didn't check it.
+async def give_all_proops() -> tuple:
+    connect = con(DATABASE_PATH)
+    connect.row_factory = Row
+    cursor = connect.cursor()
+    cursor.execute("""
+                SELECT *
+                FROM countries_inventory
+                """)
+    a = cursor.fetchone()
+    connect.close()
+    result = []
+
+    a = dict(a)
+    result = (j for j in a.keys() if j != 'name')
+    
+    return result
+
+
 async def unreg_function(country: str, interaction: Interaction) -> None:
 
         if not country:

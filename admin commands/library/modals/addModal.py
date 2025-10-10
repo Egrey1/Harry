@@ -18,7 +18,7 @@ class Quantity(Modal):
         
         cursor.execute(f"""
                         UPDATE {'country_factories' if self.itemType == 'factory' else 'countries_inventory'}
-                        SET '{self.item}' = {quantity} + '{self.item}'
+                        SET {self.item} = {quantity} + {self.item}
                         WHERE name = '{self.country}'
                         """)
         connect.commit()

@@ -1,28 +1,41 @@
-from ..modules import Interaction, SelectOption, View, Select, give_country
-from ..functions import give_all_factories
+from ..modules import Interaction, SelectOption, View, Select, give_country, Button
+from ..functions import give_all_factories, give_all_proops
 from ..modals.addModal import Quantity
 
-async def army_ask(interaction: Interaction):
+async def country_selected(interaction: Interaction):
+    country = interaction.data['values'][0]
+    view = View()
+    army = Button(label='Армия', emoji='🪖')
+    army.callback = lambda inter: army_ask(inter, country)
+    enterprise = Button(label='Предприятия', emoji='🏭')
+    enterprise.callback = lambda inter: factory_ask(inter, country)
+
+    view.add_item(army)
+    view.add_item(enterprise)
+
+    await interaction.response.send_message('Что именно выдать?', view=view, ephemeral= True)
+
+async def army_ask(interaction: Interaction, country: str):
     # Your code here
     # I don't exactly get how this is supposed to work
     #country = ''.join(interaction.data['values'])
     #army = await give_country(interaction.user.mention)
     
-    pass
+    view = View()
+    select = Select(placeholder= 'Выберите Объект', options=[SelectOption(label= i, value= i) for i in (await give_all_proops()) ]) # Select an object
+    select.callback = lambda inter: army_add(inter, country)
+    view.add_item(select)
 
-async def army_add(interaction: Interaction):
+    await interaction.response.send_message(f'Страна {country}', view= view, ephemeral= True)
+
+async def army_add(interaction: Interaction, country: str):
     item = interaction.data['values'][0] # soldier
-    country = await give_country(interaction.user.mention) # Germany
     itemType = 'army'
 
     modal = Quantity(item, country, itemType)
     await interaction.response.send_modal(modal)
 
-async def factory_ask(interaction: Interaction):
-    # don't use it. My mistake
-    # await interaction.response.defer(ephemeral=True) #added "await" here
-    country = ''.join(interaction.data['values'])
-    
+async def factory_ask(interaction: Interaction, country: str):    
     factories = await give_all_factories()
     options = []
     
@@ -34,7 +47,6 @@ async def factory_ask(interaction: Interaction):
     select.callback = factory_add
     view.add_item(select)
     
-    # only this
     await interaction.response.send_message(f'Страна `{country}`', view= view, ephemeral=True)
 
 async def factory_add(interaction: Interaction):

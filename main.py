@@ -7,12 +7,12 @@ bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 async def load_extensions():
     await bot.load_extension('selector')
     await bot.load_extension('inv')
+    await bot.load_extension('admin commands')
     await bot.load_extension('shop')
     await bot.load_extension('items move')
     await bot.load_extension('items update')
     await bot.load_extension('channel update')
     await bot.load_extension('game')
-    await bot.load_extension('admin commands')
     await bot.load_extension('os commands')
     await bot.load_extension('rofl commands')
 
