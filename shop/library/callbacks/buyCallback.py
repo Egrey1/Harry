@@ -8,14 +8,14 @@ class BuyCallback:
         country = await give_country(interaction.user.mention)
 
         if not country:
-            await interaction.response.edit_message(content= 'Вы не зарегистрированы!', view= None)
+            await interaction.response.edit_message(content= 'Вы не зарегистрированы!', embed= None)
             return None
         
         ships = ['Верфь для подлодок', 'Верфь для эсминцев', 'Верфь для крейсеров', 'Верфь для линкоров']
         country_info = await get_country_info(country)
 
         if (item in ships) and not country_info['sea']:
-            await interaction.response.edit_message(content= 'А может ты в начале выход к морю получишь?', view= None)
+            await interaction.response.edit_message(content= 'А может ты в начале выход к морю получишь?', embed= None)
             return None
 
         

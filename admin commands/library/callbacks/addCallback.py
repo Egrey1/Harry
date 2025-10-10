@@ -16,10 +16,6 @@ async def country_selected(interaction: Interaction):
     await interaction.response.send_message('Что именно выдать?', view=view, ephemeral= True)
 
 async def army_ask(interaction: Interaction, country: str):
-    # Your code here
-    # I don't exactly get how this is supposed to work
-    #country = ''.join(interaction.data['values'])
-    #army = await give_country(interaction.user.mention)
     
     view = View()
     select = Select(placeholder= 'Выберите Объект', options=[SelectOption(label= i, value= i) for i in (await give_all_proops()) ]) # Select an object
