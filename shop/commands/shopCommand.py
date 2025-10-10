@@ -34,15 +34,17 @@ class ShopCommand:
     async def buy(self, ctx: commands.Context):
         if not game_state['game_started']:
             return
-        options = []
+        view = View()
 
         # Добавляем в список все фабрики
+        # Creating a menu with all available factories
+        options = []
         for factory in await give_all_factories():
             options.append(SelectOption(label=factory[0] + ' - ' + CURRENCY + str(factory[1]), value=factory[0]))
-        
-        view = View()
         select = Select(placeholder='Выберите предмет для покупки', options=options)
         select.callback = self.buy_callback
+
+
         view.add_item(select)
 
         if ctx.interaction:
