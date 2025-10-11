@@ -1,5 +1,5 @@
 from .modules import con, ROLE_PICKER_PATH, DATABASE_PATH, Row, Interaction, roles_id
-
+ROLE_PICKER = ROLE_PICKER_PATH
 async def give_all_countries() -> tuple:
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
@@ -82,15 +82,17 @@ async def unreg_function(country: str, interaction: Interaction) -> None:
                 await user.remove_roles(role) 
             except:
                 continue
+
         # unreg = interaction.guild.get_role(1344519330091503628)
         # await user.add_roles(unreg)  
+
         try:
             await user.edit(nick='') 
         except:
             pass
         
 
-        connect = con(DATABASE_PATH)
+        connect = con(ROLE_PICKER)
         cursor = connect.cursor()
 
         cursor.execute(f"""
