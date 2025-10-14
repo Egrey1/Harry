@@ -1,10 +1,6 @@
 from .library.modules import Cog, Bot
 
-from .commands.addCommand import AddCommand
-from .commands.noSurrendCommand import NoSurrendCommand
-from .commands.surrendCommand import SurrendCommand
-from .commands.getInventoryCommand import GetInventoryCommand
-from .commands.unregPlayerCommand import UnregPlayerCommand
+from .commands import *
 
 class AdminCog(Cog, NoSurrendCommand, SurrendCommand, AddCommand, GetInventoryCommand, UnregPlayerCommand):
     def __init__(self, bot: Bot):

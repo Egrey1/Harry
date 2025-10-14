@@ -1,6 +1,6 @@
 from ..library.modules import hybrid_command, has_permissions, SelectOption, View, Select, Context, describe
 from ..library.functions import give_all_countries
-from ..library.callbacks.getInventory import getinventory
+from ..library.callbacks import getinventory
 
 class GetInventoryCommand:
 

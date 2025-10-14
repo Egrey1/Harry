@@ -1,4 +1,4 @@
-from .loops.channelUpdate import ChannelUpdate
+from .loops import ChannelUpdate
 from .library.modules import Bot, Cog
     
 

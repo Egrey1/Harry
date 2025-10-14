@@ -1,6 +1,6 @@
 from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select
 from ..library.functions import give_all_no_surrend_countries
-from ..library.callbacks.SurrendCallback import surrend_callback
+from ..library.callbacks import surrend_callback
 
 class SurrendCommand:
     @hybrid_command(name='surrend', description='Объявить о капитуляции для страны')

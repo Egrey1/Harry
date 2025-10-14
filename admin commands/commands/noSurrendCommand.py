@@ -1,6 +1,6 @@
 from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select
 from ..library.functions import give_all_surrend_countries
-from ..library.callbacks.noSurrendCallback import no_surrend_callback
+from ..library.callbacks import no_surrend_callback
 
 class NoSurrendCommand:
     @hybrid_command(name='nosurrend', description='Снять метку капитуляции')
