@@ -32,19 +32,29 @@ class Add(Modal):
         col = self.item
 
         # Get existing value for this country/item
-        cursor.execute(f"SELECT `{col}` FROM market WHERE name = ?", (self.country,))
+        cursor.execute(f"""
+                       SELECT `{col}` 
+                       FROM market 
+                       WHERE name = ?
+                       """, (self.country,))
         row = cursor.fetchone()
 
         new_value = f"{count} {price}"
 
         if row is None:
             # No row for this country yet -> insert a new row with this item
-            cursor.execute(f"INSERT INTO market (name, `{col}`) VALUES (?, ?)", (self.country, new_value))
+            cursor.execute(f"""
+                           INSERT INTO market (name, `{col}`) 
+                           VALUES (?, ?)
+                           """, (self.country, new_value))
         else:
             existing = row[0]
             if not existing:
                 # Column empty -> just set it
-                cursor.execute(f"UPDATE market SET `{col}` = ? WHERE name = ?", (new_value, self.country))
+                cursor.execute(f"""
+                               UPDATE market SET `{col}` = ? 
+                               WHERE name = ?
+                               """, (new_value, self.country))
             else:
                 # Merge quantities: parse existing as "qty price"
                 try:
@@ -57,7 +67,24 @@ class Add(Modal):
                 # Sum quantities and set price to the new provided price (adjust if you want different behavior)
                 merged_qty = existing_qty + count
                 merged_value = f"{merged_qty} {price}"
-                cursor.execute(f"UPDATE market SET `{col}` = ? WHERE name = ?", (merged_value, self.country))
+                cursor.execute(f"""
+                               UPDATE market 
+                               SET `{col}` = ? 
+                               WHERE name = ?
+                               """, (merged_value, self.country))
+
+        # Now subtract the items from the country's inventory atomically.
+        # If the inventory doesn't contain enough items, rollback and inform the user.
+        if count > 0:
+            cursor.execute(
+                f"UPDATE countries_inventory SET `{col}` = `{col}` - ? WHERE name = ? AND `{col}` >= ?",
+                (count, self.country, count),
+            )
+            if cursor.rowcount == 0:
+                connect.rollback()
+                connect.close()
+                await interaction.response.send_message('В инвентаре недостаточно предметов чтобы добавить столько на рынок', ephemeral=True)
+                return
 
         connect.commit()
         connect.close()
