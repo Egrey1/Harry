@@ -90,4 +90,4 @@ class Add(Modal):
         connect.close()
         # ----------------------------------GPT CODE END------------------------------------------
 
-        await interaction.response.send_message(f'Успешно добавлено `{count}` `{self.item}` по цене `{price}` за единицу на рынок!', ephemeral=True)
+        await interaction.response.send_message(f'Успешно добавлено `{count} {self.item}` по цене `{price}` за единицу на рынок!', ephemeral=True)

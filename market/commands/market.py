@@ -23,8 +23,8 @@ class Market():
                 desc += f'{sellers["country"]} - {sellers["qty"]} по __`{CURRENCY}{sellers["price"]}`__\n'
                 sm += sellers["price"]
                 count += 1
-            avg = (sm // count) if count else 0
-            desc += f'Средняя цена: __`{CURRENCY}{avg}`__\n\n\n'
+            avg = (sm / count) if count else 0
+            desc += f'Средняя цена: __`{CURRENCY}{avg:.2f}`__\n\n\n'
 
         embed = Embed(title="Рынок товаров", description=desc)
         await ctx.send(embed=embed, ephemeral=True)

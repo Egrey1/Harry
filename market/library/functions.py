@@ -107,3 +107,15 @@ async def market_summary() -> dict[str, dict]:
 
     return summary
 
+async def country_money(country: str) -> int:
+    connect = con(DATABASE_COUNTRIES)
+    cursor = connect.cursor()
+
+    cursor.execute(f"""
+                    SELECT Деньги
+                    FROM countries_inventory
+                    WHERE name = '{country}'
+                    """)
+    money = cursor.fetchone()
+    connect.close()
+    return int(money[0]) if money else 0
