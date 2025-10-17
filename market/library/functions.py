@@ -31,3 +31,24 @@ async def give_items(country: str, item: str | None = None) -> dict[str, int] | 
     item = cursor.fetchone()
     connect.close()
     return int(item[0]) if item else 0
+
+async def country_positions(country: str) -> dict[str, str]:
+    connect = con(DATABASE_COUNTRIES)
+    connect.row_factory = Row
+    cursor = connect.cursor()
+
+    cursor.execute(f"""
+                    SELECT *
+                    FROM market
+                    WHERE name = '{country}'
+                    """)
+    a = cursor.fetchone()
+    connect.close()
+    positions = {}
+    a = dict(a)
+    
+    for key, value in a.items():
+        if key != "name" and value and int(value.split()[0]):
+            positions[key] = value
+        
+    return positions

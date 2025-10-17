@@ -1,7 +1,7 @@
 from .commands import *
 from .library import Cog, Bot
 
-class MarketCommands(Cog, AddCommand):
+class MarketCommands(Cog, AddCommand, EditCommand):
     def __init__(self, bot: Bot):
         self.bot = bot
 

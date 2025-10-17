@@ -1,7 +1,7 @@
 from ..library import Modal, TextInput, Interaction, con, DATABASE_COUNTRIES
 from ..library.functions import give_items
 
-class AddModal(Modal):
+class Add(Modal):
     def __init__(self, country, item, item_count: int):
         super().__init__(title='Добавление позиции на рынок')
         self.country = country
