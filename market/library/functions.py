@@ -52,3 +52,58 @@ async def country_positions(country: str) -> dict[str, str]:
             positions[key] = value
         
     return positions
+
+# chat GPT helped write this function
+async def market_summary() -> dict[str, dict]:
+    """Собирает сводку по рынку из таблицы `market`.
+
+    Возвращает словарь вида:
+    {
+      'ItemName': {
+          'total': int,  # общее количество на рынке по всем странам
+          'sellers': [ {'country': str, 'price': int, 'qty': int}, ... ]
+      },
+      ...
+    }
+
+    Игнорирует пустые/нулевые ячейки.
+    """
+    connect = con(DATABASE_COUNTRIES)
+    connect.row_factory = Row
+    cursor = connect.cursor()
+
+    cursor.execute("""
+                   SELECT * 
+                   FROM market
+                   """)
+    rows = cursor.fetchall()
+    connect.close()
+
+    summary: dict[str, dict] = {}
+
+    for row in rows:
+        r = dict(row)
+        country = r.get('name')
+        for key, value in r.items():
+            if key == 'name' or not value:
+                continue
+            # value expected as "qty price"
+            try:
+                qty_str, price_str = str(value).split()
+                qty = int(qty_str)
+                price = int(price_str)
+            except Exception:
+                # skip malformed values
+                continue
+
+            if qty <= 0:
+                continue
+
+            if key not in summary:
+                summary[key] = {'total': 0, 'sellers': []}
+
+            summary[key]['total'] += qty
+            summary[key]['sellers'].append({'country': country, 'price': price, 'qty': qty})
+
+    return summary
+

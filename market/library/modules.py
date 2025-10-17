@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog, Bot, Context, hybrid_command
-from discord import Interaction, SelectOption
+from discord import Interaction, SelectOption, Embed
 from discord.ui import View, Select, TextInput, Modal
 
 from config import give_country, DATABASE_COUNTRIES, CURRENCY

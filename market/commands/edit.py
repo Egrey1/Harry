@@ -2,7 +2,7 @@ from ..library import Cog, Bot, hybrid_command, Context, give_country, SelectOpt
 from ..library.functions import country_positions, give_items
 from ..callbacks import edit_callback
 
-class EditCommand():
+class Edit():
     def __init__(self, bot: Bot):
         self.bot = bot
 

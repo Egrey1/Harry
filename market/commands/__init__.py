@@ -1,2 +1,3 @@
-from .add import AddCommand
-from .edit import EditCommand
+from .add import Add as AddCommand
+from .edit import Edit as EditCommand
+from .market import Market as MarketCommand

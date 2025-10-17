@@ -2,7 +2,7 @@ from ..library import Cog, Bot, hybrid_command, Context, give_country, View, Sel
 from ..library.functions import give_items
 from ..callbacks import add_callback
 
-class AddCommand():
+class Add():
     def __init__(self, bot: Bot):
         self.bot = bot
 
