@@ -2,11 +2,11 @@ from ..library import Modal, TextInput, Interaction, con, DATABASE_COUNTRIES
 from ..library.functions import give_items
 
 class AddModal(Modal):
-    async def __init__(self, country, item):
+    def __init__(self, country, item, item_count: int):
         super().__init__(title='Добавление позиции на рынок')
         self.country = country
         self.item = item
-        self.item_count = await give_items(country, item)
+        self.item_count = item_count
 
         # Inputs
         self.count = TextInput(label='Количество', placeholder=f'У вас есть: {self.item_count}', required=True)
@@ -28,7 +28,7 @@ class AddModal(Modal):
         cursor = connect.cursor()
 
 
-# -------------------------NON CHECK------------------------------------------ (Не проверено:( )
+# ----------------------------------GPT CODE------------------------------------------
         col = self.item
 
         # Get existing value for this country/item
@@ -60,3 +60,7 @@ class AddModal(Modal):
                 cursor.execute(f"UPDATE market SET `{col}` = ? WHERE name = ?", (merged_value, self.country))
 
         connect.commit()
+        connect.close()
+        # ----------------------------------GPT CODE END------------------------------------------
+
+        await interaction.response.send_message(f'Успешно добавлено `{count}` `{self.item}` по цене `{price}` за единицу на рынок!', ephemeral=True)

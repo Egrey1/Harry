@@ -1,7 +1,9 @@
-from config import con, DATABASE_COUNTRIES
+from .modules import con, DATABASE_COUNTRIES, Row
+
 
 async def give_items(country: str, item: str | None = None) -> dict[str, int] | int:
     connect = con(DATABASE_COUNTRIES)
+    connect.row_factory = Row
     cursor = connect.cursor()
 
     if not item:
@@ -10,8 +12,15 @@ async def give_items(country: str, item: str | None = None) -> dict[str, int] | 
                         FROM countries_inventory
                         WHERE name = '{country}'
                         """)
-        items = cursor.fetchone()
+        a = cursor.fetchone()
         connect.close()
+        a = dict(a)
+        items = {}
+
+        for key, value in a.items():
+            if key != "name":
+                items[key] = int(value)
+
         return dict(items) if items else {}
     
     cursor.execute(f"""
@@ -21,4 +30,4 @@ async def give_items(country: str, item: str | None = None) -> dict[str, int] | 
                     """)
     item = cursor.fetchone()
     connect.close()
-    return item[0] if item else 0
+    return int(item[0]) if item else 0

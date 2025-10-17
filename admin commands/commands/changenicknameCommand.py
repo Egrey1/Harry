@@ -16,7 +16,7 @@ class ChangeNicknameCommand(ChangeNickname):
         select = Select(placeholder= 'What country are you changing the nickname for?', options= options)
         view.add_item(select)
 
-        select.callback = change_nickname_callback #idk why this is throwing an undefined
+        select.callback = self.change_nickname_callback #idk why this is throwing an undefined
 
 
     

@@ -1,1 +1,1 @@
-from vipeCommand import *
+from .vipeCommand import *
