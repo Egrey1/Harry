@@ -1,14 +1,15 @@
-from ..modules import Interaction, give_country
+from ..modules import Interaction
+from ..modals.changeNameModal import ChangeNickNameModal
 
 class ChangeNickname:
-    async def change_nickname_callback(interaction: Interaction) -> None:
-        #item = ''.join(interaction.data['values']) 
-        #country = await give_country(interaction.user.mention)
-
-        #if not country:
-        #    await interaction.response.edit_message(content= 'Вы не зарегистрированы!', embed= None)
-        #    return None
+    async def change_nickname_callback(self, interaction: Interaction):
+        country_changed = ''.join(interaction.data['values'])
+        modal = ChangeNickNameModal(country_changed)
+        await interaction.response.send_modal(modal)
         
 
-        pass
+        
+        
+
+        
         

@@ -2,7 +2,7 @@ from .library.modules import Cog, Bot
 
 from .commands import *
 
-class AdminCog(Cog, NoSurrendCommand, SurrendCommand, AddCommand, GetInventoryCommand, UnregPlayerCommand):
+class AdminCog(Cog, NoSurrendCommand, SurrendCommand, AddCommand, GetInventoryCommand, UnregPlayerCommand, ChangeNicknameCommand):
     def __init__(self, bot: Bot):
         self.bot = bot
 
