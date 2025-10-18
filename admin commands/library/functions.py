@@ -1,6 +1,8 @@
-from .modules import con, ROLE_PICKER_PATH, DATABASE_PATH, Row, Interaction, roles_id
-ROLE_PICKER = ROLE_PICKER_PATH
+from .modules import con, DATABASE_PATH, Row, Interaction, roles_id
+
+#ROLE_PICKER = ROLE_PICKER_PATH
 async def give_all_countries() -> tuple:
+    from .modules import ROLE_PICKER_PATH
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -12,6 +14,7 @@ async def give_all_countries() -> tuple:
     return result
 
 async def give_all_no_surrend_countries() -> tuple:
+    from .modules import ROLE_PICKER_PATH
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -24,6 +27,7 @@ async def give_all_no_surrend_countries() -> tuple:
     return result
 
 async def give_all_surrend_countries() -> tuple:
+    from .modules import ROLE_PICKER_PATH
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -91,8 +95,8 @@ async def unreg_function(country: str, interaction: Interaction) -> None:
         except:
             pass
         
-
-        connect = con(ROLE_PICKER)
+        from .modules import ROLE_PICKER_PATH
+        connect = con(ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
         cursor.execute(f"""
@@ -102,3 +106,18 @@ async def unreg_function(country: str, interaction: Interaction) -> None:
                         """)
         connect.commit()
         connect.close()
+
+async def is_busy(country: str) -> str:
+    from .modules import ROLE_PICKER_PATH
+    connect = con(ROLE_PICKER_PATH)
+    cursor = connect.cursor()
+
+    cursor.execute(f"""
+                   SELECT is_busy
+                   FROM roles
+                   WHERE name = '{country}'
+                   """)
+    result = cursor.fetchone()[0]
+    connect.close()
+
+    return result
