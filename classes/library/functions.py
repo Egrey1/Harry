@@ -1,0 +1,46 @@
+from .modules import con, Row, DATABASE_PATH
+from ..classes import Item, Country, Factory
+
+def getfact(country: str | Country, give_factory: str | Factory | None = None) -> dict[str: Factory] | Factory:
+    name = country.name if type(country) == Country else country
+    
+    connect = con(DATABASE_PATH)
+    connect.row_factory = Row
+    cursor = connect.cursor()
+    
+    res = {}
+    cursor.execute(f"""
+                    SELECT *
+                    FROM country_factories
+                    WHERE name = '{name}'
+    """)
+    fetch = dict(cursor.fetchone())
+    connect.close()
+    
+    for factory_name, quantity in fetch.items():
+        res[factory_name] = Factory(factory_name, quantity)
+    
+    if give_factory:
+        return res[give_factory.name if type(give_factory) == Factory else give_factory]
+    return res
+
+def getinv(name: str | Country, give_item: str | Item | None = None) -> dict[str: Item] | Item:
+    name = name.name if type(name) == Country else name
+    connect = con(DATABASE_PATH)
+    connect.row_factory = Row
+    cursor = connect.cursor()
+    
+    cursor.execute(f"""
+                    SELECT *
+                    FROM countries_inventory
+                    WHERE name = '{name}'
+    """)
+    fetch = dict(cursor.fetchone())
+    connect.close()
+    res = {}
+    for item_name, item_qnty in fetch.items():
+        res[item_name] = Item(item_name, int(item_qnty))
+    
+    if not give_item:
+        return res
+    return res[give_item.name if type(give_item) == Item else give_item]
