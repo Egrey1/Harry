@@ -1,4 +1,4 @@
-from .library import con, Row, DATABASE_PATH, getinv, getfact
+from .library import con, Row, DATABASE_PATH, getinv, getfact, ROLE_PICKER_PATH
 
 
 
@@ -8,6 +8,16 @@ class Country:
         self.market_inventory = Market(name)
         self.items_inventory = getinv(name) 
         self.factories_inventory = getfact(name)
+
+        connect = con(ROLE_PICKER_PATH)
+        cursor = connect.cursor()
+        cursor.execute(f"""
+                        SELECT is_busy
+                        FROM roles
+                        WHERE name = '{name}'
+                        """)
+        self.busy = (cursor.fetchone())[0]
+        connect.close()
 
 class Item:
     def __init__(self, name: str, quantity: int | None = None, price: int = 0, country: str | Country | None = None):

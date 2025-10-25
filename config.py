@@ -36,7 +36,7 @@ async def get_cost(item: str) -> int:
     connect = con(DATABASE_COUNTRIES)
     cursor = connect.cursor()
     cursor.execute(f"""
-                   SELECT "cost"
+                   SELECT cost
                    FROM factories
                    WHERE name = '{item}'
                    """)
