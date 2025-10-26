@@ -1,6 +1,22 @@
 from .modules import con, Row, DATABASE_PATH
 from ..classes import Item, Country, Factory
 
+def getbalance(country: str | Country) -> int:
+    name = country.name if type(country) == Country else country
+    
+    connect = con(DATABASE_PATH)
+    cursor = connect.cursor()
+    
+    cursor.execute(f"""
+                    SELECT Деньги
+                    FROM market
+                    WHERE name = '{name}'
+    """)
+    res = cursor.fetchone()[0]
+    connect.close()
+    
+    return int(res)
+
 def getfact(country: str | Country, give_factory: str | Factory | None = None) -> dict[str: Factory] | Factory:
     name = country.name if type(country) == Country else country
     
@@ -18,7 +34,8 @@ def getfact(country: str | Country, give_factory: str | Factory | None = None) -
     connect.close()
     
     for factory_name, quantity in fetch.items():
-        res[factory_name] = Factory(factory_name, quantity)
+        if factory_name != 'name':
+            res[factory_name] = Factory(factory_name, quantity)
     
     if give_factory:
         return res[give_factory.name if type(give_factory) == Factory else give_factory]
@@ -39,7 +56,8 @@ def getinv(name: str | Country, give_item: str | Item | None = None) -> dict[str
     connect.close()
     res = {}
     for item_name, item_qnty in fetch.items():
-        res[item_name] = Item(item_name, int(item_qnty))
+        if item_name not in ['name', 'Деньги']:
+            res[item_name] = Item(item_name, int(item_qnty))
     
     if not give_item:
         return res

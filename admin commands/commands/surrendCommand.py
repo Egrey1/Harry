@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select
+from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Country
 from ..library.functions import give_all_no_surrend_countries
 from ..library.callbacks import surrend_callback
 
@@ -27,7 +27,7 @@ class SurrendCommand:
 
         view = View()
         select = Select(placeholder= 'Кто этот лох?', options= options)
-        select.callback = surrend_callback
+        select.callback = Country(' ').change_surrend
         view.add_item(select)
         
         if ctx.interaction:

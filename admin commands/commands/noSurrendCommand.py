@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select
+from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Country
 from ..library.functions import give_all_surrend_countries
 from ..library.callbacks import no_surrend_callback
 
@@ -23,10 +23,11 @@ class NoSurrendCommand:
             if ctx.interaction:
                 await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
             else:
-                await ctx.send('Неправильно введена страница или список пуст')        
+                await ctx.send('Неправильно введена страница или список пуст')   
+                
         view = View()
         select = Select(placeholder= 'Опять кто-то из пепла восстает?', options= options)
-        select.callback = no_surrend_callback
+        select.callback = Country('').change_surrend
         view.add_item(select)
         
         if ctx.interaction:

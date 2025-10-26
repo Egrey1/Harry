@@ -7,7 +7,7 @@ class UnregPlayerCommand:
     @describe(member= 'Обязательно указать страну')
     async def unreg_player(self, ctx: Context, member: Member):
         if not ctx.interaction:
-            await ctx.reply('/unreg_player праивльнее будет')
+            await ctx.reply('/unreg_player правильнее будет')
             return
 
         country = await give_country(ctx.author.mention)

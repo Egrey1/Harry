@@ -3,8 +3,8 @@ from ..library.functions import give_all_countries
 from ..library.callbacks.changenicknamecallback import ChangeNickname
 
 class ChangeNicknameCommand(ChangeNickname):
-    @hybrid_command(name= 'change_nickname', description='Changes country nickname')
-    @describe(page='Change countries list')
+    @hybrid_command(name= 'change_nickname', description='Меняет никнейм стране')
+    @describe(page='Сменить страницу')
     async def change_nickname(self, ctx: Context, page: int = 1):
 
         countries = await give_all_countries()
@@ -27,13 +27,13 @@ class ChangeNicknameCommand(ChangeNickname):
             else:
                 await ctx.send('Неправильно введена страница', view= view)
 
-        select = Select(placeholder= 'What country are you changing the nickname for?', options= options)
+        select = Select(placeholder= 'Выбрать здесь', options= options)
         
 
         select.callback = self.change_nickname_callback
         view.add_item(select)
 
-        await ctx.send('yes, comrade',ephemeral=True, view= view)
+        await ctx.send('Какой стране поменять никнейм',ephemeral=True, view= view)
 
 
     

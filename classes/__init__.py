@@ -1,1 +1,1 @@
-from .classes import Country, Market, Item, Factory
+from .classes import *

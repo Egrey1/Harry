@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Button
+-\from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Button
 from ..library.functions import give_all_countries
 from ..library.callbacks import country_selected
 
@@ -32,6 +32,6 @@ class AddCommand:
         
         
         if ctx.interaction:
-            await ctx.interaction.response.send_message('Пока что выдать можно только фабрики', view= view, ephemeral=True)
+            await ctx.interaction.response.send_message('Выберите страну', view= view, ephemeral=True)
         else:
-            await ctx.send('Пока что выдать можно только фабрики', view= view)
+            await ctx.send('Выберите страну', view= view)

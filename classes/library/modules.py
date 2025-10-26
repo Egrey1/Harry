@@ -1,3 +1,5 @@
+from discord import Interaction
+
 from sqlite3 import connect as con
 from sqlite3 import Row
 

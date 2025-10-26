@@ -1,4 +1,4 @@
-from ..modules import Interaction, con, ROLE_PICKER_PATH, give_country
+from ..modules import Interaction, con, ROLE_PICKER_PATH, give_country, Country
 from ..functions import unreg_function
 
 async def surrend_callback(interaction: Interaction):
