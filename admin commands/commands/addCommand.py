@@ -1,4 +1,4 @@
--\from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Button
+from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Button
 from ..library.functions import give_all_countries
 from ..library.callbacks import country_selected
 

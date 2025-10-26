@@ -1,4 +1,4 @@
-from .library import con, Row, DATABASE_PATH, getinv, getfact, getbalance, ROLE_PICKER_PATH, Interaction
+from .library import con, Row, DATABASE_PATH, getinv, getfact, getbalance, ROLE_PICKER_PATH, Interaction, bot, GUILD
 
 
 
@@ -29,7 +29,7 @@ class Country:
         
         connect.close()
     
-    def change_surrend(self, interaction: Interaction | None = None):
+    async def change_surrend(self, interaction: Interaction | None = None):
         name = interaction.data['values'][0] if interaction else self.name
         connect = con(ROLE_PICKER_PATH)
         cursor = connect.cursor()
@@ -53,11 +53,11 @@ class Country:
         connect.commit()
         connect.close()
         
-    def change_nickname(self, new_nickname: str):
+    async def change_nickname(self, new_nickname: str):
         connect = con(ROLE_PICKER_PATH)
         cursor = connect.cursor()
         
-        user_mention = self.is_busy
+        user_mention = self.busy
 
         cursor.execute(f"""
                        UPDATE roles
@@ -69,7 +69,7 @@ class Country:
         
         if user_mention:
             try:
-                member = interaction.guild.get_member(int(user_mention[2:-1]))
+                member = bot.get_guild(GUILD).get_member(int(user_mention[2:-1]))
                 await member.edit(nick= new_nickname)
             except:
                 pass

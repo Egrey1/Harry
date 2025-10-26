@@ -1,4 +1,4 @@
-from ..modules import Interaction, get_inventory, CURRENCY, Embed
+from ..modules import Interaction, get_inventory, CURRENCY, Embed, Country
 
 async def getinventory(interaction: Interaction):
     country = Country(interaction.data['values'][0])
