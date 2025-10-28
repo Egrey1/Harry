@@ -1,4 +1,4 @@
-from .modules import con, DATABASE_PATH, Row, Interaction, roles_id
+from .modules import con, DATABASE_PATH, Row, Interaction, roles_id, Country
 
 #ROLE_PICKER = ROLE_PICKER_PATH
 async def give_all_countries() -> tuple:
@@ -75,37 +75,39 @@ async def give_all_proops() -> tuple:
     return result
 
 
-async def unreg_function(country: str, interaction: Interaction) -> None:
+# async def unreg_function(country: Country, interaction: Interaction) -> None:
 
-        if not country:
-            return None
-        user = interaction.user
-        for id in roles_id.values():
-            try:
-                role = interaction.guild.get_role(id) 
-                await user.remove_roles(role) 
-            except:
-                continue
+#         await country.unreg(interaction)
 
-        # unreg = interaction.guild.get_role(1344519330091503628)
-        # await user.add_roles(unreg)  
+        # if not country:
+        #     return None
+        # user = interaction.user
+        # for id in roles_id.values():
+        #     try:
+        #         role = interaction.guild.get_role(id) 
+        #         await user.remove_roles(role) 
+        #     except:
+        #         continue
 
-        try:
-            await user.edit(nick='') 
-        except:
-            pass
+        # # unreg = interaction.guild.get_role(1344519330091503628)
+        # # await user.add_roles(unreg)  
+
+        # try:
+        #     await user.edit(nick='') 
+        # except:
+        #     pass
         
-        from .modules import ROLE_PICKER_PATH
-        connect = con(ROLE_PICKER_PATH)
-        cursor = connect.cursor()
+        # from .modules import ROLE_PICKER_PATH
+        # connect = con(ROLE_PICKER_PATH)
+        # cursor = connect.cursor()
 
-        cursor.execute(f"""
-                        UPDATE roles
-                        SET is_busy = null
-                        WHERE is_busy = '{user.mention}'
-                        """)
-        connect.commit()
-        connect.close()
+        # cursor.execute(f"""
+        #                 UPDATE roles
+        #                 SET is_busy = null
+        #                 WHERE is_busy = '{user.mention}'
+        #                 """)
+        # connect.commit()
+        # connect.close()
 
 async def is_busy(country: str) -> str:
     from .modules import ROLE_PICKER_PATH

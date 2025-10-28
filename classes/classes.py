@@ -1,4 +1,7 @@
-from .library import con, Row, DATABASE_PATH, getinv, getfact, getbalance, ROLE_PICKER_PATH, Interaction, bot, GUILD
+from .library import (con, Row, DATABASE_PATH, 
+                      getinv, getfact, getbalance, 
+                      ROLE_PICKER_PATH, Interaction, bot, 
+                      GUILD, roles_id, Context)
 
 
 
@@ -29,6 +32,8 @@ class Country:
         
         connect.close()
     
+
+
     async def change_surrend(self, interaction: Interaction | None = None):
         name = interaction.data['values'][0] if interaction else self.name
         connect = con(ROLE_PICKER_PATH)
@@ -40,11 +45,12 @@ class Country:
                             SET surrend = NULL
                             WHERE name = {name}
             """)
+            # self.unreg(interaction)
             self.surrend = None
             
         else:
             cursor.execute(f"""
-                            UPDATE oles
+                            UPDATE roles
                             SET surrend = ' '
                             WHERE name = {self.name}
             """)
@@ -53,6 +59,8 @@ class Country:
         connect.commit()
         connect.close()
         
+
+
     async def change_nickname(self, new_nickname: str):
         connect = con(ROLE_PICKER_PATH)
         cursor = connect.cursor()
@@ -73,6 +81,43 @@ class Country:
                 await member.edit(nick= new_nickname)
             except:
                 pass
+
+
+
+    async def unreg(self, interaction: Interaction | Context | None = None):
+        if not self.busy:
+            return None
+        
+        user = interaction.user # if interaction else bot.get_guild(GUILD)
+        for id in roles_id.values():
+            try:
+                role = interaction.guild.get_role(id) 
+                await user.remove_roles(role) 
+            except:
+                continue
+
+        try:
+            unreg = interaction.guild.get_role(1344519330091503628)
+            await user.add_roles(unreg)  
+        except:
+            pass
+
+        try:
+            await user.edit(nick='') 
+        except:
+            pass
+        
+        connect = con(ROLE_PICKER_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute(f"""
+                        UPDATE roles
+                        SET is_busy = null
+                        WHERE is_busy = '{self.busy}'
+                        """)
+        connect.commit()
+        connect.close()
+        self.busy = None
                 
 
 class Item:

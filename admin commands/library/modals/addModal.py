@@ -39,15 +39,14 @@ class Quantity(Modal):
         super().__init__(title="Выбор количества")  
         self.item = item
         self.country = country
-        self.itemType = itemType
         
         self.quantity= TextInput(label= 'Выберите количество, совершенно любое', placeholder= 'Столько и будет выдано', required= True)
         self.add_item(self.quantity)
 
     async def on_submit(self, interaction: Interaction) -> None:
-        quantity = int(self.quantity.value) + item.quantity # hehe naebal
+        quantity = int(self.quantity.value) + self.item.quantity # hehe naebal
         
-        item.edit_quantity(quantity if quantity >= 0 else 0, country)
+        self.item.edit_quantity(quantity if quantity >= 0 else 0, self.country)
         await interaction.response.send_message("Все готово!", ephemeral=True)
         
         

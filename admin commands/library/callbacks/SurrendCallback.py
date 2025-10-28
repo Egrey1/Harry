@@ -1,5 +1,4 @@
 from ..modules import Interaction, con, ROLE_PICKER_PATH, give_country, Country
-from ..functions import unreg_function
 
 async def surrend_callback(interaction: Interaction):
     await interaction.response.defer(ephemeral=True)
@@ -14,7 +13,8 @@ async def surrend_callback(interaction: Interaction):
                     WHERE name = '{country}'
                     """)
     
-    await unreg_function(await give_country(interaction.user.mention), interaction)
+    country = await give_country(interaction.user.mention)
+    await country.change_surrend()
     
     connect.commit()
     connect.close()

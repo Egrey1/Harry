@@ -1,8 +1,9 @@
 from discord import Intents
 from sqlite3 import connect as con
+from classes import *
 
 #Проверяет есть ли пользователь в списке стран. Возвращает пустую строку если нет
-async def give_country(mention: str) -> str:
+async def give_country(mention: str) -> Country:
     connect = con(DATABASE_ROLE_PICKER)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -92,4 +93,4 @@ TOKEN = open('TOKEN.txt').readline()
 intents = Intents.all()
 PREFIX = '!'
 
-from classes import *
+# from classes import *

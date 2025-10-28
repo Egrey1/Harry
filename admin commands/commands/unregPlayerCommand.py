@@ -11,10 +11,11 @@ class UnregPlayerCommand:
             return
 
         country = await give_country(ctx.author.mention)
-        if not country:
+        if not country.busy:
             await ctx.reply('Мать моя богиня! Это же не страна, ты чего? Не буду я его снимать!', ephemeral= True)
             return
         
-        await unreg_function(country, ctx.interaction)
+        country.unreg(ctx)
+        
         await ctx.reply('Это больше не страна!', ephemeral= True)
         
