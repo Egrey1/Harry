@@ -32,7 +32,7 @@ async def market_ask(interaction: Interaction, country: Country):
     view = View()
     
     select = Select(placeholder= 'Выберите предмет', options= [SelectOption(label= i, value= i) for i in purchasable])
-    select.calback = lambda inter: market_add(inter, country)
+    select.callback = lambda inter: market_add(inter, country)
         
     view.add_item(select)
     

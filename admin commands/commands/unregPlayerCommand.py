@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, Context, describe, Member, give_country
+from ..library.modules import hybrid_command, has_permissions, Context, describe, Member, give_country, Country
 from ..library.functions import unreg_function
 
 class UnregPlayerCommand:
@@ -10,12 +10,12 @@ class UnregPlayerCommand:
             await ctx.reply('/unreg_player правильнее будет')
             return
 
-        country = await give_country(ctx.author.mention)
+        country = Country(ctx.author.mention)
         if not country.busy:
-            await ctx.reply('Мать моя богиня! Это же не страна, ты чего? Не буду я его снимать!', ephemeral= True)
+            await ctx.send('Мать моя богиня! Это же не страна, ты чего? Не буду я его снимать!', ephemeral= True)
             return
         
-        country.unreg(ctx)
+        country.unreg()
         
-        await ctx.reply('Это больше не страна!', ephemeral= True)
+        await ctx.send('Это больше не страна!', ephemeral= True)
         

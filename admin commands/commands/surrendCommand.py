@@ -27,7 +27,7 @@ class SurrendCommand:
 
         view = View()
         select = Select(placeholder= 'Кто этот лох?', options= options)
-        select.callback = Country(' ').change_surrend
+        select.callback = Country().change_surrend
         view.add_item(select)
         
         if ctx.interaction:

@@ -27,7 +27,7 @@ class NoSurrendCommand:
                 
         view = View()
         select = Select(placeholder= 'Опять кто-то из пепла восстает?', options= options)
-        select.callback = Country('').change_surrend
+        select.callback = Country().change_surrend
         view.add_item(select)
         
         if ctx.interaction:

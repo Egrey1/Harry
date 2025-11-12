@@ -1,4 +1,4 @@
-from ..modules import Interaction, get_inventory, CURRENCY, Embed, Country
+from ..modules import Interaction, get_inventory, CURRENCY, Embed, Country, Item
 
 async def getinventory(interaction: Interaction):
     country = Country(interaction.data['values'][0])
@@ -7,6 +7,7 @@ async def getinventory(interaction: Interaction):
     embed_desc = ''
 
     for name, item in inventory.items():
+        item: Item
         if int(item.quantity):
             embed_desc += f"{name} - {int(item.quantity)}\n\n"
     

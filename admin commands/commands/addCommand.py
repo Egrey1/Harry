@@ -15,9 +15,9 @@ class AddCommand:
             
             if not options:
                 if ctx.interaction:
-                    await ctx.interaction.response.send_message('Неправильно введена страница')
+                    await ctx.interaction.response.send_message('Неправильно введена страница', ephemeral= True)
                 else:
-                    await ctx.send('Неправильно введена страница', view= view)
+                    await ctx.send('Неправильно введена страница')
                 return None
         except:
             if ctx.interaction:

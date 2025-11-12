@@ -1,9 +1,11 @@
-from discord import Intents
+from discord import Intents, SelectOption
+from discord.ext.commands import Context
 from sqlite3 import connect as con
 from classes import *
+from main import bot
 
-#Проверяет есть ли пользователь в списке стран. Возвращает пустую строку если нет
-async def give_country(mention: str) -> Country:
+#Проверяет есть ли пользователь в списке стран. 
+async def give_country(mention: str) -> Country | False:
     connect = con(DATABASE_ROLE_PICKER)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -13,10 +15,10 @@ async def give_country(mention: str) -> Country:
                     """)
     result = cursor.fetchone()
     connect.close()
-    try:
-        return result[0]
-    except:
-        return ''
+    return Country(result[0]) if result[0] else False
+
+async def all_countries_option(context: Context, countries, page: int) -> int:
+    return [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
 
 # Возвращает текущие деньги страны
 async def get_money(country: str) -> int:
@@ -85,9 +87,11 @@ DATABASE_COUNTRIES = 'databases/countries.db'
 
 CURRENCY = '£'
 RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 'sea': 1357681946276266044, 'assambley': 1357679628243959862, 'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119}
-CHANNEL_FOR_UPDATE_ID = 1344823587093352569
+CHANNEL_FOR_UPDATE_ID = 1344823587093352569 
 GUILD = 1344423355293372488
+guild = bot.get_guild(GUILD)
 game_state = {'game_started': True}
+PAGE_SIZE = 25
 
 TOKEN = open('TOKEN.txt').readline()
 intents = Intents.all()

@@ -1,9 +1,10 @@
-from ..library.modules import hybrid_command, SelectOption, Select, View, Context, describe
+from ..library.modules import hybrid_command, has_permissions, SelectOption, Select, View, Context, describe
 from ..library.functions import give_all_countries
 from ..library.callbacks.changenicknamecallback import ChangeNickname
 
 class ChangeNicknameCommand(ChangeNickname):
     @hybrid_command(name= 'change_nickname', description='Меняет никнейм стране')
+    @has_permissions(administrator= True)
     @describe(page='Сменить страницу')
     async def change_nickname(self, ctx: Context, page: int = 1):
 
@@ -33,7 +34,7 @@ class ChangeNicknameCommand(ChangeNickname):
         select.callback = self.change_nickname_callback
         view.add_item(select)
 
-        await ctx.send('Какой стране поменять никнейм',ephemeral=True, view= view)
+        await ctx.send('Какой стране поменять никнейм', ephemeral=True, view= view)
 
 
     

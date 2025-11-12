@@ -109,17 +109,17 @@ async def give_all_proops() -> tuple:
         # connect.commit()
         # connect.close()
 
-async def is_busy(country: str) -> str:
-    from .modules import ROLE_PICKER_PATH
-    connect = con(ROLE_PICKER_PATH)
-    cursor = connect.cursor()
+# async def is_busy(country: str) -> str:
+#     from .modules import ROLE_PICKER_PATH
+#     connect = con(ROLE_PICKER_PATH)
+#     cursor = connect.cursor()
 
-    cursor.execute(f"""
-                   SELECT is_busy
-                   FROM roles
-                   WHERE name = '{country}'
-                   """)
-    result = cursor.fetchone()[0]
-    connect.close()
+#     cursor.execute(f"""
+#                    SELECT is_busy
+#                    FROM roles
+#                    WHERE name = '{country}'
+#                    """)
+#     result = cursor.fetchone()[0]
+#     connect.close()
 
-    return result
+#     return result
