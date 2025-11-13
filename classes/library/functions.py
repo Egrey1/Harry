@@ -1,5 +1,45 @@
-from .modules import con, Row, DATABASE_PATH
-from ..classes import Item, Country, Factory
+from .modules import con, Row, DATABASE_PATH, Dict, Tuple, List, SelectOption, PAGE_SIZE
+from ..game_objects import Item, Country, Factory
+
+def get_options(values: Dict[str, str], page: int = 1) -> Tuple[List[SelectOption], int]:
+    """
+    Возвращает список SelectOption для указанной страницы.
+    
+    :param values: Словарь значений для SelectOption
+    :param page: Номер страницы (начинается с 1)
+    :return: Список SelectOption размером до PAGE_SIZE
+    :return: Количество страниц
+    """
+    if not values:
+        return [], 0  # Защита от пустоты
+    
+    keys = list(values.keys())
+
+    page_size = PAGE_SIZE
+    total_pages = (len(keys) + page_size - 1) // page_size  # ceil division
+
+    # Ограничиваем page допустимым диапазоном
+    if page < 1:
+        page = 1
+    elif page > total_pages:
+        page = total_pages
+
+    # Вычисляем срез
+    start_index = (page - 1) * page_size
+    end_index = start_index + page_size
+    current_page = keys[start_index:end_index]
+
+    # Создаём SelectOption
+    options = []
+    for key in current_page:
+        options.append(
+            SelectOption(
+                label= key,  
+                value= values[key]
+            )
+        )
+
+    return options, total_pages
 
 def getbalance(country: str | Country) -> int:
     name = country.name if type(country) == Country else country

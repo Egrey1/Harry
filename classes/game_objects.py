@@ -74,6 +74,9 @@ class Country:
         self.sea = guild.get_role(int(fetch[2])) if fetch and fetch[2] else None
         self.assembly = guild.get_role(int(fetch[3])) if fetch and fetch[3] else None
         self.nickname = fetch[4] if fetch and fetch[4] is not None else ""
+    
+    def __str__(self):
+        return self.name
 
     async def change_surrend(self, interaction: Interaction | None = None):
         """Переключает статус капитуляции страны.
