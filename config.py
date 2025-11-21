@@ -1,5 +1,6 @@
-from discord import Intents, SelectOption
+from discord import Intents, SelectOption, TextChannel
 from discord.ext.commands import Context
+import discord.utils as utils
 from sqlite3 import connect as con
 from classes import *
 from main import bot
@@ -82,8 +83,30 @@ async def get_country_info(country: str) -> dict:
 
     return dict(res) if res else {}
 
+def get_channel(name: str) -> TextChannel:
+    connect = con(DATABASE_CONFIG)
+    cursor = connect.cursor()
+    cursor.execute(f"""
+                   SELECT {name}
+                   FROM channels
+                   """)
+    id = int(cursor.fetchone()[0])
+    connect.close()
+    role = guild.get_role(id)
+    if role:
+        return role
+    
+    names = {
+        'event': '📣┃события',
+        'war': '📰┃новости-стран',
+        'news': '🔥┃войны'
+    }
+    return utils.get(guild.channels, names[name])
+
 DATABASE_ROLE_PICKER = 'databases/role-picker.db'
 DATABASE_COUNTRIES = 'databases/countries.db'
+DATABASE_FOCUS = 'databases/focuses.db'
+DATABASE_CONFIG = 'databases/config.db'
 
 CURRENCY = '£'
 RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 'sea': 1357681946276266044, 'assambley': 1357679628243959862, 'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119}

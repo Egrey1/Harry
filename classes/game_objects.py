@@ -2,7 +2,8 @@ from .library import (con, Row, DATABASE_PATH,
                       getinv, getfact, getbalance, 
                       ROLE_PICKER_PATH, Interaction, bot, 
                       guild, roles_id, Context,
-                      Member, TextChannel, Role)
+                      Member, TextChannel, Role,
+                      FOCUS_PATH, List, get_channel)
 
 
 
@@ -74,6 +75,23 @@ class Country:
         self.sea = guild.get_role(int(fetch[2])) if fetch and fetch[2] else None
         self.assembly = guild.get_role(int(fetch[3])) if fetch and fetch[3] else None
         self.nickname = fetch[4] if fetch and fetch[4] is not None else ""
+        
+        # Добавить в документацию
+        connect = con(FOCUS_PATH)
+        cursor = connect.cursor()
+        cursor.execute(f"""
+                        SELECT doing, completed
+                        FROM countries
+                        WHERE name = '{name}'
+                        """)
+        fetch = cursor.fetchone()
+        cursor.close()
+
+        if not fetch:
+            return None
+        
+        self.doing_focus = Focus(fetch[0]) # добавить в документацию
+        self.completed_focus = Focus(fetch[1]) # добавить в документацию
     
     def __str__(self):
         return self.name
@@ -485,3 +503,77 @@ class Factory:
         """)
         connect.commit()
         connect.close()
+
+
+
+class Focus:
+    def __init__(self, name: str, owner: Country | None = None):
+        connect = con(FOCUS_PATH)
+        connect.row_factory = Row
+        cursor = connect.cursor()
+
+        cursor.execute(f"""
+                       SELECT *
+                       FROM focuses
+                       WHERE name = '{name}'
+                       """)
+        fetch = cursor.fetchone()
+        connect.close()
+
+        self.owner = owner
+        self.name: str = fetch['name']
+        self.desc: str = fetch['desc']
+        self._req: str | None = fetch['req']
+        self.event: str | None = fetch['event']
+        self._factories: List[Factory] | None = fetch['factories']
+        self._items: List[Item] | None = fetch['items']
+        self._war: List[Country] | None = fetch['war']
+
+        self._factories = self._factories.split('; ') if self._factories else []
+        for i in range(len(self._factories)):
+            self._factories[i] = Factory(self._factories[i].split(':')[0], int(self._factories[i].split(':')[1]))
+        
+        self._items = self._items.split('; ') if self._items else []
+        for i in range(len(self._items)):
+            self._items[i] = Item(self._items[i].split(':')[0], int(self._items[i].split(':')[1]))
+        
+        self._war = [Country(i) for i in self._war.split('; ')]
+
+    async def send_event(self):
+        """Отправляет событие в текстовый канал, заменяя переменные {страна} на упоминания участников, если они заняты."""
+        if not self.event:
+            return
+
+        text = self.event
+
+        import re
+        # Находим все вхождения {...}
+        variables = re.findall(r"\{([^}]+)\}", text)
+ 
+        for var in variables:
+            # Предполагаем, что var — это название страны
+            try:
+                country = Country(var.strip())
+                # Проверяем, занята ли страна
+                if country.busy:
+                    mention = f"<@{country.busy.id}>"
+                    text = text.replace(f"{{{var}}}", mention)
+                else:
+                    text = text.replace(f"{{{var}}}", "")
+            except:
+                # Если страна не найдена в базе — просто удаляем переменную
+                text = text.replace(f"{{{var}}}", "")
+
+        # -- это нейронка написала, как страшно -- 
+        # Убираем лишние пробелы и знаки препинания (например, "на  , атаковал" → "на, атаковал" → "на атаковал")
+        # Удаляем множественные пробелы и очищаем пробелы вокруг знаков препинания
+        text = re.sub(r"\s+", " ", text)  # Заменяем множественные пробелы
+        text = re.sub(r"\s*([,.!?;:])\s*", r"\1 ", text)  # Очищаем пробелы вокруг знаков препинания
+        text = re.sub(r"\s+", " ", text).strip()  # Ещё раз убираем лишние пробелы
+        text = re.sub(r"^\W+|\W+$", "", text)  # Убираем знаки препинания в начале/конце
+        text = text.strip()
+
+        if not text:
+            return
+
+        await get_channel('event').send(text)

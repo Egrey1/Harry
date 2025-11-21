@@ -9,3 +9,5 @@ TOKEN.txt
 .vscode/
 databases/role-picker.db
 databases/countries.db
+databases/config.db
+databases/focuses.db
