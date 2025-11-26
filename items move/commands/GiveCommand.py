@@ -1,6 +1,6 @@
-from ."items move".library.modules import (hybrid_command, describe, Context, Member, View, Select, SelectOption,
+from ..library.modules import (hybrid_command, describe, Context, Member, View, Select, SelectOption,
                                game_state, give_country, get_inventory)
-from ."items move".library.callbacks import give_callback
+from ..library.callbacks import give_callback
 
 class GiveCommand:
     @hybrid_command (name= 'give', description='Передать вооружение стране')

@@ -1,6 +1,6 @@
-from .library.modules import (hybrid_command, Context, View, Select, SelectOption,
+from ..library.modules import (hybrid_command, Context, View, Select, SelectOption,
                                give_country, get_inventory)
-from .library.callbacks import use_callback
+from ..library.callbacks import use_callback
 
 class UseCommand:
     @hybrid_command(name='use', description='Убрать предмет')

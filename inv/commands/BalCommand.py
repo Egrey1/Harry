@@ -1,4 +1,4 @@
-from .inv.library.modules import give_country, Context, hybrid_command, CURRENCY, get_money
+from ..library.modules import give_country, Context, hybrid_command, CURRENCY, get_money
 
 
 class BalCommand:

@@ -1,5 +1,5 @@
-from .inv.library.modules import View, Button, give_country, Context, hybrid_command
-from .inv.library.functions import give_army, give_enterprise
+from ..library.modules import View, Button, give_country, Context, hybrid_command
+from ..library.functions import give_army, give_enterprise
 
 class InvCommand:
     @hybrid_command(name='inv', description='Посмотреть свой инвентарь вместе с балансом')

@@ -1,4 +1,4 @@
-from .library.modules import hybrid_command, describe, Context, Member
+from ..library.modules import hybrid_command, describe, Context, Member
 
 class KillCommand:
     def __init__(self):
