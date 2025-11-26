@@ -1,5 +1,6 @@
 from .library.modules import Cog, Bot
-from .commands import *
+from .commands import GiveCommand, UseCommand
+
 
 
 class ItemsCog(Cog, GiveCommand, UseCommand):
