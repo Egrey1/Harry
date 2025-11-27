@@ -1,4 +1,4 @@
-from .library.modules import Cog, Bot
+from .library import Cog, Bot
 from .commands import KillCommand
 
 class RoflCommandsCog(Cog, KillCommand):

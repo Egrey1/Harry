@@ -1,5 +1,5 @@
-from .library.modules import Cog, Bot, command, Context
-from .loops.updateInventory import UpdateInventory
+from .library import Cog, Bot, command, Context
+from .loops import UpdateInventory
 
 
     

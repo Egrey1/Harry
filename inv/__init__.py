@@ -1,5 +1,5 @@
-from .library.modules import Cog, Bot
-from .commands import InvCommand, BalCommand
+from .library import Cog, Bot
+from .commands import *
 
 class InventoryCog(Cog, InvCommand, BalCommand):
     def __init__(self, bot: Bot):

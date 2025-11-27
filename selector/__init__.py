@@ -1,8 +1,7 @@
-from .library.modules import commands, Member, Bot, Cog
-from .library.functions import set_is_busy
+from .library import commands, Member, Bot, Cog, set_is_busy
 
-from .commands.reg_command import RegCoommand
-from .commands.unreg_command import UnregCommand
+from .commands import RegCoommand, UnregCommand
+
 
     
 

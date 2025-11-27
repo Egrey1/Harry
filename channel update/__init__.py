@@ -1,5 +1,5 @@
 from .loops import ChannelUpdate
-from .library.modules import Bot, Cog
+from .library import Bot, Cog
     
 
 class ChannelUpdaterCog(Cog, ChannelUpdate):

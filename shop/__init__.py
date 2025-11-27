@@ -1,7 +1,7 @@
 from .library.modules import Cog, Bot
 
-from .commands.buyCommand import BuyCommand
-from .commands.shopCommand import ShopCommand
+from .commands import BuyCommand, ShopCommand
+#from .commands.shopCommand import ShopCommand
 
 
 class ShopCog(Cog, BuyCommand, ShopCommand):

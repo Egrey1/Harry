@@ -1,5 +1,5 @@
-from .library.modules import Cog, Bot, GUILD
-from .commands.vipeCommand import VipeCommand
+from .library import Cog, Bot, GUILD
+from .commands import VipeCommand
 
 class GameCog(Cog, VipeCommand):
     def __init__(self, bot: Bot):

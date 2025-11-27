@@ -1,5 +1,5 @@
-from .library.modules import Cog, Bot
-from .commands import GiveCommand, UseCommand
+from .library import Cog, Bot
+from .commands import *
 
 
 
