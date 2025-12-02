@@ -1,8 +1,6 @@
-# main.py
-from discord.ext import commands
-from config import TOKEN, PREFIX, intents
+from dependencies import bot, TOKEN
+from config import config
 
-bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 async def load_extensions():
     await bot.load_extension('selector')
@@ -22,6 +20,7 @@ async def load_extensions():
 @bot.event
 async def on_ready():
     print(f'Бот запускается!')
+    config()
     await load_extensions()
     await bot.tree.sync()
     print(f'Бот {bot.user} успешно запущен!')

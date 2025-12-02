@@ -38,6 +38,7 @@ class Country:
         Args:
             name (str): Название страны или упоминание участника Discord. По умолчанию — 'Италия'.
         """
+        self.busy = None
         if name.startswith('<@') and name.endswith('>'):
             connect = con(ROLE_PICKER_PATH)
             cursor = connect.cursor()

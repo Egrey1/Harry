@@ -1,10 +1,10 @@
-from selector.library.modules import con, DATABASE_PATH, Row
+from selector.library.modules import con, deps, Row
 
 
 # Возвращает словарь где говорит какие роли нужно ставить
 async def give_roles(name: str) -> dict:
 
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_ROLE_PICKER_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -23,7 +23,7 @@ async def give_roles(name: str) -> dict:
 
 # Возвращает кортеж всех доступных для регистрации стран
 async def give_all_countries() -> tuple:
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
                     SELECT name
@@ -36,7 +36,7 @@ async def give_all_countries() -> tuple:
 
 # Заносим пользователя в страну как занятого
 async def set_is_busy(mention: str, country_name: str | None = None):
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
         if country_name:
             cursor.execute(f"""

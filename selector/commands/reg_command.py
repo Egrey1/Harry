@@ -1,7 +1,7 @@
 from ..library.modules import (commands, app_commands, 
                        SelectOption, 
                        View, Select,
-                       game_state, give_country)
+                       deps, give_country)
 
 from ..library.callbacks.regCallback import picker_callback
 
@@ -20,11 +20,13 @@ class RegCoommand():
             await ctx.interaction.response.send_message('Чего это? За две страны одновременно поиграть захотелось? А вот нельзя, не разрешаю!')
             return None
 
-        if not game_state['game_started']:
+        if not deps.game_state['game_started']:
             await ctx.interaction.response.send_message('Дождитесь начала вайпа!', ephemeral= True)
             return None
         countries = await give_all_countries()  
 
+
+        # -------------------------------------------- SEE --------------------------------------------------
         PAGE_SIZE = 25
         try:
             options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
@@ -40,7 +42,8 @@ class RegCoommand():
                 await ctx.interaction.response.send_message('Неправильно введена страница')
             else:
                 await ctx.send('Неправильно введена страница', view= view)
-        
+        # --------- YOU NEED TO USE deps.ChooseMenu FROM classes.help_objects.py. READ DOCUMENTATION ------
+
         view = View()
         select = Select(placeholder='Выберите страну', options=options)
         select.callback = picker_callback
