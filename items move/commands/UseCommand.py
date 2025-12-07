@@ -1,5 +1,5 @@
 from ..library.modules import (hybrid_command, Context, View, Select, SelectOption,
-                               give_country, get_inventory)
+                               deps)
 from ..library.callbacks import use_callback
 
 class UseCommand:

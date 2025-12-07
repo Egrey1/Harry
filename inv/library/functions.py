@@ -1,6 +1,6 @@
-from .modules import (con, DATABASE_COUNTRIES_PATH, DATABASE_ROLE_PICKER_PATH, 
+from .modules import (con, 
                       Row, Interaction, Embed,
-                      give_country, CURRENCY, get_money)
+                      deps)
 
 
 # Возвращает весь инвентарь страны в виде словаря

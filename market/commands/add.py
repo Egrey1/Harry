@@ -1,4 +1,4 @@
-from ..library import Cog, Bot, hybrid_command, Context, give_country, View, SelectOption, Select
+from ..library import Cog, Bot, hybrid_command, Context, View, SelectOption, Select
 from ..library.functions import give_items
 from ..callbacks import add_callback
 

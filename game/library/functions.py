@@ -1,5 +1,4 @@
-from .modules import Member, roles_id, con, Guild
-from .modules import DATABASE_ROLE_PICKER as DATABASE_PATH
+from .modules import Member, deps, con, Guild
 
 async def unreg_function(member: Member, guild: Guild):
     for id in roles_id.values():

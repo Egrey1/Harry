@@ -1,4 +1,4 @@
-from .modules import con, DATABASE_COUNTRIES, Row
+from .modules import con, deps, Row
 
 
 async def give_items(country: str, item: str | None = None) -> dict[str, int] | int:

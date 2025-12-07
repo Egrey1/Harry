@@ -102,22 +102,25 @@ def get_channel(name: str) -> TextChannel:
     }
     return utils.get(deps.guild.channels, names[name])
 
-def config():
-    """Присваивает всем переменным из dependencies.py их значения"""
-    deps.CHANNEL_FOR_UPDATE_ID = 1344823587093352569 
-    deps.guild_id = 1344423355293372488
-    deps.guild = deps.bot.get_guild(deps.guild_id)
-    deps.game_state = {'game_started': True}
-    deps.PAGE_SIZE = 25
+def first_config():
+    """Создает экземпляр бота для последующего запуска"""
     deps.TOKEN = open('TOKEN.txt').readline()
     deps.intents = Intents.all()
     deps.PREFIX = '!'
+    deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents) 
+
+async def second_config():
+    """Присваивает остальным переменным их значения. Использовать функцию только после запуска"""
+    deps.CHANNEL_FOR_UPDATE_ID = 1344823587093352569 
+    deps.guild_id = 1344423355293372488
+    deps.guild = await deps.bot.get_guild(deps.guild_id)
+    deps.game_state = {'game_started': True}
+    deps.PAGE_SIZE = 25
     deps.CURRENCY = '£'
     deps.DATABASE_ROLE_PICKER = 'databases/role-picker.db'
     deps.DATABASE_COUNTRIES = 'databases/countries.db'
     deps.DATABASE_FOCUS = 'databases/focuses.db'
     deps.DATABASE_CONFIG = 'databases/config.db'
-    deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
     deps.RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 
             'sea': 1357681946276266044, 'assambley': 1357679628243959862, 
             'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 

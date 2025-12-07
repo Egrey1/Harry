@@ -1,4 +1,4 @@
-from ..library import Modal, TextInput, CURRENCY, Interaction, con, DATABASE_COUNTRIES
+from ..library import Modal, TextInput, Interaction, con, deps
 from ..library.functions import country_money
 
 class Buy(Modal):

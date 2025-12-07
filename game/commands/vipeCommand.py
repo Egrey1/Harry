@@ -1,6 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, Context, con, game_state, Guild
-from ..library.modules import DATABASE_COUNTRIES as DATABASE_COUNTRIES_PATH
-from ..library.modules import DATABASE_ROLE_PICKER as DATABASE_ROLE_PICKER_PATH
+from ..library.modules import hybrid_command, has_permissions, Context, con, deps, Guild
 
 from ..library.functions import unreg_function
 

@@ -1,9 +1,10 @@
-from ..library.modules import (commands, Select, View, SelectOption,
-                               CURRENCY, game_state)
+from ..library.modules import (commands, Select, View, SelectOption
+                               )
 
 from ..library.functions import give_all_factories
 
-from ..library.callbacks.buyCallback import BuyCallback
+#from ..library.callbacks.buyCallback import BuyCallback
+from ..library.callbacks import BuyCallback
 
 class BuyCommand(BuyCallback):
     def __init__(self):

@@ -1,4 +1,4 @@
-from ..library import Bot, hybrid_command, Context, give_country, Select, SelectOption, View
+from ..library import Bot, hybrid_command, Context, deps, Select, SelectOption, View
 from ..library.functions import country_positions
 
 class Rem():

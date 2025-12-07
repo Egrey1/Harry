@@ -1,4 +1,4 @@
-from .modules import con, Row, DATABASE_PATH, Dict, Tuple, List, SelectOption, PAGE_SIZE
+from .modules import con, Row, deps, Dict, Tuple, List, SelectOption
 from ..game_objects import Item, Country, Factory
 
 def get_options(values: Dict[str, str], page: int = 1) -> Tuple[List[SelectOption], int]:

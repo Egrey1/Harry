@@ -1,7 +1,5 @@
-from ..library.modules import commands, Embed, CURRENCY
 from ..library.functions import give_all_factories
-from ..library.modules import (commands, Select, View, SelectOption,
-                               CURRENCY, game_state)
+from ..library.modules import (commands, Embed, Select, View, SelectOption)
 
 from ..library.functions import give_all_factories
 

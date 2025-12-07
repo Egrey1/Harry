@@ -1,4 +1,4 @@
-from ..library.modules import View, Button, give_country, Context, hybrid_command
+from ..library.modules import View, Button, deps, Context, hybrid_command
 from ..library.functions import give_army, give_enterprise
 
 class InvCommand:

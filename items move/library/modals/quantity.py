@@ -1,4 +1,4 @@
-from ..modules import Modal, TextInput, Interaction, get_inventory, con, DATABASE_PATH
+from ..modules import Modal, TextInput, Interaction, con, deps
 
 class Quantity(Modal):
     def __init__(self, item, had, country1, country2):

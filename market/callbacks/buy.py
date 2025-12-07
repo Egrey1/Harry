@@ -1,4 +1,4 @@
-from ..library import Interaction, Select, SelectOption, View, CURRENCY
+from ..library import Interaction, Select, SelectOption, View, deps
 from ..modals import BuyModal
 
 async def choosed_seller(interaction: Interaction, country: str, item: str, positions: dict[str, dict]):

@@ -1,4 +1,4 @@
-from ..library import Interaction, con, DATABASE_COUNTRIES
+from ..library import Interaction, deps
 
 async def rem(interaction: Interaction, country: str):
     item = interaction.data['values'][0]

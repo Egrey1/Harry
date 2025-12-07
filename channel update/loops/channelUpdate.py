@@ -1,4 +1,4 @@
-from ..library.modules import Bot, game_state, GUILD, CHANNEL_ID, loop
+from ..library.modules import Bot, deps, loop
 from ..library.functions import increment_iteration
 
 class ChannelUpdate:

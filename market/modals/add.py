@@ -1,4 +1,4 @@
-from ..library import Modal, TextInput, Interaction, con, DATABASE_COUNTRIES
+from ..library import Modal, TextInput, Interaction, con, deps
 from ..library.functions import give_items
 
 class Add(Modal):

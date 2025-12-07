@@ -1,6 +1,5 @@
 from ..modules import (Interaction,  Modal, TextInput,
-                       CURRENCY, get_money, 
-                       con, DATABASE_PATH)
+                       con)
 
 # Модальное окно для запроса количества
 class Buy(Modal):
@@ -22,7 +21,7 @@ class Buy(Modal):
             quantity = int(quantity)
             
             # Проверяем может ли человек позволить себе этот предмет
-            money = await get_money(self.country)
+            money = await get_money(self.country) # EDIT! USE Country OBJECT AND .balance ATTRIBUTE
             if money < quantity * self.cost:
                 await interaction.followup.send('У твоей страны нет столько денег', ephemeral=True)
                 return None

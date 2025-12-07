@@ -153,8 +153,8 @@ class Country:
         if self.busy:
             try:
                 await self.busy.edit(nick=new_nickname)
-            except Exception:
-                pass  # Игнорируем ошибки изменения никнейма
+            except:
+                pass  # Игнорируем ошибки изменения никнейма -> translate: Ignore
 
     async def unreg(self, interaction: Interaction | Context | None = None):
         """Открепляет участника Discord от страны и сбрасывает его роли.

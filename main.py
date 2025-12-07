@@ -1,5 +1,5 @@
 from dependencies import bot, TOKEN
-from config import config
+from config import first_config, second_config
 
 
 async def load_extensions():
@@ -20,7 +20,7 @@ async def load_extensions():
 @bot.event
 async def on_ready():
     print(f'Бот запускается!')
-    config()
+    second_config()
     await load_extensions()
     await bot.tree.sync()
     print(f'Бот {bot.user} успешно запущен!')
@@ -30,5 +30,6 @@ async def on_ready():
 
 
 if __name__ == "__main__":
+    first_config()
     bot.run(TOKEN)
     

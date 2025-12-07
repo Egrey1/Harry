@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, Country
+from ..library.modules import hybrid_command, has_permissions, describe, Context, SelectOption, View, Select, deps
 from ..library.functions import give_all_no_surrend_countries
 from ..library.callbacks import surrend_callback
 

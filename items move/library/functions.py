@@ -1,4 +1,4 @@
-from .modules import con, DATABASE_PATH
+from .modules import con, deps
 
 async def remove_item(item: str, quantity: int, country: str) -> int:
     connect = con(DATABASE_PATH)

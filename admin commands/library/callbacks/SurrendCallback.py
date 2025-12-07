@@ -1,5 +1,6 @@
-from ..modules import Interaction, con, ROLE_PICKER_PATH, give_country, Country
+from ..modules import Interaction, con, deps
 
+# temp file
 async def surrend_callback(interaction: Interaction):
     await interaction.response.defer(ephemeral=True)
 

@@ -1,4 +1,4 @@
-from ..library import Cog, Bot, hybrid_command, Context, give_country, SelectOption, CURRENCY, Select, View
+from ..library import Cog, Bot, hybrid_command, Context, SelectOption, Select, View
 from ..library.functions import country_positions, give_items
 from ..callbacks import edit_callback
 

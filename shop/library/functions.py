@@ -1,4 +1,4 @@
-from .modules import con, DATABASE_PATH, Row
+from .modules import con, Row
 
 # Получаем все фабрики
 async def give_all_factories() -> tuple:

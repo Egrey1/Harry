@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, Context, describe, Member, give_country, Country
+from ..library.modules import hybrid_command, has_permissions, Context, describe, Member, deps
 from ..library.functions import unreg_function
 
 class UnregPlayerCommand:

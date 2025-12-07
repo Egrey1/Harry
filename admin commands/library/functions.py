@@ -1,4 +1,4 @@
-from .modules import con, DATABASE_PATH, Row, Interaction, roles_id, Country
+from .modules import con, Row, Interaction, deps
 
 #ROLE_PICKER = ROLE_PICKER_PATH
 async def give_all_countries() -> tuple:

@@ -1,4 +1,4 @@
-from ..library.modules import con, DATABASE_PATH, Row
+from ..library.modules import con, deps, Row
 
 async def have_sea(country: str) -> bool:
     from config import DATABASE_ROLE_PICKER as ROLE_PICKER_PATH

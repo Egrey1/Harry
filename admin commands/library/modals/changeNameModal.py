@@ -1,4 +1,4 @@
-from ..modules import Modal, TextInput, Interaction, con, ROLE_PICKER_PATH, Country
+from ..modules import Modal, TextInput, Interaction, con, deps
 from ..functions import is_busy
 
 class ChangeNickNameModal(Modal):

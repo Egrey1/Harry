@@ -1,4 +1,4 @@
-from ..library import Bot, hybrid_command, Context, give_country, View, Select, SelectOption
+from ..library import Bot, hybrid_command, Context, View, Select, SelectOption
 from ..library.functions import market_summary
 from ..callbacks import buy_callback
 

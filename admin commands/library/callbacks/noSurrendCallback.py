@@ -1,5 +1,6 @@
-from ..modules import Interaction, con, ROLE_PICKER_PATH
+from ..modules import Interaction, con, deps
 
+# Temp file
 async def no_surrend_callback(interaction: Interaction):
     await interaction.response.defer(ephemeral=True)
 

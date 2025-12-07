@@ -1,4 +1,4 @@
-from ..library import Cog, Bot, hybrid_command, Context, Embed, CURRENCY
+from ..library import Cog, Bot, hybrid_command, Context, Embed, deps
 from ..library.functions import market_summary
 
 class Market():

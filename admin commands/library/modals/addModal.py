@@ -1,4 +1,4 @@
-from ..modules import Modal, TextInput, Interaction, con, DATABASE_PATH, Item, Country
+from ..modules import Modal, TextInput, Interaction, con, deps # deps.Item...
 
 class MarketEdit(Modal):
     def __init__(self, item: Item, country: Country):
