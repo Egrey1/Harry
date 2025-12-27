@@ -1,5 +1,5 @@
 from ..library import Cog, Bot, hybrid_command, Context, Embed, deps
-from ..library.functions import market_summary
+from ..library.modules import con, Row
 
 class Market():
     def __init__(self, bot: Bot):
@@ -7,11 +7,46 @@ class Market():
 
     @hybrid_command(name="market", description="Просмотр рынка")
     async def dmarket(self, ctx: Context):
-        market = await market_summary()
+        # Inline summary of market table
+        connect = con(deps.DATABASE_COUNTRIES)
+        connect.row_factory = Row
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       SELECT * 
+                       FROM market
+                       """)
+        rows = cursor.fetchall()
+        connect.close()
+
+        market: dict[str, dict] = {}
+
+        for row in rows:
+            r = dict(row)
+            country = r.get('name')
+            for key, value in r.items():
+                if key == 'name' or not value:
+                    continue
+                try:
+                    qty_str, price_str = str(value).split()
+                    qty = int(qty_str)
+                    price = int(price_str)
+                except Exception:
+                    continue
+
+                if qty <= 0:
+                    continue
+
+                if key not in market:
+                    market[key] = {'total': 0, 'sellers': []}
+
+                market[key]['total'] += qty
+                market[key]['sellers'].append({'country': country, 'price': price, 'qty': qty})
+
         if not market:
             await ctx.send("Пока что никто ничего не продает", ephemeral=True)
             return
-        
+
         desc = ''
 
         for item, details in market.items():

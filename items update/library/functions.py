@@ -1,8 +1,7 @@
 from ..library.modules import con, deps, Row
 
 async def have_sea(country: str) -> bool:
-    from config import DATABASE_ROLE_PICKER as ROLE_PICKER_PATH
-    connect = con(ROLE_PICKER_PATH)
+    connect = con(deps.DATABASE_ROLE_PICKER_PATH)
     cursor = connect.cursor()
 
     cursor.execute(f"""
@@ -16,7 +15,7 @@ async def have_sea(country: str) -> bool:
     return bool(result)
 
 async def give_factories() -> tuple[dict[str, any], ...]:
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
 
@@ -34,7 +33,7 @@ async def give_factories() -> tuple[dict[str, any], ...]:
     return result
 
 async def to_items(factories_have: tuple[dict[str, any]]) -> tuple[dict[str, any]]:
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
 
@@ -66,7 +65,7 @@ async def to_items(factories_have: tuple[dict[str, any]]) -> tuple[dict[str, any
     return tuple(result)
 
 async def set_upd(coutry_items: tuple[dict[str, any]]) -> None:
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
 
@@ -85,7 +84,7 @@ async def set_upd(coutry_items: tuple[dict[str, any]]) -> None:
     return None
 
 async def give_items() -> tuple[dict[str, any], ...]:
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
 

@@ -1,7 +1,7 @@
 from ..modules import Modal, TextInput, Interaction, con, deps # deps.Item...
 
 class MarketEdit(Modal):
-    def __init__(self, item: Item, country: Country):
+    def __init__(self, item: deps.Item, country: deps.Country):
         
         super().__init__(title='Выберите количество и новую цену в рынке для предмета')
         self.item = item
@@ -35,7 +35,7 @@ class MarketEdit(Modal):
         return None
 
 class Quantity(Modal):
-    def __init__(self, item: Item, country: str | Country):
+    def __init__(self, item: deps.Item, country: str | deps.Country):
         super().__init__(title="Выбор количества")  
         self.item = item
         self.country = country

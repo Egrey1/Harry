@@ -1,23 +1,8 @@
 from ..modules import Interaction, con, deps
 
 # temp file
-async def surrend_callback(interaction: Interaction):
-    await interaction.response.defer(ephemeral=True)
-
-    country = ''.join(interaction.data['values'])
-    connect = con(ROLE_PICKER_PATH)
-    cursor = connect.cursor()
-
-    cursor.execute(f"""
-                    UPDATE roles
-                    SET surrender = ' '
-                    WHERE name = '{country}'
-                    """)
-    
-    country = await give_country(interaction.user.mention)
+async def surrend_callback(interaction: Interaction, value: str):
+    country = deps.Country(value)
     await country.change_surrend()
-    
-    connect.commit()
-    connect.close()
 
-    await interaction.followup.send('Страна подписана как сдавшиеся!', ephemeral=True)
+    await interaction.response.send_message('Страна подписана как сдавшиеся!', ephemeral=True)

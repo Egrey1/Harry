@@ -3,8 +3,8 @@ from ..functions import give_roles, set_is_busy
 
 
 # Основная логика  файла
-async def picker_callback(interaction: Interaction) -> None:
-    country_name = ''.join(interaction.data['values']) 
+async def picker_callback(interaction: Interaction, value: str) -> None:
+    country_name = value
     picker = await give_roles(country_name)
     await interaction.response.defer(ephemeral=True)
     user = interaction.user
@@ -14,7 +14,7 @@ async def picker_callback(interaction: Interaction) -> None:
         try:
             await user.edit(nick=picker['nickname']) 
         except:
-            await interaction.followup.send(f'Произошла ошибка при смене никнейма. Обратитесь в поддержку: {picker['nickname']}', ephemeral=True) # type: ignore
+            await interaction.followup.send(f'Произошла ошибка при смене никнейма. Обратитесь в поддержку: {picker['nickname']}', ephemeral=True)
         
         # Создаем переменные всех неконстаных ролей с их ID
         sea = picker['sea']

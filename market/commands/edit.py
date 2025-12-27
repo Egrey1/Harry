@@ -1,5 +1,4 @@
 from ..library import Cog, Bot, hybrid_command, Context, SelectOption, Select, View
-from ..library.functions import country_positions, give_items
 from ..callbacks import edit_callback
 
 class Edit():
@@ -13,16 +12,17 @@ class Edit():
             await ctx.send("Вы не зарегистрированы!", ephemeral=True)
             return
         
-        positions = await country_positions(country)
+        # Build positions from Country.market
+        positions = {name: f"{item.quantity} {item.price}" for name, item in country.market.inventory.items() if item.quantity > 0}
         if not positions: 
             await ctx.send("Нет у вас на рынке ничего!", ephemeral=True)
             return
         
-        
         view = View()
         options = []
         for item, value in positions.items():
-            have = await give_items(country, item)
+            have_item = country.inventory.get(item)
+            have = have_item.quantity if have_item else 0
             qty, price = value.split()
             options.append(SelectOption(label=f'{item} - {qty}', description=f"У вас есть {have}, каждая по {CURRENCY}{price}"))
         

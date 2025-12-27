@@ -2,7 +2,7 @@ from discord import Interaction, Member, TextChannel, Role, SelectOption, Button
 from discord.ext.commands import Context
 from discord.ui import View, Select, Button
 
-from sqlite3 import connect as con
+from sqlite3 import connect
 from sqlite3 import Row
 
 import dependencies as deps

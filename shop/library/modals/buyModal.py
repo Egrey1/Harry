@@ -1,27 +1,28 @@
 from ..modules import (Interaction,  Modal, TextInput,
-                       con)
+                       con, deps)
 
 # Модальное окно для запроса количества
 class Buy(Modal):
-    def __init__(self, money, cost, country, item):
+    def __init__(self, money: int, cost: int, country: deps.Country, factory: deps.Factory):
         super().__init__(title='Введите количество')
         self.cost = cost
         self.max_buy = int(money / cost) if cost != 0 else '∞'
         self.country = country
-        self.item = item
+        self.factory = factory
 
-        self.quantity = TextInput(label=f'У вас ' + CURRENCY + str(money), placeholder='Вы можете приобрести ' + str(self.max_buy) + 'шт.', required=True)
+        self.quantity = TextInput(label=f'У вас ' + deps.CURRENCY + str(money), placeholder='Вы можете приобрести ' + str(self.max_buy) + 'шт.', required=True)
         self.add_item(self.quantity)
     
     async def on_submit(self, interaction: Interaction) -> None:
         # Делаем проверку на значение
         quantity = self.quantity.value
         await interaction.response.defer(ephemeral=True)
+        self.country = deps.Country(self.country.name)  # Обновляем данные страны
         try:
             quantity = int(quantity)
             
             # Проверяем может ли человек позволить себе этот предмет
-            money = await get_money(self.country) # EDIT! USE Country OBJECT AND .balance ATTRIBUTE
+            money = self.country.balance 
             if money < quantity * self.cost:
                 await interaction.followup.send('У твоей страны нет столько денег', ephemeral=True)
                 return None
@@ -30,11 +31,11 @@ class Buy(Modal):
                 return None
             
             # Делаем SQL запросы
-            connect = con(DATABASE_PATH)
+            connect = con(deps.DATABASE_COUNTRIES_PATH)
             cursor = connect.cursor()
             cursor.execute(f"""
                             UPDATE country_factories
-                            SET "{self.item}" = "{self.item}" + {quantity}
+                            SET "{self.factory.name}" = "{self.factory.name}" + {quantity}
                             WHERE name = "{self.country}"
                            """)
             connect.commit()
@@ -47,16 +48,16 @@ class Buy(Modal):
             connect.commit()
 
             cursor.execute(f"""
-                            SELECT "{self.item}"
+                            SELECT "{self.factory.name}"
                             FROM country_factories
                             WHERE name = '{self.country}'
                            """)
             count = cursor.fetchone()[0]
 
-            money = await get_money(self.country)
+            money = self.country.balance
             connect.close()
  
-            await interaction.followup.send(f'Теперь у вас {count} зданий вида: {self.item}\nИ {CURRENCY}{money} на балансе', ephemeral=True)
+            await interaction.followup.send(f'Теперь у вас {count} зданий вида: {self.factory.name}\nИ {deps.CURRENCY}{money} на балансе', ephemeral=True)
             
 
 

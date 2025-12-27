@@ -1,5 +1,4 @@
 from ..library import Bot, hybrid_command, Context, deps, Select, SelectOption, View
-from ..library.functions import country_positions
 
 class Rem():
     def __init__(self, bot: Bot):
@@ -12,7 +11,7 @@ class Rem():
             await ctx.reply("Ты даже не страна!")
             return
         
-        positions = await country_positions(country)
+        positions = country.market.get_inv()
         if not positions:
             await ctx.reply("У тебя нет позиций на рынке!")
             return

@@ -2,7 +2,7 @@ from .modules import con, Row, Interaction, deps
 
 #ROLE_PICKER = ROLE_PICKER_PATH
 async def give_all_countries() -> tuple:
-    from .modules import ROLE_PICKER_PATH
+    ROLE_PICKER_PATH = deps.DATABASE_ROLE_PICKER_PATH
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -14,7 +14,7 @@ async def give_all_countries() -> tuple:
     return result
 
 async def give_all_no_surrend_countries() -> tuple:
-    from .modules import ROLE_PICKER_PATH
+    ROLE_PICKER_PATH = deps.DATABASE_ROLE_PICKER_PATH
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -27,7 +27,7 @@ async def give_all_no_surrend_countries() -> tuple:
     return result
 
 async def give_all_surrend_countries() -> tuple:
-    from .modules import ROLE_PICKER_PATH
+    ROLE_PICKER_PATH = deps.DATABASE_ROLE_PICKER_PATH
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
@@ -40,6 +40,7 @@ async def give_all_surrend_countries() -> tuple:
     return result
 
 async def give_all_factories() -> tuple:
+    DATABASE_PATH = deps.DATABASE_COUNTRIES_PATH
     connect = con(DATABASE_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
@@ -58,6 +59,7 @@ async def give_all_factories() -> tuple:
 
 # It should work, I didn't check it.
 async def give_all_proops() -> tuple:
+    DATABASE_PATH = deps.DATABASE_COUNTRIES_PATH
     connect = con(DATABASE_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()

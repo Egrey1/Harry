@@ -1,5 +1,4 @@
 from ..library import Interaction, give_country
-from ..library.functions import give_items, country_positions
 from ..modals import EditModal
 
 async def edit(interaction: Interaction):
@@ -10,8 +9,10 @@ async def edit(interaction: Interaction):
         await interaction.response.send_message("Вы не зарегистрированы!", ephemeral=True)
         return
     
-    have = await give_items(country, item)
-    on_market = (await country_positions(country))[item]
+    have_item = country.inventory.get(item)
+    have = have_item.quantity if have_item else 0
+    market_item = country.market.inventory.get(item)
+    on_market = f"{market_item.quantity} {market_item.price}" if market_item else "0 0"
 
     modal = EditModal(country, item, have, on_market) 
     await interaction.response.send_modal(modal)

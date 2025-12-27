@@ -11,10 +11,5 @@ class ChannelUpdaterCog(Cog, ChannelUpdate):
         self.update_channel.cancel()
     
 
-        
-
-
-        
-
 async def setup(bot: Bot):
     await bot.add_cog(ChannelUpdaterCog(bot))

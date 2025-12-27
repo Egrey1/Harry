@@ -2,7 +2,7 @@ from ..modules import Modal, TextInput, Interaction, con, deps
 from ..functions import is_busy
 
 class ChangeNickNameModal(Modal):
-    def __init__(self, country: Country):
+    def __init__(self, country: deps.Country):
         super().__init__(title="Поменять никнейм")  
         self.country = country
         

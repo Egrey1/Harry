@@ -1,8 +1,8 @@
-from .modules import con, Row
+from .modules import con, Row, deps
 
 # Получаем все фабрики
 async def give_all_factories() -> tuple:
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
     cursor.execute("""

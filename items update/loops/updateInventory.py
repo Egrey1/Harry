@@ -9,11 +9,11 @@ class UpdateInventory:
     @tasks.loop(hours=1)
     # @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
-        if not game_state['game_started']:
+        if not deps.game_state['game_started']:
             return
         
         print('Инвентарь обновляется')
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
 
 

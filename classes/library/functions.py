@@ -15,7 +15,7 @@ def get_options(values: Dict[str, str], page: int = 1) -> Tuple[List[SelectOptio
     
     keys = list(values.keys())
 
-    page_size = PAGE_SIZE
+    page_size = deps.PAGE_SIZE
     total_pages = (len(keys) + page_size - 1) // page_size  # ceil division
 
     # Ограничиваем page допустимым диапазоном
@@ -44,7 +44,7 @@ def get_options(values: Dict[str, str], page: int = 1) -> Tuple[List[SelectOptio
 def getbalance(country: str | Country) -> int:
     name = country.name if type(country) == Country else country
     
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     cursor = connect.cursor()
     
     cursor.execute(f"""
@@ -60,7 +60,7 @@ def getbalance(country: str | Country) -> int:
 def getfact(country: str | Country, give_factory: str | Factory | None = None) -> dict[str: Factory] | Factory:
     name = country.name if type(country) == Country else country
     
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
     
@@ -83,7 +83,7 @@ def getfact(country: str | Country, give_factory: str | Factory | None = None) -
 
 def getinv(name: str | Country, give_item: str | Item | None = None) -> dict[str: Item] | Item:
     name = name.name if type(name) == Country else name
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
     

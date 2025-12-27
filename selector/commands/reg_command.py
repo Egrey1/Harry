@@ -11,12 +11,11 @@ from ..library.functions import give_all_countries
 
 class RegCoommand():
     @commands.hybrid_command(name='reg', description='Зарегистрироваться за страну')
-    @app_commands.describe(page='На какую страницу переключить селектор')
-    async def send_role_picker(self, ctx: commands.Context, page: int = 1) -> None:
+    async def send_role_picker(self, ctx: commands.Context) -> None:
         if not ctx.interaction:
             return None
         
-        if await give_country(ctx.interaction.user.mention):
+        if deps.Country(ctx.author.mention).busy:
             await ctx.interaction.response.send_message('Чего это? За две страны одновременно поиграть захотелось? А вот нельзя, не разрешаю!')
             return None
 
@@ -25,33 +24,11 @@ class RegCoommand():
             return None
         countries = await give_all_countries()  
 
-
-        # -------------------------------------------- SEE --------------------------------------------------
-        PAGE_SIZE = 25
-        try:
-            options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
-            
-            if not options:
-                if ctx.interaction:
-                    await ctx.interaction.response.send_message('Неправильно введена страница')
-                else:
-                    await ctx.send('Неправильно введена страница', view= view)
-                return None
-        except:
-            if ctx.interaction:
-                await ctx.interaction.response.send_message('Неправильно введена страница')
-            else:
-                await ctx.send('Неправильно введена страница', view= view)
-        # --------- YOU NEED TO USE deps.ChooseMenu FROM classes.help_objects.py. READ DOCUMENTATION ------
-
-        view = View()
-        select = Select(placeholder='Выберите страну', options=options)
-        select.callback = picker_callback
-
-        view.add_item(select)
+        values = {i: i for i in countries if not deps.Country(i).busy}
+        if not values:
+            await ctx.interaction.response.send_message("Увы, но доступных для регистрации стран нет", ephemeral= True)
+            return None
         
-        if ctx.interaction:
-            if not options:
-                await ctx.interaction.response.send_message("Увы, но доступных для регистрации стран нет", ephemeral= True)
-                return None
-            await ctx.interaction.response.send_message("Вам представлен список доступных для регистрации стран", view=view, ephemeral=True)
+        view = deps.ChooseMenu(values, picker_callback)
+        msg = await ctx.interaction.response.send_message("Вам представлен список доступных для регистрации стран", view=view, ephemeral=True)
+        view.message = msg

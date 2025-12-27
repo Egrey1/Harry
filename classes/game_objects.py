@@ -4,7 +4,9 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import *
+from .library import Row, getinv, getfact, getbalance, Interaction, Context, List
+from .library import connect as con
+import dependencies as deps
 
 
 
@@ -40,7 +42,7 @@ class Country:
         """
         self.busy = None
         if name.startswith('<@') and name.endswith('>'):
-            connect = con(ROLE_PICKER_PATH)
+            connect = connect(deps.DATABASE_ROLE_PICKER_PATH)
             cursor = connect.cursor()
             
             cursor.execute(f"""
@@ -61,7 +63,7 @@ class Country:
         self.factories = getfact(name)
         self.balance = getbalance(name)
 
-        connect = con(ROLE_PICKER_PATH)
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
         
         cursor.execute(f"""
@@ -72,14 +74,14 @@ class Country:
         fetch = cursor.fetchone()
         connect.close()
         
-        self.busy = guild.get_member(int(fetch[0][2:-1])) if fetch and fetch[0] else None
+        self.busy = deps.guild.get_member(int(fetch[0][2:-1])) if fetch and fetch[0] else None
         self.surrend = bool(fetch[1]) if fetch else False
-        self.sea = guild.get_role(int(fetch[2])) if fetch and fetch[2] else None
-        self.assembly = guild.get_role(int(fetch[3])) if fetch and fetch[3] else None
+        self.sea = deps.guild.get_role(int(fetch[2])) if fetch and fetch[2] else None
+        self.assembly = deps.guild.get_role(int(fetch[3])) if fetch and fetch[3] else None
         self.nickname = fetch[4] if fetch and fetch[4] is not None else ""
         
         # Добавить в документацию
-        connect = con(FOCUS_PATH)
+        connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
                         SELECT doing, completed
@@ -109,7 +111,7 @@ class Country:
                 имя страны берётся из значения выбора в интерактивном меню.
         """
         name = interaction.data['values'][0] if interaction else self.name
-        connect = con(ROLE_PICKER_PATH)
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
         
         if self.surrend:
@@ -139,7 +141,7 @@ class Country:
         Args:
             new_nickname (str): Новый никнейм для страны.
         """
-        connect = con(ROLE_PICKER_PATH)
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
         cursor.execute(f"""
@@ -170,16 +172,16 @@ class Country:
             return None
         
         user = self.busy
-        for role_id in roles_id.values():
+        for role_id in deps.RP_ROLES.values():
             try:
-                role = guild.get_role(role_id) 
+                role = deps.guild.get_role(role_id) 
                 if role:
                     await user.remove_roles(role) 
             except Exception:
                 continue
 
         try:
-            unreg_role = guild.get_role(1344519330091503628)
+            unreg_role = deps.guild.get_role(1344519330091503628)
             if unreg_role:
                 await user.add_roles(unreg_role)  
         except Exception:
@@ -190,7 +192,7 @@ class Country:
         except Exception:
             pass
         
-        connect = con(ROLE_PICKER_PATH)
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
         cursor.execute(f"""
@@ -238,7 +240,7 @@ class Item:
         self.quantity = quantity if quantity is not None else (getinv(country, name).quantity if country else 0)
         self.price = price
 
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
         cursor.execute(f"""
@@ -269,7 +271,7 @@ class Item:
         """
         country_name = country.name if isinstance(country, Country) else country
         self.quantity = quantity
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
                         UPDATE country_inventories
@@ -306,7 +308,7 @@ class Market:
         self.name = country_name
         self.inventory = {}
 
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
 
@@ -370,7 +372,7 @@ class Market:
         Returns:
             None
         """
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
             INSERT INTO market (name, `{item.name}`)
@@ -397,7 +399,7 @@ class Market:
             return None
 
         self.inventory[item.name] = item
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
             UPDATE market
@@ -419,7 +421,7 @@ class Market:
             None
         """
         item_name = item.name if isinstance(item, Item) else item
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
             UPDATE market
@@ -462,7 +464,7 @@ class Factory:
         self.quantity = quantity if quantity is not None else (getfact(country, factory_name).quantity if country else 0)
         self.country = Country(country) if country else None
 
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
         cursor.execute(f"""
@@ -496,7 +498,7 @@ class Factory:
         """
         country_name = country.name if isinstance(country, Country) else country
         self.quantity = quantity
-        connect = con(DATABASE_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
                         UPDATE countries_factory
@@ -510,7 +512,7 @@ class Factory:
 
 class Focus:
     def __init__(self, name: str, owner: Country | None = None):
-        connect = con(FOCUS_PATH)
+        connect = con(deps.DATABASE_FOCUS_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
 
@@ -578,4 +580,4 @@ class Focus:
         if not text:
             return
 
-        await get_channel('event').send(text)
+        # await get_channel('event').send(text)

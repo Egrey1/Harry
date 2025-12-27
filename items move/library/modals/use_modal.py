@@ -11,12 +11,25 @@ class UseModal(Modal):
         self.add_item(self.quantity)
     
     async def on_submit(self, interaction: Interaction) -> None:
-        quantity = int(self.quantity.value)
-        count = 0
+        raw = (self.quantity.value or '').strip()
+        try:
+            quantity = int(raw)
+        except ValueError:
+            await interaction.response.send_message('Пожалуйста, введите целое число больше нуля.', ephemeral=True)
+            return None
+
+        if quantity <= 0:
+            await interaction.response.send_message('Количество должно быть положительным.', ephemeral=True)
+            return None
+
+        original_item = self.country.inventory.get(self.item)
+        original_qty = original_item.quantity if original_item else 0
 
         try:
-            count = int(await remove_item(self.item, quantity, self.country))
-        except ValueError:
-            await interaction.response.send_message('Думаешь ввел отрицательное число и самый умный?', ephemeral=True)
+            new_qty = await remove_item(self.item, quantity, self.country)
+        except ValueError as exc:
+            await interaction.response.send_message(str(exc), ephemeral=True)
             return None
-        await interaction.response.send_message(f'Все, нету больше твоих солдатиков, самолетиков или что там было. Теперь их у тебя `{count}`')
+
+        removed = original_qty - int(new_qty)
+        await interaction.response.send_message(f'Удалено `{removed}` предмет(ов). Осталось `{new_qty}`.', ephemeral=True)

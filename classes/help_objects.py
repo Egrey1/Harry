@@ -1,26 +1,4 @@
-"""
-:class:`ChooseMenu` — how to use? 
-```
-async def on_choice_selected(interaction: Interaction, value: str):
-    await interaction.response.send_message(f"You have chosen: `{value}`", 
-                                            ephemeral=True)
-
-# Somewhere in the code...:
-values = {f"Country {i}": f"country_{i}" for i in range(1, 50)}
-view = ChooseMenu(values, on_choice_selected)
-view.message = await interaction.response.send_message(
-    "Select country:", 
-    view=view, 
-    ephemeral=True
-)
-```
-⚠️ To make `view.message` work, you need to save a link to the message. In `discord.py`, you can do this:
-```
-msg = await interaction.response.send_message("...", view=view)
-view.message = msg
-```
-"""
-from .library import *
+from .library import View, Select, Button, ButtonStyle, Dict, Callable, Awaitable, Interaction, NotFound, Lock, get_options
 #from .library import (View, Select, Button, 
 #                      ButtonStyle, Dict, 
 #                      Callable, Awaitable,

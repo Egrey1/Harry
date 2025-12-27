@@ -1,5 +1,4 @@
 from ..library import Cog, Bot, hybrid_command, Context, View, SelectOption, Select
-from ..library.functions import give_items
 from ..callbacks import add_callback
 
 class Add():
@@ -14,7 +13,8 @@ class Add():
             await ctx.send('Ты не зарегистрирован!', ephemeral=True)
             return
         
-        items = await give_items(country)
+        # Use Country object inventory directly
+        items = {k: v.quantity for k, v in country.inventory.items()}
 
         view = View()
         options = []

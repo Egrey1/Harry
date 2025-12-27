@@ -5,32 +5,10 @@ from ..library.callbacks import no_surrend_callback
 class NoSurrendCommand:
     @hybrid_command(name='nosurrend', description='Снять метку капитуляции')
     @has_permissions(administrator= True)
-    @describe(page='Выберите страницу')
-    async def nosurrend(self, ctx: Context, page: int = 1):
+    async def nosurrend(self, ctx: Context):
         countries = await give_all_surrend_countries()
         
-        PAGE_SIZE = 25
-        try:
-            options = [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * PAGE_SIZE, min((page) * PAGE_SIZE, len(countries))) if i < len(countries)]
-            
-            if not options:
-                if ctx.interaction:
-                    await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
-                else:
-                    await ctx.send('Неправильно введена страница или список пуст')
-                return None
-        except:
-            if ctx.interaction:
-                await ctx.interaction.response.send_message('Неправильно введена страница или список пуст', ephemeral=True)
-            else:
-                await ctx.send('Неправильно введена страница или список пуст')   
-                
-        view = View()
-        select = Select(placeholder= 'Опять кто-то из пепла восстает?', options= options)
-        select.callback = Country().change_surrend
-        view.add_item(select)
-        
-        if ctx.interaction:
-            await ctx.interaction.response.send_message('Введите страну, которая больше не отмечена как сдавшиеся', view= view, ephemeral=True)
-        else:
-            await ctx.send('Введите страну, которая больше не отмечена как сдавшиеся', view= view) 
+        values = {i: i for i in countries}
+        view = deps.ChooseMenu(values, no_surrend_callback)
+        msg = await ctx.send('Введите страну, которая больше не отмечена как сдавшиеся', view= view, ephemeral=True)
+        view.message = msg

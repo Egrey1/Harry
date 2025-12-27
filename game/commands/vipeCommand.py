@@ -12,7 +12,7 @@ class VipeCommand:
         if ctx.interaction:
             await ctx.interaction.response.defer(ephemeral=True)
 
-        connect = con(DATABASE_ROLE_PICKER_PATH)
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
         cursor.execute(f"""
@@ -26,7 +26,7 @@ class VipeCommand:
         for member in result:
             await unreg_function(self.guild.get_member(int(member[0][2:-1])), self.guild)
         
-        connect = con(DATABASE_COUNTRIES_PATH)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
 
         cursor.execute(f"DELETE FROM country_factories")
@@ -46,9 +46,9 @@ class VipeCommand:
         connect.commit()
         connect.close()
 
-        game_state['game_started'] = not game_state['game_started']
+        deps.game_state['game_started'] = not deps.game_state['game_started']
 
         if ctx.interaction:
-            await ctx.interaction.followup.send('Новый вайп начался!' if game_state['game_started'] else 'Этот вайп закончился!', ephemeral=False)
+            await ctx.interaction.followup.send('Новый вайп начался!' if deps.game_state['game_started'] else 'Этот вайп закончился!', ephemeral=False)
         else:
-            await ctx.send('Новый вайп начался!' if game_state['game_started'] else 'Этот вайп закончился!')
+            await ctx.send('Новый вайп начался!' if deps.game_state['game_started'] else 'Этот вайп закончился!')

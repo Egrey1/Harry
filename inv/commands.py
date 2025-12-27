@@ -1,4 +1,4 @@
-from .library.modules import View, Button, give_country, Context, hybrid_command, CURRENCY, get_money
+from .library.modules import View, Button, Context, hybrid_command, deps
 from .library.functions import give_army, give_enterprise
 
 class InvCommand:
@@ -9,16 +9,17 @@ class InvCommand:
         enterprise = Button(label='Предприятия', emoji='🏭')
         army.callback = give_army
         enterprise.callback = give_enterprise
+        country = deps.Country(ctx.author.mention)
 
         view.add_item(army)
         view.add_item(enterprise)
-        await ctx.reply(f'`{await give_country(ctx.author.mention) if await give_country(ctx.author.mention) else ctx.author.name}` конкрентизируйте', view=view, ephemeral=True)
+        await ctx.reply(f'`{country.name if await country.name else ctx.author.name}` конкрентизируйте', view=view, ephemeral=True)
 
 class BalCommand:
 
     @hybrid_command(name='bal', description='Посмотреть свой баланс')
     async def bal(self, ctx: Context) -> None:
-        country = await give_country(ctx.author.mention)
+        country = deps.Country(ctx.author.mention)
         if ctx.interaction:
             await ctx.interaction.response.defer(ephemeral=True)
         
@@ -31,10 +32,10 @@ class BalCommand:
             return None
         
 
-        money = await get_money(country)
+        money = country.balance
         
         if ctx.interaction:
-            await ctx.interaction.followup.send(f'Ваш баланс равен {CURRENCY}{money}', ephemeral= True)
+            await ctx.interaction.followup.send(f'Ваш баланс равен {deps.CURRENCY}{money}', ephemeral= True)
         else:
-            await ctx.reply(f'Ваш баланс равен {CURRENCY}{money}')
+            await ctx.reply(f'Ваш баланс равен {deps.CURRENCY}{money}')
         return None

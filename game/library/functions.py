@@ -1,7 +1,7 @@
 from .modules import Member, deps, con, Guild
 
 async def unreg_function(member: Member, guild: Guild):
-    for id in roles_id.values():
+    for id in deps.RP_ROLES.values():
         try:
             role = guild.get_role(id) 
             await member.remove_roles(role) 
@@ -15,7 +15,7 @@ async def unreg_function(member: Member, guild: Guild):
     except:
         pass
     
-    connect = con(DATABASE_PATH)
+    connect = con(deps.DATABASE_ROLE_PICKER_PATH)
     cursor = connect.cursor()
 
     cursor.execute(f"""

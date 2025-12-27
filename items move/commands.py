@@ -1,44 +1,33 @@
-from .library.modules import (hybrid_command, describe, Context, Member, View, Select, SelectOption,
-                               game_state, give_country, get_inventory)
+from .library.modules import (hybrid_command, describe, Context, Member, View, Select, SelectOption, deps)
 from .library.callbacks import give_callback, use_callback
 
 class GiveCommand:
     @hybrid_command (name= 'give', description='Передать вооружение стране')
     @describe(member='Кому передать')
     async def give(self, ctx: Context, member: Member):
-        if not game_state['game_started']:
+        if not deps.game_state['game_started']:
             return
         
         # Получаем названия их стран если они ими являются
-        country1 = await give_country(ctx.author.mention)
-        country2 = await give_country(member.mention)
-        
-        # Это слеш команда?
-        is_interaction = bool(ctx.interaction)
-        interaction = None
-        if is_interaction:
-            interaction = ctx.interaction
+        country1 = deps.Country(ctx.author.mention)
+        country2 = deps.Country(member.mention)
 
 		# Проверяем,являются ли пользователи странами 
-        if not country1:
-            if is_interaction:
-                await interaction.followup.send('Вы не страна!', ephemeral= True) 
-                return None
-            await ctx.send('Вы не страна!')
+        if country1.busy:
+            await ctx.send('Вы не страна!', ephemeral= True)
             return None
-        elif not country2:
-            if is_interaction:
-                await interaction.followup.send('Он не страна!', ephemeral= True) 
-                return None
-            await ctx.send('Он не страна!')
+        
+        if country2.busy:
+            await ctx.send('Он не страна!', ephemeral= True)
             return None
         
         # Создаем список предметов 
-        inv = await get_inventory(country1)
+        inv = country1.inventory
         options = []
-        for name, count in inv.items():
-            if name not in ('name', 'Пехота', 'Морпехота', 'Десантник', 'Кавалерия') and int(count):
-                options.append(SelectOption(label=f'{name} - {int(count)}шт.', value=name))
+        for name, item in inv.items():
+            item: deps.Item
+            if name != 'name' and item.purchasable and item.quantity:
+                options.append(SelectOption(label=f'{name} - {item.quantity}шт.', value=name))
 
 
         # Создаем объект 
@@ -48,21 +37,18 @@ class GiveCommand:
 
 		# Отправляем сообщение. Если была введена слеш команда, то отправляем только ему()
         view.add_item(select)
-        if is_interaction:
-            await interaction.response.send_message('Выберите что хотите передать, но только тихо....', ephemeral= True, view= view)
-        else:
-            await ctx.send('Выберите что передать', view= view)
+        await ctx.send('Выберите что хотите передать' + ', но только тихо....' if ctx.interaction else '', ephemeral= True, view= view)
 
 
 class UseCommand:
     @hybrid_command(name='use', description='Убрать предмет')
     async def use(self, ctx: Context) -> None:
-        country = await give_country(ctx.author.mention)
+        country = deps.Country(ctx.author.mention)
         if not country:
             await ctx.reply('Вы не страна!', ephemeral=True)
             return None
 
-        inv = await get_inventory(country)
+        inv = country.inventory
         options = []
         for name, count in inv.items():
             if name not in ('name') and int(count):
@@ -73,5 +59,5 @@ class UseCommand:
         select.callback = lambda interaction: use_callback(interaction, country)
         view.add_item(select)
 
-        await ctx.reply('Что должно испариться?', view= view, ephemeral=True)
+        await ctx.send('Что должно испариться?', view= view, ephemeral=True)
         

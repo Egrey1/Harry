@@ -9,7 +9,8 @@ class InvCommand:
         enterprise = Button(label='Предприятия', emoji='🏭')
         army.callback = give_army
         enterprise.callback = give_enterprise
+        country = deps.Country(ctx.author.mention)
 
         view.add_item(army)
         view.add_item(enterprise)
-        await ctx.reply(f'`{await give_country(ctx.author.mention) if await give_country(ctx.author.mention) else ctx.author.name}` конкрентизируйте', view=view, ephemeral=True)
+        await ctx.reply(f'`{country.name if await country.name else ctx.author.name}` конкрентизируйте', view=view, ephemeral=True)

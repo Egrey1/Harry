@@ -1,5 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, Context, describe, Member, deps
-from ..library.functions import unreg_function
+from ..library import hybrid_command, has_permissions, Context, describe, Member, deps
 
 class UnregPlayerCommand:
     @hybrid_command(name= 'unreg_player', description='Снимите регистрацию со страны')
@@ -10,7 +9,7 @@ class UnregPlayerCommand:
             await ctx.reply('/unreg_player правильнее будет')
             return
 
-        country = Country(ctx.author.mention)
+        country = deps.Country(member.mention)
         if not country.busy:
             await ctx.send('Мать моя богиня! Это же не страна, ты чего? Не буду я его снимать!', ephemeral= True)
             return

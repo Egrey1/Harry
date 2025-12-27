@@ -2,8 +2,8 @@ from ..modules import Interaction, SelectOption, View, Select, Button, deps
 from ..functions import give_all_factories, give_all_proops
 from ..modals.addModal import Quantity, MarketEdit
 
-async def country_selected(interaction: Interaction):
-    country = Country(interaction.data['values'][0])
+async def country_selected(interaction: Interaction, value: str):
+    country = deps.Country(value)
     view = View()
     
     
@@ -26,7 +26,7 @@ async def country_selected(interaction: Interaction):
 
 
 
-async def market_ask(interaction: Interaction, country: Country):
+async def market_ask(interaction: Interaction, country: deps.Country):
     purchasable = country.market.inventory.keys()
     
     view = View()
@@ -40,15 +40,15 @@ async def market_ask(interaction: Interaction, country: Country):
     
     
     
-async def market_add(interaction: Interaction, country: Country):
-    item = Item(interaction.data['values'][0])
+async def market_add(interaction: Interaction, country: deps.Country):
+    item = deps.Item(interaction.data['values'][0])
     
     modal = MarketEdit(item, country)
     await interaction.response.send_modal(modal)
 
 
 
-async def army_ask(interaction: Interaction, country: Country):
+async def army_ask(interaction: Interaction, country: deps.Country):
     view = View()
     
     select = Select(placeholder= 'Выберите Объект', options=[SelectOption(label= i, value= i) for i in (await give_all_proops()) ]) # Select an object
@@ -60,15 +60,15 @@ async def army_ask(interaction: Interaction, country: Country):
 
 
 
-async def army_add(interaction: Interaction, country: Country):
-    item = Item(interaction.data['values'][0]) # soldier 
+async def army_add(interaction: Interaction, country: deps.Country):
+    item = deps.Item(interaction.data['values'][0]) # soldier 
 
     modal = Quantity(item, country)
     await interaction.response.send_modal(modal)
 
 
 
-async def factory_ask(interaction: Interaction, country: Country):    
+async def factory_ask(interaction: Interaction, country: deps.Country):    
     factories = await give_all_factories()
     options = []
     
@@ -85,8 +85,8 @@ async def factory_ask(interaction: Interaction, country: Country):
 
 
 async def factory_add(interaction: Interaction):
-    item = Factory(interaction.data['values'][0])
-    country = await give_country(interaction.user.mention)
+    item = deps.Factory(interaction.data['values'][0])
+    country = deps.Country(interaction.user.mention)
 
     # Создаем модальное окно
     modal = Quantity(item, country)
