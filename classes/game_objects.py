@@ -239,6 +239,7 @@ class Item:
         self.name = name
         self.quantity = quantity if quantity is not None else (getinv(country, name).quantity if country else 0)
         self.price = price
+        self.country = Country(country) if isinstance(country, str) else (country if isinstance(country, Country) else None)
 
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
@@ -462,7 +463,7 @@ class Factory:
         """
         self.name = factory_name
         self.quantity = quantity if quantity is not None else (getfact(country, factory_name).quantity if country else 0)
-        self.country = Country(country) if country else None
+        self.country = Country(country) if isinstance(country, str) else (country if isinstance(country, Country) else None)
 
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
@@ -524,7 +525,7 @@ class Focus:
         fetch = cursor.fetchone()
         connect.close()
 
-        self.owner = owner
+        self.owner: Country | None = owner
         self.name: str = fetch['name']
         self.desc: str = fetch['desc']
         self._req: str | None = fetch['req']
@@ -580,4 +581,20 @@ class Focus:
         if not text:
             return
 
-        # await get_channel('event').send(text)
+        deps.rp_channels.get_event().send(text)
+    
+    async def declare_war(self):
+        if len(self._war) == 0:
+            return
+        countries = [i.name for i in self._war]
+        title = f'{self.owner} Объявляет войну ' + ('Государству ' + countries[0] if len(countries) == 1 else 'Государствам ' + ', '.join(countries))
+        content = 'По какой-то невиданной мне причине куратор так и не нашелся. В таком случае нам всем придется подождать!\n' + '||' + self.owner.busy.mention + ', ' + ', '.join([i.busy.mention for i in self._war if i.busy]) + '||'
+        await deps.rp_channels.get_war().create_thread(name=title, content=content)
+    
+    async def send_factories(self):
+        for factory in self._factories:
+            factory.edit_quantity(self.owner.factories[factory.name].quantity + factory.quantity, self.owner)
+    async def send_items(self):
+        for item in self._items:
+            item.edit_quantity(self.owner.inventory[item.name].quantity + item.quantity, self.owner)
+        

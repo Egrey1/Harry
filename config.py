@@ -102,12 +102,67 @@ def get_channel(name: str) -> TextChannel:
     }
     return utils.get(deps.guild.channels, names[name])
 
+def config_rpchannels():
+    async def tmp(self, event, war, news):
+        self.event = await deps.guild.get_role(event) if type(event) == int else (await utils.get(deps.guild.channels, event) if type(event) == str else event)
+        self.war = await deps.guild.get_role(war) if type(war) == int else (await utils.get(deps.guild.channels, war) if type(war) == str else war)
+        self.news = await deps.guild.get_role(news) if type(news) == int else (await utils.get(deps.guild.channels, news) if type(news) == str else news)
+    deps.RpChannels.__init__ = tmp
+    
+    
+    def tmp(self):
+        return self.event
+    deps.RpChannels.get_event = tmp
+    
+    async def tmp(self, event):
+        self.event = await deps.guild.get_role(event) if type(event) == int else (await utils.get(deps.guild.channels, event) if type(event) == str else event)
+    deps.RpChannels.set_event = tmp
+    
+    async def tmp(self):
+        new_channel = await self.event.clone()
+        await self.event.delete()
+        self.event = new_channel
+    deps.RpChannels.del_event = tmp
+    
+    
+    def tmp(self):
+        return self.war
+    deps.RpChannels.get_war = tmp
+    
+    async def tmp(self, war):
+        self.war = await deps.guild.get_role(war) if type(war) == int else (await utils.get(deps.guild.channels, war) if type(war) == str else war)
+    deps.RpChannels.set_war = tmp
+    
+    async def tmp(self):
+        new_channel = await self.war.clone()
+        await self.war.delete()
+        self.war = new_channel
+    deps.RpChannels.del_war = tmp
+    
+    
+    def tmp(self):
+        return self.news
+    deps.RpChannels.get_news = tmp
+    
+    async def tmp(self, news):
+        self.news = await deps.guild.get_role(news) if type(news) == int else (await utils.get(deps.guild.channels, news) if type(news) == str else news)
+    deps.RpChannels.set_news = tmp
+    
+    async def tmp(self):
+        new_channel = await self.news.clone()
+        await self.news.delete()
+        self.news = new_channel
+    deps.RpChannels.del_news = tmp
+    
+    
+
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
     deps.TOKEN = open('TOKEN.txt').readline()
     deps.intents = Intents.all()
     deps.PREFIX = '!'
-    deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents) 
+    deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
+    config_rpchannels
 
 async def second_config():
     """Присваивает остальным переменным их значения. Использовать функцию только после запуска"""
@@ -125,6 +180,8 @@ async def second_config():
             'sea': 1357681946276266044, 'assambley': 1357679628243959862, 
             'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 
             'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119}
+    deps.audit = await deps.guild.get_channel(1454735211647733917) # #гарри text channel
+    deps.rp_channels = deps.RpChannels()
 
 
 # from classes import *
