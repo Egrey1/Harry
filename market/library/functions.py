@@ -4,4 +4,4 @@
 #   - country.market.inventory / Item.price
 #   - use DB-level helpers in `classes.game_objects` if you need centralized mutation
 
-raise RuntimeError('market/library/functions.py has been removed; update call sites to use Country/Market/Item objects')
+# raise RuntimeError('market/library/functions.py has been removed; update call sites to use Country/Market/Item objects')

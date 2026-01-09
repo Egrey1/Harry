@@ -4,7 +4,7 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import Row, getinv, getfact, getbalance, Interaction, Context, List
+from .library import Row, Interaction, Context, List
 from .library import connect as con
 import dependencies as deps
 
@@ -40,10 +40,12 @@ class Country:
         Args:
             name (str): Название страны или упоминание участника Discord. По умолчанию — 'Италия'.
         """
+        from .library import getinv, getfact, getbalance
         self.busy = None
+        self.is_country = True
         if name.startswith('<@') and name.endswith('>'):
-            connect = connect(deps.DATABASE_ROLE_PICKER_PATH)
-            cursor = connect.cursor()
+            conn = con(deps.DATABASE_ROLE_PICKER_PATH)
+            cursor = conn.cursor()
             
             cursor.execute(f"""
                             SELECT name
@@ -54,6 +56,7 @@ class Country:
             if result:
                 name = result[0]
             else:
+                self.is_country = False
                 return
             connect.close() 
         
@@ -84,7 +87,7 @@ class Country:
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
-                        SELECT doing, completed
+                        SELECT doing
                         FROM countries
                         WHERE name = '{name}'
                         """)
@@ -94,8 +97,7 @@ class Country:
         if not fetch:
             return None
         
-        self.doing_focus = Focus(fetch[0]) # добавить в документацию
-        self.completed_focus = Focus(fetch[1]) # добавить в документацию
+        self.focus = Focus(fetch[0], self) # добавить в документацию
     
     def __str__(self):
         return self.name
@@ -204,6 +206,48 @@ class Country:
         connect.close()
         self.busy = None
 
+    async def send_news(self, news: str):
+        """Отправляет новостное сообщение в канал новостей стран.
+
+        Args:
+            news (str): Текст новости для отправки.
+        """
+        channel = deps.rp_channels.get_news()
+
+        # Попытка загрузить аватар из БД
+        avatar_bytes = None
+        try:
+            conn = con(deps.DATABASE_COUNTRIES_AI_PATH)
+            cursor = conn.cursor()
+            cursor.execute("SELECT avatar FROM avatars WHERE name = ?", (self.name,))
+            row = cursor.fetchone()
+            conn.close()
+            avatar_bytes = row[0] if row and row[0] else None
+        except Exception:
+            avatar_bytes = None
+
+        try:
+            # Если нет аватара, попробуем использовать первый доступный вебхук
+            if not avatar_bytes:
+                webhooks = await channel.webhooks()
+                if webhooks:
+                    await webhooks[0].send(content=news, username=self.name)
+                    return
+
+            # Создаём временный вебхук (с аватаром, если он есть) и отправляем сообщение
+            if avatar_bytes:
+                webhook = await channel.create_webhook(name=self.name, avatar=avatar_bytes)
+            else:
+                webhook = await channel.create_webhook(name=self.name)
+
+            await webhook.send(content=news, username=self.name)
+        finally:
+            # Удаляем временный вебхук, если он был создан
+            try:
+                if 'webhook' in locals():
+                    await webhook.delete()
+            except Exception:
+                pass
                 
 
 class Item:
@@ -236,6 +280,7 @@ class Item:
             country (str | Country | None): Страна, чей инвентарь используется для определения количества.
                 Может быть строкой с названием или объектом Country.
         """
+        from .library import getinv
         self.name = name
         self.quantity = quantity if quantity is not None else (getinv(country, name).quantity if country else 0)
         self.price = price
@@ -252,6 +297,9 @@ class Item:
         items_info = dict(cursor.fetchone())
         connect.close()
 
+        if items_info is None:
+            raise ValueError(f"Предмет с именем '{name}' не найдена в базе данных.")
+        
         self.purchasable = int(items_info['tradable']) == 1
         self.is_ship = int(items_info['ship']) == 1
         self.is_ground = int(items_info['ground']) == 1
@@ -307,7 +355,7 @@ class Market:
         """
         country_name = country.name if isinstance(country, Country) else country
         self.name = country_name
-        self.inventory = {}
+        self.inventory: dict[str, Item] = {}
 
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
@@ -461,6 +509,7 @@ class Factory:
             quantity (int | None): Количество фабрик. Если None — загружается из данных страны.
             country (str | Country | None): Страна, в которой находятся фабрики. Может быть строкой или объектом Country.
         """
+        from .library import getfact
         self.name = factory_name
         self.quantity = quantity if quantity is not None else (getfact(country, factory_name).quantity if country else 0)
         self.country = Country(country) if isinstance(country, str) else (country if isinstance(country, Country) else None)
@@ -510,7 +559,6 @@ class Factory:
         connect.close()
 
 
-
 class Focus:
     def __init__(self, name: str, owner: Country | None = None):
         connect = con(deps.DATABASE_FOCUS_PATH)
@@ -528,19 +576,29 @@ class Focus:
         self.owner: Country | None = owner
         self.name: str = fetch['name']
         self.desc: str = fetch['desc']
-        self._req: str | None = fetch['req']
+        self._req_items: List[Item] | None = fetch['req_items']
+        self._req_factories: list[Factory] | None = fetch['req_factories']
+        self._req_news: bool = fetch['req_news'] is not None
         self.event: str | None = fetch['event']
         self._factories: List[Factory] | None = fetch['factories']
         self._items: List[Item] | None = fetch['items']
         self._war: List[Country] | None = fetch['war']
+        
+        self._items = self._items.split('; ') if self._items else []
+        for i in range(len(self._items)):
+            self._items[i] = Item(self._items[i].split(':')[0], int(self._items[i].split(':')[1]))
+        
+        self._req_items = self._req_items.split('; ') if self._req_items else []
+        for i in range(len(self._req_items)):
+            self._req_items[i] = Item(self._req_items[i].split(':')[0], int(self._req_items[i].split(':')[1]))
 
         self._factories = self._factories.split('; ') if self._factories else []
         for i in range(len(self._factories)):
             self._factories[i] = Factory(self._factories[i].split(':')[0], int(self._factories[i].split(':')[1]))
         
-        self._items = self._items.split('; ') if self._items else []
-        for i in range(len(self._items)):
-            self._items[i] = Item(self._items[i].split(':')[0], int(self._items[i].split(':')[1]))
+        self._req_factories = self._req_factories.split('; ') if self._req_factories else []
+        for i in range(len(self._req_factories)):
+            self._req_factories[i] = Factory(self._req_factories[i].split(':')[0], int(self._req_factories[i].split(':')[1]))
         
         self._war = [Country(i) for i in self._war.split('; ')]
 
@@ -591,10 +649,25 @@ class Focus:
         content = 'По какой-то невиданной мне причине куратор так и не нашелся. В таком случае нам всем придется подождать!\n' + '||' + self.owner.busy.mention + ', ' + ', '.join([i.busy.mention for i in self._war if i.busy]) + '||'
         await deps.rp_channels.get_war().create_thread(name=title, content=content)
     
-    async def send_factories(self):
+    def send_factories(self):
         for factory in self._factories:
             factory.edit_quantity(self.owner.factories[factory.name].quantity + factory.quantity, self.owner)
-    async def send_items(self):
+    def send_items(self):
         for item in self._items:
             item.edit_quantity(self.owner.inventory[item.name].quantity + item.quantity, self.owner)
         
+    def requirements_complete(self) -> bool:
+        for item in self._req_items:
+            if self.owner.inventory[item.name].quantity < item.quantity:
+                return False
+        for factory in self._req_factories:
+            if self.owner.factories[factory.name].quantity < factory.quantity:
+                return False
+        return True
+    
+    async def complete_focus(self):
+        self.send_factories()
+        self.send_items()
+        await self.send_event()
+        await self.declare_war()
+

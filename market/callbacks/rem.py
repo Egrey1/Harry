@@ -1,9 +1,9 @@
-from ..library import Interaction, deps
+from ..library import Interaction, deps, con
 
 async def rem(interaction: Interaction, country: str):
     item = interaction.data['values'][0]
 
-    connect = con(DATABASE_COUNTRIES)
+    connect = con(deps.DATABASE_COUNTRIES_PATH)
     cursor = connect.cursor()
 
     cursor.execute(f"""

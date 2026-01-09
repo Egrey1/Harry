@@ -1,4 +1,4 @@
-from discord import Member, Guild
+from discord import Member, Guild, Message
 from discord.ext.commands import hybrid_command, has_permissions, Context, Cog, Bot
 
 import dependencies as deps

@@ -1,7 +1,5 @@
 from ..library.modules import hybrid_command, has_permissions, Context, con, deps, Guild
 
-from ..library.functions import unreg_function
-
 class VipeCommand:
     def __init__(self, guild: Guild):
         self.guild = guild
@@ -16,15 +14,15 @@ class VipeCommand:
         cursor = connect.cursor()
 
         cursor.execute(f"""
-                       SELECT is_busy
+                       SELECT name
                        FROM roles
                        WHERE is_busy IS NOT NULL
                        """)
         result = cursor.fetchall()
         connect.close()
 
-        for member in result:
-            await unreg_function(self.guild.get_member(int(member[0][2:-1])), self.guild)
+        for country_name in result:
+            deps.Country(country_name[0]).unreg()
         
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()

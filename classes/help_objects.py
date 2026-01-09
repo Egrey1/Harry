@@ -1,10 +1,5 @@
-from .library import View, Select, Button, ButtonStyle, Dict, Callable, Awaitable, Interaction, NotFound, Lock, get_options
-#from .library import (View, Select, Button, 
-#                      ButtonStyle, Dict, 
-#                      Callable, Awaitable,
-#                      Interaction, NotFound,
-#                      Lock)
-#from .library import get_options, PAGE_SIZE
+from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button, select
+from typing import Dict, Callable, Awaitable
 
 class ChooseMenu(View):
     """
@@ -64,7 +59,7 @@ class ChooseMenu(View):
             custom_id=f"choose_menu_select_{id(self)}"  # Уникальный ID, чтобы не было конфликтов
         )
 
-    @Button(label="⏮️", style=ButtonStyle.blurple, disabled=True)
+    @button(label="⏮️", style=ButtonStyle.blurple, disabled=True)
     async def prev_button(self, interaction: Interaction, button: Button):
         async with self.lock:
             if self.current_page <= 1:
@@ -74,7 +69,7 @@ class ChooseMenu(View):
             self.current_page -= 1
             await self._update_menu(interaction)
 
-    @Button(label="⏭️", style=ButtonStyle.blurple)
+    @button(label="⏭️", style=ButtonStyle.blurple)
     async def next_button(self, interaction: Interaction, button: Button):
         async with self.lock:
             if self.current_page >= self.total_pages:
@@ -103,7 +98,7 @@ class ChooseMenu(View):
             # Сообщение удалено — ничего не делаем
             pass
 
-    @Select(custom_id="choose_menu_select")  # Должно совпадать с тем, что в _create_select
+    @select(custom_id="choose_menu_select")  # Должно совпадать с тем, что в _create_select
     async def select_callback(self, interaction: Interaction, select: Select):
         """Вызывается при выборе опции."""
         selected_value = select.values[0]

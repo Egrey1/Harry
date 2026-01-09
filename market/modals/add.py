@@ -1,5 +1,4 @@
 from ..library import Modal, TextInput, Interaction, con, deps
-from ..library.functions import give_items
 
 class Add(Modal):
     def __init__(self, country, item, item_count: int):
@@ -24,7 +23,7 @@ class Add(Modal):
             await interaction.response.send_message(f'Опять хитрец нашелся, нельзя отрицательные числа вводить!', ephemeral=True)
             return
 
-        connect = con(DATABASE_COUNTRIES)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
 
 

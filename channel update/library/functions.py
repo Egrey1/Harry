@@ -2,12 +2,12 @@ from .modules import match
 
 async def increment_iteration(text: str) -> str:
     pattern = r'(.*?)(\d+)/(\d+)\s+(\d+)(.*)'
-    match = match(pattern, text)
+    matchh = match(pattern, text)
     
-    if not match:
+    if not matchh:
         return text
     
-    prefix, current_str, total_str, year_str, suffix = match.groups()
+    prefix, current_str, total_str, year_str, suffix = matchh.groups()
     current = int(current_str)
     total = int(total_str)
     year = int(year_str)

@@ -1,9 +1,9 @@
-from ..library import Interaction, give_country
+from ..library import Interaction, deps
 from ..modals import AddModal
 
 async def add(interaction: Interaction):
     item = ''.join(interaction.data['values'])
-    country = await give_country(interaction.user.mention)
+    country = deps.Country(interaction.user.mention)
 
     if not country:
         await interaction.response.edit_message(content='Вы не зарегистрированы!', embed=None)

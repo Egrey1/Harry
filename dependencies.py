@@ -1,12 +1,15 @@
+"""Здесь хранятся глобальные переменные и объекты, используемые в боте."""
+
 from discord import Guild, Intents, TextChannel, ForumChannel
 from discord.ext.commands import Bot
 from classes import *
 
-bot: Bot
+bot: Bot = Bot('!', intents=Intents.all())
 DATABASE_ROLE_PICKER_PATH: str
 DATABASE_COUNTRIES_PATH: str
 DATABASE_FOCUS_PATH: str
 DATABASE_CONFIG_PATH: str
+DATABASE_COUNTRIES_AI_PATH: str
 
 CURRENCY: str
 RP_ROLES: dict

@@ -5,8 +5,8 @@ from sqlite3 import connect as con
 import dependencies as deps
 
 #Проверяет есть ли пользователь в списке стран. 
-async def give_country(mention: str) -> deps.Country | False:
-    connect = con(deps.DATABASE_ROLE_PICKER)
+async def give_country(mention: str) -> deps.Country | bool:
+    connect = con(deps.DATABASE_ROLE_PICKER.PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
                     SELECT name
@@ -104,9 +104,9 @@ def get_channel(name: str) -> TextChannel:
 
 def config_rpchannels():
     async def tmp(self, event, war, news):
-        self.event = await deps.guild.get_role(event) if type(event) == int else (await utils.get(deps.guild.channels, event) if type(event) == str else event)
-        self.war = await deps.guild.get_role(war) if type(war) == int else (await utils.get(deps.guild.channels, war) if type(war) == str else war)
-        self.news = await deps.guild.get_role(news) if type(news) == int else (await utils.get(deps.guild.channels, news) if type(news) == str else news)
+        self.event = deps.guild.get_role(event) if type(event) == int else (utils.get(deps.guild.channels, event) if type(event) == str else event)
+        self.war = deps.guild.get_role(war) if type(war) == int else (utils.get(deps.guild.channels, war) if type(war) == str else war)
+        self.news = deps.guild.get_role(news) if type(news) == int else (utils.get(deps.guild.channels, news) if type(news) == str else news)
     deps.RpChannels.__init__ = tmp
     
     
@@ -115,7 +115,7 @@ def config_rpchannels():
     deps.RpChannels.get_event = tmp
     
     async def tmp(self, event):
-        self.event = await deps.guild.get_role(event) if type(event) == int else (await utils.get(deps.guild.channels, event) if type(event) == str else event)
+        self.event = deps.guild.get_role(event) if type(event) == int else (utils.get(deps.guild.channels, event) if type(event) == str else event)
     deps.RpChannels.set_event = tmp
     
     async def tmp(self):
@@ -168,20 +168,19 @@ async def second_config():
     """Присваивает остальным переменным их значения. Использовать функцию только после запуска"""
     deps.CHANNEL_FOR_UPDATE_ID = 1344823587093352569 
     deps.guild_id = 1344423355293372488
-    deps.guild = await deps.bot.get_guild(deps.guild_id)
+    deps.guild = deps.bot.get_guild(deps.guild_id)
     deps.game_state = {'game_started': True}
     deps.PAGE_SIZE = 25
     deps.CURRENCY = '£'
-    deps.DATABASE_ROLE_PICKER = 'databases/role-picker.db'
-    deps.DATABASE_COUNTRIES = 'databases/countries.db'
-    deps.DATABASE_FOCUS = 'databases/focuses.db'
-    deps.DATABASE_CONFIG = 'databases/config.db'
+    deps.DATABASE_ROLE_PICKER_PATH = 'databases/role-picker.db'
+    deps.DATABASE_COUNTRIES_PATH = 'databases/countries.db'
+    deps.DATABASE_COUNTRIES_AI_PATH = 'databases/countries_ai.db'
+    deps.DATABASE_FOCUS_PATH = 'databases/focuses.db'
+    deps.DATABASE_CONFIG_PATH = 'databases/config.db'
     deps.RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 
             'sea': 1357681946276266044, 'assambley': 1357679628243959862, 
             'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 
             'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119}
-    deps.audit = await deps.guild.get_channel(1454735211647733917) # #гарри text channel
-    deps.rp_channels = deps.RpChannels()
+    deps.audit = deps.guild.get_channel(1454735211647733917) # #гарри text channelnnels()
 
 
-# from classes import *

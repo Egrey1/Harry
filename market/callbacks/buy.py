@@ -19,7 +19,7 @@ async def buy(interaction: Interaction, country: str, positions: dict[str, dict]
     view = View()
     options = []
     for seller in sellers:
-        options.append(SelectOption(label=f"{seller['country']} - {CURRENCY}{seller['price']}", value=seller['country']))
+        options.append(SelectOption(label=f"{seller['country']} - {deps.CURRENCY}{seller['price']}", value=seller['country']))
     select = Select(placeholder='Выберите продавца', options=options)
     select.callback = lambda interaction: choosed_seller(interaction, country, item, positions)
 

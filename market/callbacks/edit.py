@@ -1,11 +1,11 @@
-from ..library import Interaction, give_country
+from ..library import Interaction, deps
 from ..modals import EditModal
 
 async def edit(interaction: Interaction):
     item = interaction.data['values'][0].split(' - ')[0]
 
-    country = await give_country(interaction.user.mention)
-    if not country:
+    country = deps.Country(interaction.user.mention)
+    if not country.busy:
         await interaction.response.send_message("Вы не зарегистрированы!", ephemeral=True)
         return
     

@@ -1,5 +1,4 @@
-from ..library.modules import (commands, 
-                             give_country, deps)
+from ..library.modules import commands, deps
 
 from ..library.functions import set_is_busy
 

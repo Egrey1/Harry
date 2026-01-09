@@ -1,7 +1,7 @@
 from ..library.modules import (commands, app_commands, 
                        SelectOption, 
                        View, Select,
-                       deps, give_country)
+                       deps)
 
 from ..library.callbacks.regCallback import picker_callback
 

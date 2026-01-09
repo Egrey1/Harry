@@ -1,9 +1,9 @@
 from ..library import Modal, TextInput, Interaction, con, deps
 
 class Buy(Modal):
-    def __init__(self, country: str, item: str, seller: str, positions: dict[str, dict]):
+    def __init__(self, country: str | deps.Country, item: str, seller: str, positions: dict[str, dict]):
         super().__init__(title='Покупка позиции с рынка')
-        self.country = country
+        self.country = country if isinstance(country, str) else country.name
         self.item = item
         self.positions = positions
 
@@ -76,7 +76,7 @@ class Buy(Modal):
             buyer_country.inventory[self.item] = new_item
 
         # Transfer money via DB updates
-        connect = con(deps.DATABASE_COUNTRIES)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute('''
                        UPDATE countries_inventory
