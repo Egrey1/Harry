@@ -3,16 +3,16 @@ from config import first_config, second_config
 
 
 async def load_extensions():
-    await deps.bot.load_extension('rofl commands')
+    await deps.bot.load_extension('rofl_commands')
     await deps.bot.load_extension('selector')
     await deps.bot.load_extension('inv')
-    await deps.bot.load_extension('admin commands')
+    await deps.bot.load_extension('admin_commands')
     await deps.bot.load_extension('shop')
-    await deps.bot.load_extension('items move')
-    await deps.bot.load_extension('items update')
-    await deps.bot.load_extension('channel update')
+    await deps.bot.load_extension('items_move')
+    await deps.bot.load_extension('items_update')
+    await deps.bot.load_extension('channel_update')
     await deps.bot.load_extension('game')
-    await deps.bot.load_extension('os commands')
+    await deps.bot.load_extension('os_commands')
     await deps.bot.load_extension('market')
 
 

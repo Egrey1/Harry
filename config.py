@@ -1,7 +1,7 @@
 from discord import Intents, SelectOption, TextChannel
 from discord.ext.commands import Context, Bot
 import discord.utils as utils
-from sqlite3 import connect as con
+from sqlite3 import connect as conyto
 import dependencies as deps
 
 #Проверяет есть ли пользователь в списке стран. 
