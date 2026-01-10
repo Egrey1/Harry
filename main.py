@@ -32,6 +32,3 @@ if __name__ == "__main__":
     deps.bot.add_listener(on_ready)
     deps.bot.run(deps.TOKEN)
 
-
-
-    

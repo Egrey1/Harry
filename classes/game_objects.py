@@ -87,7 +87,7 @@ class Country:
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
-                        SELECT doing
+                        SELECT doing, current
                         FROM countries
                         WHERE name = '{name}'
                         """)
@@ -97,7 +97,8 @@ class Country:
         if not fetch:
             return None
         
-        self.focus = Focus(fetch[0], self) # добавить в документацию
+        self.doing_focus = Focus(fetch[0], self) # добавить в документацию
+        self.current_focus = Focus(fetch[1], self) # добавить в документацию
     
     def __str__(self):
         return self.name
@@ -249,6 +250,40 @@ class Country:
             except Exception:
                 pass
                 
+    def give_available_focuses(self) -> list['Focus']:
+        """Возвращает список доступных национальных фокусов для страны.
+
+        Фокусы загружаются из базы данных и фильтруются по критериям доступности
+        для текущей страны.
+
+        Returns:
+            List[Focus]: Список доступных фокусов.
+        """
+        connect = con(deps.DATABASE_FOCUS_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       SELECT name
+                       FROM all_focuses
+                       WHERE after = ?
+                       """, (self.current_focus.name,))
+        result = cursor.fetchall()
+        connect.close()
+
+        return [Focus(row[0]) for row in result]
+
+    def set_focus(self, focus: 'Focus' | str):
+        new_focus = focus.name if isinstance(focus, Focus) else focus
+        connect = con(deps.DATABASE_FOCUS_PATH)
+        cursor = connect.cursor()
+        cursor.execute(f"""
+                          UPDATE countries
+                          SET doing = '{new_focus}'
+                          WHERE name = '{self.name}'
+                        """)
+        connect.commit()
+        connect.close()
+        self.doing_focus = focus if isinstance(focus, Focus) else Focus(focus, self)
 
 class Item:
     """Представляет игровой предмет с его свойствами и количеством в инвентаре страны.
@@ -575,32 +610,54 @@ class Focus:
 
         self.owner: Country | None = owner
         self.name: str = fetch['name']
-        self.desc: str = fetch['desc']
-        self._req_items: List[Item] | None = fetch['req_items']
-        self._req_factories: list[Factory] | None = fetch['req_factories']
-        self._req_news: bool = fetch['req_news'] is not None
-        self.event: str | None = fetch['event']
-        self._factories: List[Factory] | None = fetch['factories']
-        self._items: List[Item] | None = fetch['items']
-        self._war: List[Country] | None = fetch['war']
-        
-        self._items = self._items.split('; ') if self._items else []
-        for i in range(len(self._items)):
-            self._items[i] = Item(self._items[i].split(':')[0], int(self._items[i].split(':')[1]))
-        
-        self._req_items = self._req_items.split('; ') if self._req_items else []
-        for i in range(len(self._req_items)):
-            self._req_items[i] = Item(self._req_items[i].split(':')[0], int(self._req_items[i].split(':')[1]))
+        """Название фокуса"""
 
-        self._factories = self._factories.split('; ') if self._factories else []
-        for i in range(len(self._factories)):
-            self._factories[i] = Factory(self._factories[i].split(':')[0], int(self._factories[i].split(':')[1]))
+        self.description: str = fetch['desc']
+        """Описание фокуса"""
+
+        self.emoji: str | None = fetch['emoji']
+        """Эмодзи фокуса"""
+
+
+        self.req_items: List[Item] | None = fetch['req_items']
+        """Требуемые предметы для выполнения фокуса"""
+
+        self.req_factories: list[Factory] | None = fetch['req_factories']
+        """Требуемые фабрики для выполнения фокуса"""
+
+        self.req_news: bool = fetch['req_news'] is not None
+        """Требуется ли новостное сообщение для выполнения фокуса"""
+
+        self.event: str | None = fetch['event']
+        """Событие, которое происходит при выполнении фокуса"""
+
+
+        self.factories: List[Factory] | None = fetch['factories']
+        """Фабрики, которые даёт фокус"""
+
+        self.items: List[Item] | None = fetch['items']
+        """Предметы, которые даёт фокус"""
+
+        self.war: List[Country] | None = fetch['war']
+        """Страны, с которыми объявляется война при выполнении фокуса"""
         
-        self._req_factories = self._req_factories.split('; ') if self._req_factories else []
-        for i in range(len(self._req_factories)):
-            self._req_factories[i] = Factory(self._req_factories[i].split(':')[0], int(self._req_factories[i].split(':')[1]))
+        self.items = self.items.split('; ') if self.items else []
+        for i in range(len(self.items)):
+            self.items[i] = Item(self.items[i].split(':')[0], int(self.items[i].split(':')[1]))
         
-        self._war = [Country(i) for i in self._war.split('; ')]
+        self.req_items = self.req_items.split('; ') if self.req_items else []
+        for i in range(len(self.req_items)):
+            self.req_items[i] = Item(self.req_items[i].split(':')[0], int(self.req_items[i].split(':')[1]))
+
+        self.factories = self.factories.split('; ') if self.factories else []
+        for i in range(len(self.factories)):
+            self.factories[i] = Factory(self.factories[i].split(':')[0], int(self.factories[i].split(':')[1]))
+        
+        self.req_factories = self.req_factories.split('; ') if self.req_factories else []
+        for i in range(len(self.req_factories)):
+            self.req_factories[i] = Factory(self.req_factories[i].split(':')[0], int(self.req_factories[i].split(':')[1]))
+        
+        self.war = [Country(i) for i in self.war.split('; ')]
 
     async def send_event(self):
         """Отправляет событие в текстовый канал, заменяя переменные {страна} на упоминания участников, если они заняты."""
@@ -642,25 +699,25 @@ class Focus:
         deps.rp_channels.get_event().send(text)
     
     async def declare_war(self):
-        if len(self._war) == 0:
+        if len(self.war) == 0:
             return
-        countries = [i.name for i in self._war]
+        countries = [i.name for i in self.war]
         title = f'{self.owner} Объявляет войну ' + ('Государству ' + countries[0] if len(countries) == 1 else 'Государствам ' + ', '.join(countries))
-        content = 'По какой-то невиданной мне причине куратор так и не нашелся. В таком случае нам всем придется подождать!\n' + '||' + self.owner.busy.mention + ', ' + ', '.join([i.busy.mention for i in self._war if i.busy]) + '||'
+        content = 'По какой-то невиданной мне причине куратор так и не нашелся. В таком случае нам всем придется подождать!\n' + '||' + self.owner.busy.mention + ', ' + ', '.join([i.busy.mention for i in self.war if i.busy]) + '||'
         await deps.rp_channels.get_war().create_thread(name=title, content=content)
     
     def send_factories(self):
-        for factory in self._factories:
+        for factory in self.factories:
             factory.edit_quantity(self.owner.factories[factory.name].quantity + factory.quantity, self.owner)
     def send_items(self):
-        for item in self._items:
+        for item in self.items:
             item.edit_quantity(self.owner.inventory[item.name].quantity + item.quantity, self.owner)
         
     def requirements_complete(self) -> bool:
-        for item in self._req_items:
+        for item in self.req_items:
             if self.owner.inventory[item.name].quantity < item.quantity:
                 return False
-        for factory in self._req_factories:
+        for factory in self.req_factories:
             if self.owner.factories[factory.name].quantity < factory.quantity:
                 return False
         return True

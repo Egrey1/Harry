@@ -1,8 +1,8 @@
-from ..modules import Modal, TextInput, Interaction
+from ..modules import Modal, TextInput, Interaction, deps
 from ..functions import remove_item
 
 class UseModal(Modal):
-    def __init__(self, item, country):
+    def __init__(self, item, country: deps.Country):
         super().__init__(title='Сколько всего было уничтожено или потрачено?')
         self.item = item
         self.country = country

@@ -1,9 +1,9 @@
-from ..modules import Modal, TextInput, Interaction
+from ..modules import Modal, TextInput, Interaction, deps
 from ..functions import transfer_item
 
 
 class Quantity(Modal):
-    def __init__(self, item_name: str, had: int, country_from, country_to):
+    def __init__(self, item_name: str, had: int, country_from: deps.Country, country_to: deps.Country):
         super().__init__(title='Введите количество')
         self.item_name = item_name
         self.had = int(had)
