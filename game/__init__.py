@@ -1,7 +1,7 @@
 from .library import Cog, Bot, deps
-from .commands import VipeCommand
+from .commands import VipeCommand, FocusesCommand
 
-class GameCog(Cog, VipeCommand):
+class GameCog(Cog, VipeCommand, FocusesCommand):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.guild = deps.guild

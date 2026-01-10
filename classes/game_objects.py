@@ -58,7 +58,7 @@ class Country:
             else:
                 self.is_country = False
                 return
-            connect.close() 
+            conn.close() 
         
         self.name = name
         self.market = Market(name)
@@ -97,7 +97,6 @@ class Country:
         if not fetch:
             return None
         
-        print(self.name, fetch)
         self.doing_focus = Focus(fetch[0], self) if fetch[0] else None # добавить в документацию
         self.current_focus = Focus(fetch[1], self) # добавить в документацию
     

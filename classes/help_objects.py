@@ -60,7 +60,10 @@ class ChooseMenu(View):
         # Кнопки (они уже добавлены через декоратор @button, не добавляем их дважды)
 
     def _create_select(self) -> Select:
-        """Создаёт новый Select с текущими опциями (не используется, но оставлено для совместимости)."""
+        """Создаёт новый Select с текущими опциями."""
+        if not self.options:
+            placeholder_option = SelectOption(label="Нет опций", value="", description="", default=True)
+            return Select(placeholder=f"Выберите опцию (страница {self.current_page})", options=[placeholder_option], custom_id=f"choose_menu_select_{id(self)}", disabled=True)
         return Select(
             placeholder=f"Выберите опцию (страница {self.current_page})",
             options=self.options,
@@ -94,6 +97,8 @@ class ChooseMenu(View):
         # Пересоздаём Select
         self.remove_item(self.select)
         self.select = self._create_select()
+        # Привязываем callback к новому Select
+        self.select.callback = self.select_callback
         self.add_item(self.select)
 
         # Обновляем состояние кнопок
@@ -106,13 +111,22 @@ class ChooseMenu(View):
             # Сообщение удалено — ничего не делаем
             pass
 
-    async def select_callback(self, interaction: Interaction, select: Select):
-        """Вызывается при выборе опции."""
-        # Защита: убедимся, что есть выбранное значение
-        if not select.values:
-            await interaction.response.send_message('Похоже, опции недоступны.', ephemeral=True)
-            return
-        selected_value = select.values[0]
+    async def select_callback(self, interaction: Interaction, select: Select | None = None):
+        """Вызывается при выборе опции.
+
+        Вызов может происходить двумя способами: через декоратор (framework передаёт select) или
+        через присвоение `Select.callback` (тогда передаётся только `interaction`).
+        Поэтому `select` здесь опционален.
+        """
+        # Получаем выбранное значение безопасно
+        if select and getattr(select, 'values', None):
+            selected_value = select.values[0]
+        else:
+            vals = interaction.data.get('values') if getattr(interaction, 'data', None) else None
+            if not vals:
+                await interaction.response.send_message('Похоже, опции недоступны.', ephemeral=True)
+                return
+            selected_value = vals[0]
         await self.callback(interaction, selected_value)
 
     async def on_timeout(self) -> None:

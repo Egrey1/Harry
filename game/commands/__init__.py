@@ -1,1 +1,2 @@
-from .vipeCommand import *
+from .vipeCommand import VipeCommand
+from .focusesCommand import FocusesCommand

@@ -1,1 +1,1 @@
-from focuses import focus_callback
+from .focuses import focus_callback
