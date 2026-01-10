@@ -158,7 +158,6 @@ def config_rpchannels():
 
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
-    deps.TOKEN = open('TOKEN.txt').readline()
     deps.intents = Intents.all()
     deps.PREFIX = '!'
     deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
