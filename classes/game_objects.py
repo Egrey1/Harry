@@ -4,7 +4,7 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import Row, Interaction, Context, List
+from .library import Row, Interaction, Context, List, Attachment
 from .library import connect as con
 import dependencies as deps
 
@@ -50,7 +50,7 @@ class Country:
             cursor.execute(f"""
                             SELECT name
                             FROM roles
-                            WHERE is_busy = {name}
+                            WHERE is_busy = '{name}'
             """)
             result = cursor.fetchone()
             if result:
@@ -70,7 +70,7 @@ class Country:
         cursor = connect.cursor()
         
         cursor.execute(f"""
-                        SELECT is_busy, surrend, sea, assembly, nickname
+                        SELECT is_busy, surrender, sea, assembly, nickname
                         FROM roles
                         WHERE name = '{name}'
                         """)
@@ -97,7 +97,8 @@ class Country:
         if not fetch:
             return None
         
-        self.doing_focus = Focus(fetch[0], self) # добавить в документацию
+        print(self.name, fetch)
+        self.doing_focus = Focus(fetch[0], self) if fetch[0] else None # добавить в документацию
         self.current_focus = Focus(fetch[1], self) # добавить в документацию
     
     def __str__(self):
@@ -207,12 +208,13 @@ class Country:
         connect.close()
         self.busy = None
 
-    async def send_news(self, news: str):
+    async def send_news(self, news: str, attachments: List[Attachment]):
         """Отправляет новостное сообщение в канал новостей стран.
 
         Args:
             news (str): Текст новости для отправки.
         """
+        files = [await file.to_file() for file in attachments]
         channel = deps.rp_channels.get_news()
 
         # Попытка загрузить аватар из БД
@@ -272,7 +274,8 @@ class Country:
 
         return [Focus(row[0]) for row in result]
 
-    def set_focus(self, focus: 'Focus' | str):
+    def set_focus(self, focus):
+        focus: Focus | str = focus
         new_focus = focus.name if isinstance(focus, Focus) else focus
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
@@ -416,7 +419,22 @@ class Market:
                 WHERE name = '{country_name}'
             """)
         
-        result = dict(cursor.fetchone())
+        fetch = cursor.fetchone()
+        if not fetch:
+            cursor.execute(f"""
+                INSERT INTO market (name)
+                VALUES ('{country_name}')
+            """)
+            connect.commit()
+
+            cursor.execute(f"""
+                SELECT *
+                FROM market
+                WHERE name = '{country_name}'
+            """)
+            fetch = cursor.fetchone()
+        
+        result = dict(fetch)
         connect.close()
 
         # Парсим поля: каждое поле (кроме 'name') содержит строку вида "количество цена"
@@ -606,6 +624,7 @@ class Focus:
                        WHERE name = '{name}'
                        """)
         fetch = cursor.fetchone()
+        fetch = dict(fetch) if fetch else None
         connect.close()
 
         self.owner: Country | None = owner
@@ -657,7 +676,7 @@ class Focus:
         for i in range(len(self.req_factories)):
             self.req_factories[i] = Factory(self.req_factories[i].split(':')[0], int(self.req_factories[i].split(':')[1]))
         
-        self.war = [Country(i) for i in self.war.split('; ')]
+        self.war = [Country(i) for i in self.war.split('; ')] if self.war else []
 
     async def send_event(self):
         """Отправляет событие в текстовый канал, заменяя переменные {страна} на упоминания участников, если они заняты."""
@@ -684,7 +703,7 @@ class Focus:
                 # Если страна не найдена в базе — просто удаляем переменную
                 text = text.replace(f"{{{var}}}", "")
 
-        # -- это нейронка написала, как страшно -- 
+        # -- это нейронка написала, мне страшно -- 
         # Убираем лишние пробелы и знаки препинания (например, "на  , атаковал" → "на, атаковал" → "на атаковал")
         # Удаляем множественные пробелы и очищаем пробелы вокруг знаков препинания
         text = re.sub(r"\s+", " ", text)  # Заменяем множественные пробелы
@@ -721,6 +740,17 @@ class Focus:
             if self.owner.factories[factory.name].quantity < factory.quantity:
                 return False
         return True
+    
+    def mark_as_completed(self):
+        connect = con(deps.DATABASE_FOCUS_PATH)
+        cursor = connect.cursor()
+        
+        cursor.execute("""
+                        UPDATE countries
+                        SET completed = ?
+                        """, (self.name,))
+        connect.commit()
+        connect.close()
     
     async def complete_focus(self):
         self.send_factories()

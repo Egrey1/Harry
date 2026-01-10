@@ -1,6 +1,6 @@
 """Здесь хранятся глобальные переменные и объекты, используемые в боте."""
 
-from discord import Guild, Intents, TextChannel, ForumChannel
+from discord import Guild, Intents, TextChannel, ForumChannel, Role
 from discord.ext.commands import Bot
 from classes import *
 
@@ -13,6 +13,7 @@ DATABASE_COUNTRIES_AI_PATH: str
 
 CURRENCY: str
 RP_ROLES: dict
+PERSONAL: dict[str, Role]
 
 CHANNEL_FOR_UPDATE_ID: int
 """Канал, который будет обновляться каждую единицу времени"""

@@ -103,7 +103,7 @@ def get_channel(name: str) -> TextChannel:
     return utils.get(deps.guild.channels, names[name])
 
 def config_rpchannels():
-    async def tmp(self, event, war, news):
+    async def tmp(self, event = '📣┃события', war = '🔥┃войны', news = '📰┃новости-стран'):
         self.event = deps.guild.get_role(event) if type(event) == int else (utils.get(deps.guild.channels, event) if type(event) == str else event)
         self.war = deps.guild.get_role(war) if type(war) == int else (utils.get(deps.guild.channels, war) if type(war) == str else war)
         self.news = deps.guild.get_role(news) if type(news) == int else (utils.get(deps.guild.channels, news) if type(news) == str else news)
@@ -181,6 +181,10 @@ async def second_config():
             'sea': 1357681946276266044, 'assambley': 1357679628243959862, 
             'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 
             'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119}
+    deps.PERSONAL = {'politolog': deps.guild.get_role(1344824679390515280), 'mapper': deps.guild.get_role(1344824559777484861),
+                        'moderator': deps.guild.get_role(1344824679390515280), 'anketolog': deps.guild.get_role(1344824637540012154),
+                        'curator': deps.guild.get_role(1345434049027506187), 'zamcur': deps.guild.get_role(1345434049027506187),
+                        'curpers': deps.guild.get_role(1344824766737027182),}
     deps.audit = deps.guild.get_channel(1454735211647733917) # #гарри text channelnnels()
 
 

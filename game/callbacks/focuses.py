@@ -1,4 +1,4 @@
-from ..library import Interaction, deps, Embed
+from ..library import Interaction, deps, Embed, View, Select, SelectOption, Button
 
 async def accepted(interaction: Interaction, country: deps.Country):
     focus = deps.Focus(interaction.data['values'][0], country)
@@ -29,5 +29,16 @@ async def focus_callback(interaction: Interaction, country: deps.Country):
 
     if war_value_field:
         embed.add_field(name="Последствия", value="Объявление войны: " + war_value_field, inline=True)
+        
+    available_focuses = country.give_available_focuses()
+    view = View()
+    options = [SelectOption(label=focuss.name, value=focuss.name, emoji=focuss.emoji) for focuss in available_focuses if focuss.name != focus.name]
+    if options:
+        select = Select(placeholder='Выберите фокус', options=options)
+        select.callback = lambda interaction: focus_callback(interaction, country)
+        view.add_item(select)
+    select2 = Button(label= 'Принять', emoji='❌️' if country.doing_focus is None else '✅️', disabled= country.doing_focus is not None)
+    select2.callback = lambda inter: accepted(inter, country)
+    view.add_item(select2)
 
-    await interaction.response.send_message(content=f'Вы начали выполнение фокуса: **{focus.name}**', embed=embed, ephemeral=True)
+    await interaction.response.send_message(embed=embed, ephemeral=True, view=view)

@@ -1,4 +1,5 @@
-from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button, select
+from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button
+from discord import SelectOption
 from typing import Dict, Callable, Awaitable
 
 class ChooseMenu(View):
@@ -44,19 +45,26 @@ class ChooseMenu(View):
 
         # Получаем данные для первой страницы
         self.options, self.total_pages = get_options(values, self.current_page)
-        self.select = self._create_select()
+
+        # Если список опций пуст — создаём заглушку, чтобы API не ругался
+        if not self.options:
+            placeholder_option = SelectOption(label="Нет опций", value="", description="", default=True)
+            self.select = Select(placeholder=f"Выберите опцию (страница {self.current_page})", options=[placeholder_option], custom_id=f"choose_menu_select_{id(self)}", disabled=True)
+        else:
+            self.select = Select(placeholder=f"Выберите опцию (страница {self.current_page})", options=self.options, custom_id=f"choose_menu_select_{id(self)}")
+
+        # Привязываем callback к динамическому Select
+        self.select.callback = self.select_callback
         self.add_item(self.select)
 
-        # Кнопки
-        self.add_item(self.prev_button)
-        self.add_item(self.next_button)
+        # Кнопки (они уже добавлены через декоратор @button, не добавляем их дважды)
 
     def _create_select(self) -> Select:
-        """Создаёт новый Select с текущими опциями."""
+        """Создаёт новый Select с текущими опциями (не используется, но оставлено для совместимости)."""
         return Select(
             placeholder=f"Выберите опцию (страница {self.current_page})",
             options=self.options,
-            custom_id=f"choose_menu_select_{id(self)}"  # Уникальный ID, чтобы не было конфликтов
+            custom_id=f"choose_menu_select_{id(self)}"
         )
 
     @button(label="⏮️", style=ButtonStyle.blurple, disabled=True)
@@ -98,9 +106,12 @@ class ChooseMenu(View):
             # Сообщение удалено — ничего не делаем
             pass
 
-    @select(custom_id="choose_menu_select")  # Должно совпадать с тем, что в _create_select
     async def select_callback(self, interaction: Interaction, select: Select):
         """Вызывается при выборе опции."""
+        # Защита: убедимся, что есть выбранное значение
+        if not select.values:
+            await interaction.response.send_message('Похоже, опции недоступны.', ephemeral=True)
+            return
         selected_value = select.values[0]
         await self.callback(interaction, selected_value)
 

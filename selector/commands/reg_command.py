@@ -30,5 +30,5 @@ class RegCoommand():
             return None
         
         view = deps.ChooseMenu(values, picker_callback)
-        msg = await ctx.interaction.response.send_message("Вам представлен список доступных для регистрации стран", view=view, ephemeral=True)
+        msg = await ctx.send("Вам представлен список доступных для регистрации стран", view=view, ephemeral=True)
         view.message = msg

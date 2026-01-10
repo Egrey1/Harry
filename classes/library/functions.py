@@ -57,7 +57,7 @@ def getbalance(country: str | 'Country') -> int:
     
     cursor.execute(f"""
                     SELECT Деньги
-                    FROM market
+                    FROM countries_inventory
                     WHERE name = '{name}'
     """)
     res = cursor.fetchone()[0]
