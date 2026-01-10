@@ -1,7 +1,8 @@
 from .library import Cog, Bot
 from .commands import KillCommand
+from .commands import Quote
 
-class RoflCommandsCog(Cog, KillCommand):
+class RoflCommandsCog(Cog, KillCommand, Quote):
     def __init__(self, bot : Bot):
         self.bot = bot
     
