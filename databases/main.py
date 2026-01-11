@@ -1,12 +1,5 @@
-import discord
 import dependencies as deps
 from config import first_config, second_config
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-BOT_TOKEN = os.getenv('TOKEN')
 
 async def load_extensions():
     await deps.bot.load_extension('rofl_commands')
@@ -23,7 +16,6 @@ async def load_extensions():
 
 
 async def on_ready():
-    activity = discord.Game(name="DTRI | /help")
     print('Бот запускается!')
     await second_config()
     await load_extensions()
@@ -36,7 +28,7 @@ async def on_ready():
 if __name__ == "__main__":
     first_config()
     deps.bot.add_listener(on_ready)
-    deps.bot.run(BOT_TOKEN)
+    deps.bot.run(deps.TOKEN)
 
 # SkyDevTech inc <3
 
