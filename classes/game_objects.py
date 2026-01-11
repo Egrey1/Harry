@@ -740,14 +740,53 @@ class Focus:
                 return False
         return True
     
-    def mark_as_completed(self):
+    def mark_as_completed(self, country_name: str | Country | None):
+        country_name = country_name if issistance(country_name, str) else (country_name.name if issistance(country_name, Country) else self.owner.name)
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         
         cursor.execute("""
                         UPDATE countries
                         SET completed = ?
-                        """, (self.name,))
+                        WHERE name = ?
+                        """, (self.name, country_name))
+        connect.commit()
+        connect.close()
+    
+    @property
+    def is_completed(self) -> bool:
+        """Возвращает bool значение. True если фокус за страну выполнен и False, если self.owner не указзан или фокус не выполнен"""
+        if self.owner is None:
+            return False
+        connect = con(deps.DATABASE_FOCUSES_PATH)
+        cursor = connect.cursor()
+        
+        cursor.execute("""
+                        SELECT doing, completed
+                        from countries
+                        WHERE name = ?
+                        """, (self.owner.name,))
+        doing, completed = cursor.fetchone()
+        connect.close()
+        
+        if doing != completed or completed != self.name or completed is None:
+            return False
+        return True
+    
+    @is_completed.setter
+    def is_completed(self, new_value: bool):
+        
+        if self.owner is None:
+            return
+        
+        connect = con(deps.DATABASE_FOCUSES_PATH)
+        cursor = connect.cursor()
+        
+        cursor.execute("""
+                        UPDATE countries
+                        SET completed = ?
+                        WHERE name = ?
+        """, (self.name if new_value else None, self.owner.name))
         connect.commit()
         connect.close()
     

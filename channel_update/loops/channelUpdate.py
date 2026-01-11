@@ -5,7 +5,7 @@ class ChannelUpdate:
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @loop(hours=1)
+    @loop(hours=deps.SPEED)
     # @loop(seconds=10) # for test
     async def update_channel(self):
         if not deps.game_state['game_started']:

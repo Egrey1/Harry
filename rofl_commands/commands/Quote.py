@@ -1,9 +1,6 @@
-import discord
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-import io
-import requests
-import textwrap
-from ..library.modules import hybrid_command, Context
+from ..library.modules import  (hybrid_command, Context, 
+                                File, BytesIO, requests_get, wrap, 
+                                Image, ImageDraw, ImageFont, ImageOps)
 
 class Quote:
     def __init__(self):
@@ -15,7 +12,7 @@ class Quote:
         img = Image.new('RGB', (W, H), color=(0, 0, 0))
         
 
-        avatar = Image.open(io.BytesIO(avatar_bytes)).convert("RGBA")
+        avatar = Image.open(BytesIO(avatar_bytes)).convert("RGBA")
         avatar = ImageOps.fit(avatar, (500, 500))
         
 
@@ -36,7 +33,7 @@ class Quote:
             font_main = ImageFont.load_default()
             font_author = ImageFont.load_default()
 
-        lines = textwrap.wrap(text, width=25)
+        lines = wrap(text, width=25)
         y_text = 150 
         for line in lines:
             draw.text((520, y_text), line, font=font_main, fill="white")
@@ -60,11 +57,11 @@ class Quote:
         author_name = orig_msg.author.global_name or orig_msg.author.name
 
         avatar_url = orig_msg.author.display_avatar.with_format("png").url
-        avatar_bytes = requests.get(avatar_url).content
+        avatar_bytes = requests_get(avatar_url).content
 
         final_img = self.create_quote(content, author_name, avatar_bytes)
 
-        with io.BytesIO() as out:
+        with BytesIO() as out:
             final_img.save(out, format="PNG")
             out.seek(0)
-            await ctx.send(file=discord.File(fp=out, filename="quote.png"))
+            await ctx.send(file=File(fp=out, filename="quote.png"))
