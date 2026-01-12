@@ -25,6 +25,7 @@ guild: Guild
 
 game_state: dict
 PAGE_SIZE: int = 25
+SPEED: int = 1 # В часах
 
 TOKEN: str
 intents: Intents

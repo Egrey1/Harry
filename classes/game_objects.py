@@ -198,11 +198,12 @@ class Country:
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
-        cursor.execute(f"""
+        cursor.execute("""
                         UPDATE roles
                         SET is_busy = NULL
-                        WHERE is_busy = '{self.busy.id}'
-                        """)
+                        WHERE is_busy = ?
+                        """, (self.busy.mention,))
+        
         connect.commit()
         connect.close()
         self.busy = None
@@ -233,7 +234,7 @@ class Country:
             if not avatar_bytes:
                 webhooks = await channel.webhooks()
                 if webhooks:
-                    await webhooks[0].send(content=news, username=self.name)
+                    await webhooks[0].send(content=news, username=self.name, files=files)
                     return
 
             # Создаём временный вебхук (с аватаром, если он есть) и отправляем сообщение
@@ -242,7 +243,7 @@ class Country:
             else:
                 webhook = await channel.create_webhook(name=self.name)
 
-            await webhook.send(content=news, username=self.name)
+            await webhook.send(content=news, username=self.name, files=files)
         finally:
             # Удаляем временный вебхук, если он был создан
             try:
@@ -741,7 +742,7 @@ class Focus:
         return True
     
     def mark_as_completed(self, country_name: str | Country | None):
-        country_name = country_name if issistance(country_name, str) else (country_name.name if issistance(country_name, Country) else self.owner.name)
+        country_name = country_name if isinstance(country_name, str) else (country_name.name if isinstance(country_name, Country) else self.owner.name)
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         

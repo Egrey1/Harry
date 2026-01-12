@@ -13,4 +13,4 @@ class InvCommand:
 
         view.add_item(army)
         view.add_item(enterprise)
-        await ctx.reply(f'`{country.name if country.name else ctx.author.name}` конкрентизируйте', view=view, ephemeral=True)
+        await ctx.reply(f'`{country.name if country.busy else ctx.author.name}` конкрентизируйте', view=view, ephemeral=True)

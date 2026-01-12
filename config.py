@@ -5,85 +5,86 @@ from sqlite3 import connect as conyto
 import dependencies as deps
 
 #Проверяет есть ли пользователь в списке стран. 
-async def give_country(mention: str) -> deps.Country | bool:
-    connect = con(deps.DATABASE_ROLE_PICKER.PATH)
-    cursor = connect.cursor()
-    cursor.execute(f"""
-                    SELECT name
-                    FROM roles
-                    WHERE is_busy = '{mention}'
-                    """)
-    result = cursor.fetchone()
-    connect.close()
-    return deps.Country(result[0]) if result[0] else False
+# async def give_country(mention: str) -> deps.Country | bool:
+#     connect = con(deps.DATABASE_ROLE_PICKER.PATH)
+#     cursor = connect.cursor()
+#     cursor.execute(f"""
+#                     SELECT name
+#                     FROM roles
+#                     WHERE is_busy = '{mention}'
+#                     """)
+#     result = cursor.fetchone()
+#     connect.close()
+#     return deps.Country(result[0]) if result[0] else False
 
-async def all_countries_option(context: Context, countries, page: int) -> int:
-    return [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * deps.PAGE_SIZE, min((page) * deps.PAGE_SIZE, len(countries))) if i < len(countries)]
+# async def all_countries_option(context: Context, countries, page: int) -> int:
+#     return [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * deps.PAGE_SIZE, min((page) * deps.PAGE_SIZE, len(countries))) if i < len(countries)]
 
-# Возвращает текущие деньги страны
-async def get_money(country: str) -> int:
-    connect = con(deps.DATABASE_COUNTRIES)
-    cursor = connect.cursor()
-    cursor.execute(f"""
-                   SELECT "Деньги"
-                   FROM countries_inventory
-                   WHERE name = '{country}'
-                   """)
-    res = cursor.fetchone()[0]
-    connect.close()
+# # Возвращает текущие деньги страны
+# async def get_money(country: str) -> int:
+#     connect = con(deps.DATABASE_COUNTRIES)
+#     cursor = connect.cursor()
+#     cursor.execute(f"""
+#                    SELECT "Деньги"
+#                    FROM countries_inventory
+#                    WHERE name = '{country}'
+#                    """)
+#     res = cursor.fetchone()[0]
+#     connect.close()
 
-    return int(res)
+#     return int(res)
 
-# Возвращает стоимость товара
-async def get_cost(item: str) -> int:
-    connect = con(deps.DATABASE_COUNTRIES)
-    cursor = connect.cursor()
-    cursor.execute(f"""
-                   SELECT cost
-                   FROM factories
-                   WHERE name = '{item}'
-                   """)
-    res = cursor.fetchone()[0]
-    connect.close()
+# # Возвращает стоимость товара
+# async def get_cost(item: str) -> int:
+#     connect = con(deps.DATABASE_COUNTRIES)
+#     cursor = connect.cursor()
+#     cursor.execute(f"""
+#                    SELECT cost
+#                    FROM factories
+#                    WHERE name = '{item}'
+#                    """)
+#     res = cursor.fetchone()[0]
+#     connect.close()
 
-    return int(res)
+#     return int(res)
 
-# Возвращает инвентарь страны в виде словаря
-async def get_inventory(country: str) -> dict:
-    from sqlite3 import Row
+# # Возвращает инвентарь страны в виде словаря
+# async def get_inventory(country: str) -> dict:
+#     from sqlite3 import Row
 
-    connect = con(deps.DATABASE_COUNTRIES)
-    connect.row_factory = Row
-    cursor = connect.cursor()
-    cursor.execute(f"""
-                    SELECT *
-                    FROM countries_inventory
-                    WHERE name = '{country}'
-                   """)
-    res = cursor.fetchone()
-    connect.close()
+#     connect = con(deps.DATABASE_COUNTRIES)
+#     connect.row_factory = Row
+#     cursor = connect.cursor()
+#     cursor.execute(f"""
+#                     SELECT *
+#                     FROM countries_inventory
+#                     WHERE name = '{country}'
+#                    """)
+#     res = cursor.fetchone()
+#     connect.close()
 
-    return dict(res) if res else {}
+#     return dict(res) if res else {}
 
-# Возвращает всю информацию по ролям для страны
-async def get_country_info(country: str) -> dict:
-    from sqlite3 import Row
+# # Возвращает всю информацию по ролям для страны
+# async def get_country_info(country: str) -> dict:
+#     from sqlite3 import Row
 
-    connect = con(deps.DATABASE_ROLE_PICKER)
-    connect.row_factory = Row
-    cursor = connect.cursor()
-    cursor.execute(f"""
-                    SELECT *
-                    FROM roles
-                    WHERE name = '{country}'
-                   """)
-    res = cursor.fetchone()
-    connect.close()
+#     connect = con(deps.DATABASE_ROLE_PICKER)
+#     connect.row_factory = Row
+#     cursor = connect.cursor()
+#     cursor.execute(f"""
+#                     SELECT *
+#                     FROM roles
+#                     WHERE name = '{country}'
+#                    """)
+#     res = cursor.fetchone()
+#     connect.close()
 
-    return dict(res) if res else {}
+#     return dict(res) if res else {}
 
 def get_channel(name: str) -> TextChannel:
-    connect = con(deps.DATABASE_CONFIG)
+    from sqlite3 import connect as con
+    connect = con(deps.DATABASE_CONFIG_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
                    SELECT {name}
@@ -179,7 +180,8 @@ async def second_config():
     deps.RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 
             'sea': 1357681946276266044, 'assambley': 1357679628243959862, 
             'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 
-            'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119}
+            'soviet': 1357679674410664076, 'PARAMS': 1358763645538009119,
+            'registered': 1344519261216964710}
     deps.PERSONAL = {'politolog': deps.guild.get_role(1344824679390515280), 'mapper': deps.guild.get_role(1344824559777484861),
                         'moderator': deps.guild.get_role(1344824679390515280), 'anketolog': deps.guild.get_role(1344824637540012154),
                         'curator': deps.guild.get_role(1345434049027506187), 'zamcur': deps.guild.get_role(1345434049027506187),

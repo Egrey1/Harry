@@ -6,7 +6,7 @@ class UpdateInventory:
     def __init__(self):
         pass
 
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=deps.SPEED)
     # @tasks.loop(seconds=10) # for test
     async def update_inventories(self):
         if not deps.game_state['game_started']:

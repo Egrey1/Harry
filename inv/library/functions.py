@@ -35,8 +35,8 @@ async def factory_list(country: str) -> dict:
 async def give_army(interaction: Interaction) -> None:
     country = deps.Country(interaction.user.mention)
 
-    if not country or not country.busy:
-        await interaction.followup.send('Балван! Ты не страна! Ну или это ошибка в базе...', ephemeral=True)
+    if not country.busy:
+        await interaction.response.send_message('Балван! Ты не страна! Ну или это ошибка в базе...', ephemeral=True)
         return None
 
     items = []
@@ -57,8 +57,8 @@ async def give_army(interaction: Interaction) -> None:
 async def give_enterprise(interaction: Interaction) -> None:
     country = deps.Country(interaction.user.mention)
 
-    if not country:
-        await interaction.followup.send('Балван! Ты не страна! Ну или это ошибка в базе...', ephemeral=True)
+    if not country.busy:
+        await interaction.response.send_message('Балван! Ты не страна!', ephemeral=True)
         return None
 
     factories = country.factories
@@ -75,4 +75,4 @@ async def give_enterprise(interaction: Interaction) -> None:
     embed_desc = '\n\n'.join(items) if items else 'Пусто'
     balance = getattr(country, 'balance', 0)
     embed = Embed(title=f"Баланс: {deps.CURRENCY}{balance}", description=embed_desc)
-    await interaction.followup.send(embed=embed, ephemeral=True)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
