@@ -31,13 +31,13 @@ class MarketEdit(Modal):
         
         self.country.market.edit_item(self.item)
         
-        interaction.response.send_message(f'Команда выполнена успешо! {self.country} Теперь продает {self.item.name} за {self.country.market.inventory[self.item.name].price}')
+        await interaction.response.send_message(f'Команда выполнена успешо! {self.country} Теперь продает {self.item.name} за {self.country.market.inventory[self.item.name].price}')
         return None
 
 class Quantity(Modal):
-    def __init__(self, item: deps.Item, country: str | deps.Country):
+    def __init__(self, item: deps.Item | deps.Factory, country: str | deps.Country):
         super().__init__(title="Выбор количества")  
-        self.item = item
+        self.item = country.inventory.get(item.name, item) if isinstance(item, deps.Item) else country.factories.get(item.name, item)
         self.country_name = country if isinstance(country, str) else getattr(country, 'name')
         
         self.quantity= TextInput(label= 'Выберите количество, совершенно любое', placeholder= 'Столько и будет выдано', required= True)

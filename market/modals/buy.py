@@ -1,14 +1,14 @@
 from ..library import Modal, TextInput, Interaction, con, deps
 
 class Buy(Modal):
-    def __init__(self, country: str | deps.Country, item: str, seller: str, positions: dict[str, dict]):
+    def __init__(self, country: str | deps.Country, item_name: str, seller: str, positions: dict[str, dict]):
         super().__init__(title='Покупка позиции с рынка')
-        self.country = country if isinstance(country, str) else country.name
-        self.item = item
+        self.country_name = country if isinstance(country, str) else country.name
+        self.item_name = item_name
         self.positions = positions
 
         self.seller_info = None
-        for countries in positions[item]['sellers']:
+        for countries in positions[item_name]['sellers']:
             if countries['country'] == seller:
                 self.seller_info = countries
                 break
@@ -38,7 +38,7 @@ class Buy(Modal):
         price_per = int(self.seller_info['price'])
         total_price = buy_count * price_per
 
-        buyer_country = self.country if isinstance(self.country, deps.Country) else deps.Country(self.country)
+        buyer_country = self.country_name if isinstance(self.country_name, deps.Country) else deps.Country(self.country_name)
         seller_country = deps.Country(self.seller_info['country'])
         if not buyer_country or not seller_country:
             await interaction.response.send_message('Покупатель или продавец не найдены.', ephemeral=True)
@@ -55,25 +55,24 @@ class Buy(Modal):
             return
 
         # Update seller market item
-        market_item = seller_country.market.inventory.get(self.item)
+        market_item = seller_country.market.inventory.get(self.item_name)
         new_seller_qty = max(0, market_item.quantity - buy_count) if market_item else 0
         if market_item:
             if new_seller_qty == 0:
-                seller_country.market.remove_item(self.item)
+                seller_country.market.remove_item(self.item_name)
             else:
                 market_item.quantity = new_seller_qty
                 seller_country.market.edit_item(market_item)
 
         # Give items to buyer
-        buyer_item = buyer_country.inventory.get(self.item)
+        buyer_item = buyer_country.inventory.get(self.item_name)
         if buyer_item:
             buyer_item.edit_quantity(buyer_item.quantity + buy_count, buyer_country)
             buyer_item.quantity += buy_count
         else:
-            from classes.game_objects import Item as GameItem
-            new_item = GameItem(self.item, quantity=buy_count, price=0, country=buyer_country)
+            new_item = deps.Item(self.item_name, quantity=buy_count, price=0, country=buyer_country)
             new_item.edit_quantity(buy_count, buyer_country)
-            buyer_country.inventory[self.item] = new_item
+            buyer_country.inventory[self.item_name] = new_item
 
         # Transfer money via DB updates
         connect = con(deps.DATABASE_COUNTRIES_PATH)
@@ -91,5 +90,5 @@ class Buy(Modal):
         connect.commit()
         connect.close()
 
-        await interaction.response.send_message(f'Успешно куплено `{buy_count} {self.item}` у {self.seller_info["country"]} за {deps.CURRENCY}{total_price}!', ephemeral=True)
+        await interaction.response.send_message(f'Успешно куплено `{buy_count} {self.item_name}` у {self.seller_info["country"]} за {deps.CURRENCY}{total_price}!', ephemeral=True)
 

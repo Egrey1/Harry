@@ -1,4 +1,4 @@
-from ..library import Cog, Bot, hybrid_command, Context, SelectOption, Select, View
+from ..library import Bot, hybrid_command, Context, SelectOption, Select, View, deps
 from ..callbacks import edit_callback
 
 class Edit():
@@ -7,7 +7,7 @@ class Edit():
 
     @hybrid_command(name="market_edit", description="Редактирует одну из ваших позиций на рынке")
     async def edit(self, ctx: Context):
-        country = await give_country(ctx.author.mention)
+        country = deps.Country(ctx.author.mention)
         if not country:
             await ctx.send("Вы не зарегистрированы!", ephemeral=True)
             return
@@ -24,7 +24,7 @@ class Edit():
             have_item = country.inventory.get(item)
             have = have_item.quantity if have_item else 0
             qty, price = value.split()
-            options.append(SelectOption(label=f'{item} - {qty}', description=f"У вас есть {have}, каждая по {CURRENCY}{price}"))
+            options.append(SelectOption(label=f'{item} - {qty}', description=f"У вас есть {have}, каждая по {deps.CURRENCY}{price}"))
         
         select = Select(placeholder="И какую позицию вам нужно отредактировать?", options=options)
         select.callback = edit_callback

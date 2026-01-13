@@ -1,4 +1,4 @@
-from ..library import Bot, hybrid_command, Context, View, Select, SelectOption
+from ..library import Bot, hybrid_command, Context, View, Select, SelectOption, deps, List
 from ..callbacks import buy_callback
 from ..library.modules import con, Row
 
@@ -8,10 +8,10 @@ class Buy():
 
     @hybrid_command(name="market_buy", description="Покупка вооружения с рынка")
     async def buy(self, ctx: Context):
-        country = await give_country(ctx.author.mention)
+        country = deps.Country(ctx.author.mention)
 
         # Inline market summary
-        connect = con(deps.DATABASE_COUNTRIES)
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
 
@@ -22,13 +22,13 @@ class Buy():
         rows = cursor.fetchall()
         connect.close()
 
-        positions: dict[str, dict] = {}
+        positions: dict[str, dict[str, str]] = {}
 
         for row in rows:
             r = dict(row)
             country_name = r.get('name')
-            for key, value in r.items():
-                if key == 'name' or not value:
+            for name, value in r.items():
+                if name == 'name' or not value:
                     continue
                 try:
                     qty_str, price_str = str(value).split()
@@ -40,11 +40,11 @@ class Buy():
                 if qty <= 0:
                     continue
 
-                if key not in positions:
-                    positions[key] = {'total': 0, 'sellers': []}
+                if name not in positions:
+                    positions[name] = {'total': 0, 'sellers': []}
 
-                positions[key]['total'] += qty
-                positions[key]['sellers'].append({'country': country_name, 'price': price, 'qty': qty})
+                positions[name]['total'] += qty
+                positions[name]['sellers'].append({'country': country_name, 'price': price, 'qty': qty})
 
         if not positions:
             await ctx.send(f'На рынке нет доступных позиций для покупки!')

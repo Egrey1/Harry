@@ -1,10 +1,10 @@
 from ..library import Modal, TextInput, Interaction, con, deps
 
 class Add(Modal):
-    def __init__(self, country, item, item_count: int):
+    def __init__(self, country: deps.Country, item: deps.Item, item_count: int):
         super().__init__(title='Добавление позиции на рынок')
-        self.country = country
-        self.item = item
+        self.country = country.name
+        self.item = str(item)
         self.item_count = item_count
 
         # Inputs

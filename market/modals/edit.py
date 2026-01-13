@@ -1,9 +1,9 @@
 from ..library import Modal, TextInput, Interaction, con, deps
 
 class Edit(Modal):
-    def __init__(self, country: str | deps.Country, item: str, have: str, on_market: str):
+    def __init__(self, country: str | deps.Country, item: str | deps.Item, have: str, on_market: str):
         super().__init__(title='Тут можешь отредактировать свою позицию!')
-        self.item = item
+        self.item_name = item if isinstance(item, str) else item.name
         self.on_market = on_market.split()
         self.country_name = country if isinstance(country, str) else country.name
         self.have = have
@@ -39,7 +39,7 @@ class Edit(Modal):
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
 
-        col = self.item
+        col = self.item_name
         new_value = f"{updated_count} {new_price}"
 
         cursor.execute(f"""
@@ -58,11 +58,11 @@ class Edit(Modal):
         connect.close()
 
         if updated_count == 0:
-            await interaction.response.send_message(f'Твои `{self.item}` удалены >:)', ephemeral=True)
+            await interaction.response.send_message(f'Твои `{self.item_name}` удалены >:)', ephemeral=True)
             return
         
         if not self.count.value and not self.price.value:
             await interaction.response.send_message(f'Ты вызвал команду чтоб на кнопки потыкать?', ephemeral=True)
             return
         
-        await interaction.response.send_message(f'Готово! `{self.item}` - `{updated_count}` по `{deps.CURRENCY}{new_price}` за единицу!', ephemeral=True)
+        await interaction.response.send_message(f'Готово! `{self.item_name}` - `{updated_count}` по `{deps.CURRENCY}{new_price}` за единицу!', ephemeral=True)

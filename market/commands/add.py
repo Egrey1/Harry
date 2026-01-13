@@ -1,4 +1,4 @@
-from ..library import Cog, Bot, hybrid_command, Context, View, SelectOption, Select
+from ..library import Bot, hybrid_command, Context, View, SelectOption, Select, deps
 from ..callbacks import add_callback
 
 class Add():
@@ -7,7 +7,7 @@ class Add():
 
     @hybrid_command(name="market_add", description="Добавляет вашу позицию на рынок")
     async def add(self, ctx: Context):
-        country = await give_country(ctx.author.mention)
+        country = deps.Country(ctx.author.mention)
 
         if not country:
             await ctx.send('Ты не зарегистрирован!', ephemeral=True)
