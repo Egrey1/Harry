@@ -361,7 +361,7 @@ class Item:
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
-                        UPDATE country_inventories
+                        UPDATE countries_inventory
                         SET `{self.name}` = {quantity}
                         WHERE `name` = '{country_name}'
         """)
@@ -604,7 +604,7 @@ class Factory:
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
-                        UPDATE countries_factory
+                        UPDATE country_factories
                         SET `{self.name}` = {quantity}
                         WHERE `name` = '{country_name}'
         """)

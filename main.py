@@ -28,6 +28,7 @@ async def on_ready():
     await second_config()
     await load_extensions()
     await deps.bot.tree.sync()
+    deps.bot.activity = activity
     print(f'Бот {deps.bot.user} успешно запущен!')
     print(f'ID бота: {deps.bot.user.id}')
     print('------')
