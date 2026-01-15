@@ -6,15 +6,16 @@ class UnregPlayerCommand:
     @describe(member= 'Обязательно указать страну')
     async def unreg_player(self, ctx: Context, member: Member):
         if not ctx.interaction:
-            await ctx.reply('/unreg_player правильнее будет')
+            await ctx.send('Правильнее будет /unreg_player @страна', ephemeral= True)
             return
-
+        
+        await ctx.interaction.response.defer(ephemeral= True)
         country = deps.Country(member.mention)
         if not country.busy:
-            await ctx.send('Мать моя богиня! Это же не страна, ты чего? Не буду я его снимать!', ephemeral= True)
+            await ctx.interaction.followup.send('Мать моя богиня! Это же не страна, ты чего? Не буду я его снимать!', ephemeral= True)
             return
         
-        country.unreg()
+        await country.unreg()
         
-        await ctx.send('Это больше не страна!', ephemeral= True)
+        await ctx.interaction.followup.send('Он больше не страна!', ephemeral= True)
         

@@ -14,10 +14,10 @@ async def focus_callback(interaction: Interaction, country: deps.Country):
     
     requirements_value_field = '\n'.join([f"{factory.name} - {factory.quantity}шт." for factory in focus.req_factories])
     requirements_value_field += ('\n' if requirements_value_field else '') + '\n'.join([f"{item.name} - {item.quantity}шт." for item in focus.req_items])
-    requirements_value_field = ('\n' if requirements_value_field else '') + '\nНужно отправлять новость? - ' + ('Да' if focus.req_news else 'Нет') 
+    requirements_value_field += ('\n' if requirements_value_field else '') + ('\n' + focus.req_news if focus.req_news is not None else '') 
     
     if requirements_value_field:
-        embed.add_field(name="Требования", value="Сделать там вот так", inline=True)
+        embed.add_field(name="Требования", value=requirements_value_field, inline=True)
     
     reward_value_field = '\n'.join([f"{factory.name}: {factory.quantity}шт." for factory in focus.factories])
     reward_value_field += ('\n' if reward_value_field else '') + '\n'.join([f"{item.name}: {item.quantity}шт." for item in focus.items])
@@ -32,12 +32,12 @@ async def focus_callback(interaction: Interaction, country: deps.Country):
         
     available_focuses = country.give_available_focuses()
     view = View()
-    options = [SelectOption(label=focuss.name, value=focuss.name, emoji=focuss.emoji) for focuss in available_focuses if focuss.name != focus.name]
+    options = [SelectOption(label=focuss.name, value=focuss.name, emoji=focuss.emoji if focuss.emoji else None ) for focuss in available_focuses if focuss.name != focus.name]
     if options:
         select = Select(placeholder='Выберите фокус', options=options)
         select.callback = lambda interaction: focus_callback(interaction, country)
         view.add_item(select)
-    select2 = Button(label= 'Принять', emoji='❌️' if country.doing_focus is None else '✅️', disabled= country.doing_focus is not None)
+    select2 = Button(label= 'Принять', emoji='❎' if country.doing_focus is not None else '✅️', disabled= country.doing_focus is not None)
     select2.callback = lambda inter: accepted(inter, country)
     view.add_item(select2)
 

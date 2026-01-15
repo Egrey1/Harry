@@ -120,21 +120,22 @@ class Country:
         if self.surrend:
             cursor.execute(f"""
                             UPDATE roles
-                            SET surrend = NULL
+                            SET surrender = NULL
                             WHERE name = '{name}'
             """)
             self.surrend = False
+            connect.commit()
+            connect.close()
             await self.unreg(interaction) 
         else:
             cursor.execute(f"""
                             UPDATE roles
-                            SET surrend = '1'
+                            SET surrender = '1'
                             WHERE name = '{self.name}'
             """)
             self.surrend = True
-            
-        connect.commit()
-        connect.close()
+            connect.commit()
+            connect.close()
 
     async def change_nickname(self, new_nickname: str):
         """Изменяет отображаемое имя (никнейм) страны в базе данных и у участника Discord.
@@ -644,7 +645,7 @@ class Focus:
         self.req_factories: list[Factory] | None = fetch['req_factories']
         """Требуемые фабрики для выполнения фокуса"""
 
-        self.req_news: bool = fetch['req_news'] is not None
+        self.req_news: str | None = fetch['req_news'] if fetch['req_news'] else None
         """Требуется ли новостное сообщение для выполнения фокуса"""
 
         self.event: str | None = fetch['event']

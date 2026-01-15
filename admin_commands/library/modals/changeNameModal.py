@@ -10,5 +10,5 @@ class ChangeNickNameModal(Modal):
 
     async def on_submit(self, interaction: Interaction) -> None:
         new_nickname = self.new_nickname.value
-        self.country.change_nickname(new_nickname)
-        await interaction.response.send_message(content= 'Successfully changed nickname', ephemeral= True)
+        await self.country.change_nickname(new_nickname)
+        await interaction.response.send_message(content= 'Никнейм успешно изменен', ephemeral= True)
