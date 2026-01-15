@@ -209,33 +209,36 @@ class Country:
         connect.close()
         self.busy = None
 
-    async def send_news(self, news: str, attachments: List[Attachment]):
+    async def send_news(self, news: str, attachments: List[Attachment], view):
         """Отправляет новостное сообщение в канал новостей стран.
 
         Args:
             news (str): Текст новости для отправки.
         """
         files = [await file.to_file() for file in attachments]
-        channel = deps.rp_channels.get_news()
+        channel = deps.guild.get_channel(1429571616982958222)
 
         # Попытка загрузить аватар из БД
         avatar_bytes = None
-        try:
-            conn = con(deps.DATABASE_COUNTRIES_AI_PATH)
-            cursor = conn.cursor()
-            cursor.execute("SELECT avatar FROM avatars WHERE name = ?", (self.name,))
-            row = cursor.fetchone()
-            conn.close()
-            avatar_bytes = row[0] if row and row[0] else None
-        except Exception:
-            avatar_bytes = None
+        # try:
+        conn = con(deps.DATABASE_COUNTRY_AI_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+                        SELECT avatar 
+                        FROM avatars 
+                        WHERE name = ?""", (self.name,))
+        row = cursor.fetchone()
+        conn.close()
+        avatar_bytes = row[0] if row and row[0] else None
+        # except Exception:
+        #     avatar_bytes = None
 
         try:
             # Если нет аватара, попробуем использовать первый доступный вебхук
             if not avatar_bytes:
                 webhooks = await channel.webhooks()
                 if webhooks:
-                    await webhooks[0].send(content=news, username=self.name, files=files)
+                    await webhooks[0].send(content=news, username=self.name, files=files, view=view)
                     return
 
             # Создаём временный вебхук (с аватаром, если он есть) и отправляем сообщение
@@ -244,7 +247,7 @@ class Country:
             else:
                 webhook = await channel.create_webhook(name=self.name)
 
-            await webhook.send(content=news, username=self.name, files=files)
+            await webhook.send(content=news, username=self.name, files=files, view=view)
         finally:
             # Удаляем временный вебхук, если он был создан
             try:

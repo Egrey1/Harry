@@ -2,6 +2,7 @@
 
 from discord import Guild, Intents, TextChannel, ForumChannel, Role
 from discord.ext.commands import Bot
+from discord import utils
 from classes import *
 
 bot: Bot = Bot('!', intents=Intents.all())
@@ -9,7 +10,7 @@ DATABASE_ROLE_PICKER_PATH: str
 DATABASE_COUNTRIES_PATH: str
 DATABASE_FOCUS_PATH: str
 DATABASE_CONFIG_PATH: str
-DATABASE_COUNTRIES_AI_PATH: str
+DATABASE_COUNTRY_AI_PATH: str
 
 CURRENCY: str
 RP_ROLES: dict
@@ -34,8 +35,10 @@ PREFIX: str
 audit: TextChannel
     
 class RpChannels:
-    async def __init__(self, event: int | str | TextChannel = '📣┃события', war: int | str | TextChannel | ForumChannel = '🔥┃войны', news: int | str | TextChannel = '📰┃новости-стран'):
-        """"""
+    def __init__(self, event: int | TextChannel = '📣┃события', war: int | ForumChannel = '🔥┃войны', news: int | TextChannel = '📰┃новости-стран'):
+        self.event = guild.get_role(event) if isinstance(event, int) else event
+        self.war = guild.get_role(war) if isinstance(war, int) else war
+        self.news = guild.get_role(news) if isinstance(news, int) else news
         
     def get_event(self) -> TextChannel:
         """Возвращает канал для ивентов"""

@@ -104,13 +104,6 @@ def get_channel(name: str) -> TextChannel:
     return utils.get(deps.guild.channels, names[name])
 
 def config_rpchannels():
-    async def tmp(self, event = '📣┃события', war = '🔥┃войны', news = '📰┃новости-стран'):
-        self.event = deps.guild.get_role(event) if type(event) == int else (utils.get(deps.guild.channels, event) if type(event) == str else event)
-        self.war = deps.guild.get_role(war) if type(war) == int else (utils.get(deps.guild.channels, war) if type(war) == str else war)
-        self.news = deps.guild.get_role(news) if type(news) == int else (utils.get(deps.guild.channels, news) if type(news) == str else news)
-    deps.RpChannels.__init__ = tmp
-    
-    
     def tmp(self):
         return self.event
     deps.RpChannels.get_event = tmp
@@ -174,7 +167,7 @@ async def second_config():
     deps.CURRENCY = '£'
     deps.DATABASE_ROLE_PICKER_PATH = 'databases/role-picker.db'
     deps.DATABASE_COUNTRIES_PATH = 'databases/countries.db'
-    deps.DATABASE_COUNTRIES_AI_PATH = 'databases/countries_ai.db'
+    deps.DATABASE_COUNTRY_AI_PATH = 'databases/country_ai.db'
     deps.DATABASE_FOCUS_PATH = 'databases/focuses.db'
     deps.DATABASE_CONFIG_PATH = 'databases/config.db'
     deps.RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 
@@ -187,5 +180,6 @@ async def second_config():
                         'curator': deps.guild.get_role(1345434049027506187), 'zamcur': deps.guild.get_role(1345434049027506187),
                         'curpers': deps.guild.get_role(1344824766737027182),}
     deps.audit = deps.guild.get_channel(1454735211647733917) # #гарри text channelnnels()
+    deps.rp_channels = deps.RpChannels(news=1429571616982958222)
 
 

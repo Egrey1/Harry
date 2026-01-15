@@ -1,0 +1,1 @@
+from .send_new import NewEvent

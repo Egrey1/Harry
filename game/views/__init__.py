@@ -1,1 +1,1 @@
-from country_new import CountryNewView
+from .country_new import CountryNewView
