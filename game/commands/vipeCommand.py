@@ -22,14 +22,14 @@ class VipeCommand:
         connect.close()
 
         for country_name in result:
-            deps.Country(country_name[0]).unreg()
+            await deps.Country(country_name[0]).unreg()
         
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
 
         cursor.execute(f"DELETE FROM country_factories")
         cursor.execute("""
-                       INSERT INTO country_factories
+                       INSERT INTO country_factori
                        SELECT *
                        FROM country_factories_default
                        """)
