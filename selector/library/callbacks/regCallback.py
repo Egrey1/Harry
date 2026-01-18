@@ -14,7 +14,8 @@ async def picker_callback(interaction: Interaction, value: str) -> None:
         try:
             await user.edit(nick=picker['nickname']) 
         except:
-            await interaction.followup.send(f'Произошла ошибка при смене никнейма. Обратитесь в поддержку: {picker['nickname']}', ephemeral=True)
+            ebuchibothost = picker['nickname']
+            await interaction.followup.send(f'Произошла ошибка при смене никнейма. Обратитесь в поддержку: {ebuchibothost}', ephemeral=True)
         
         # Создаем переменные всех неконстаных ролей с их ID
         sea = picker['sea']

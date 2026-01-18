@@ -75,9 +75,11 @@ async def set_upd(coutry_items: tuple[dict[str, any]]) -> None:
             for ship in ships:
                 items[ship] = 0
 
+        ebuchibothost1 = ', '.join(['\"' + i + '\"' for i in items.keys()])
+        ebuchibothost2 = ', '.join(['\"' + str(i) + '\"' for i in items.values()])
         cursor.execute(f"""
-                    INSERT OR REPLACE INTO countries_inventory_add ({', '.join(['\"' + i + '\"' for i in items.keys()])})
-                    VALUES ({', '.join(['\"' + str(i) + '\"' for i in items.values()])})
+                    INSERT OR REPLACE INTO countries_inventory_add ({ebuchibothost1})
+                    VALUES ({ebuchibothost2})
                     """)
     connect.commit()
     connect.close()
