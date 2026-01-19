@@ -745,7 +745,7 @@ class Focus:
                 return False
         return True
     
-    def mark_as_completed(self, country_name: str | Country | None):
+    def mark_as_completed(self, country_name: str | Country | None = None):
         country_name = country_name if isinstance(country_name, str) else (country_name.name if isinstance(country_name, Country) else self.owner.name)
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()

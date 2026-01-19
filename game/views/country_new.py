@@ -3,10 +3,10 @@ from ..library import deps, View, Button, button, Interaction, Embed
 
 
 
-def has_focus(country: deps.Country) -> bool:
+def has_focus() -> bool:
     def dec(func):
         async def wrapper(self, interaction: Interaction, butt: Button | None = None, *args, **kwargs):
-            if country.doing_focus:
+            if self.country.doing_focus is None:
                 butt.disabled = True
                 butt.emoji = '❎'
                 return
@@ -73,7 +73,7 @@ class CountryNewView(View):
         await interaction.message.delete()
     
     @button(label='Принять фокус', emoji='✅')
-    @has_focus(country=deps.Country)
+    @has_focus()
     async def accept_focus(self, interaction: Interaction, butt: Button):
         if (deps.PERSONAL['politolog'] not in interaction.user.roles) and (not interaction.user.resolved_permissions.administrator):
             await interaction.response.send_message('У тебя нет права использовать эту кнопочку! Не тыкай сюда!', ephemeral=True)
@@ -82,9 +82,11 @@ class CountryNewView(View):
         focus = self.country.doing_focus
         country = deps.Country(interaction.message.author.display_name)
         if not focus.requirements_complete():
-            await interaction.message.channel.send(f'{country.busy} попытался выполнить фокус `{focus.name}`, но он не выполнил все условия')
+            await interaction.message.channel.send(f'{country.busy} попытался выполнить фокус `{focus.name}`, но он не выполнил все условия', delete_after=30)
             return
         
         focus.mark_as_completed()
-        butt.disabled = True
-    
+        await interaction.response.send_message(f'Фокус успешно помечен как выполненный', ephemeral=True)
+
+        # butt.disabled = True
+        # await interaction.message.edit(view=self)    

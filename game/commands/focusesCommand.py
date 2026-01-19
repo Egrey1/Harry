@@ -14,7 +14,8 @@ class FocusesCommand:
             return None
 
         view = View()
-        options = [SelectOption(label=focus.name, value=focus.name, emoji=focus.emoji) for focus in available_focuses]
+        # options = [SelectOption(label=focus.name, value=focus.name, emoji=focus.emoji) for focus in available_focuses]
+        options = [SelectOption(label=focus.name, value=focus.name) for focus in available_focuses]
         select = Select(placeholder='Выберите фокус', options=options)
         select.callback = lambda interaction: focus_callback(interaction, country)
         view.add_item(select)

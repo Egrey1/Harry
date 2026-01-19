@@ -1,13 +1,12 @@
 from ..library import Interaction, deps, Embed, View, Select, SelectOption, Button
 
-async def accepted(interaction: Interaction, country: deps.Country):
-    focus = deps.Focus(interaction.data['values'][0], country)
+async def accepted(interaction: Interaction, country: deps.Country, focus: deps.Focus):
     country.set_focus(focus)
-    interaction.response.send_message(content=f'Вы выполняете фокус: **{focus.name}**', ephemeral=True)
+    await interaction.response.send_message(content=f'Вы выполняете фокус: **{focus.name}**', ephemeral=True)
 
 
 async def focus_callback(interaction: Interaction, country: deps.Country):
-    focus = deps.Focus(interaction.data['values'][0])
+    focus = deps.Focus(interaction.data['values'][0], country)
     
     embed = Embed(title=focus.name,
                   description=focus.description)
@@ -32,13 +31,15 @@ async def focus_callback(interaction: Interaction, country: deps.Country):
         
     available_focuses = country.give_available_focuses()
     view = View()
-    options = [SelectOption(label=focuss.name, value=focuss.name, emoji=focuss.emoji if focuss.emoji else None ) for focuss in available_focuses if focuss.name != focus.name]
+    options = [SelectOption(label=focuss.name, value=focuss.name) for focuss in available_focuses if focuss.name != focus.name]
+    # options = [SelectOption(label=focuss.name, value=focuss.name, emoji=focuss.emoji if focuss.emoji else None ) for focuss in available_focuses if focuss.name != focus.name]
     if options:
         select = Select(placeholder='Выберите фокус', options=options)
         select.callback = lambda interaction: focus_callback(interaction, country)
         view.add_item(select)
-    select2 = Button(label= 'Принять', emoji='❎' if country.doing_focus is not None else '✅️', disabled= country.doing_focus is not None)
-    select2.callback = lambda inter: accepted(inter, country)
+    # select2 = Button(label= 'Принять', emoji='❎' if country.doing_focus is not None else '✅️', disabled= country.doing_focus is not None)
+    select2 = Button(label= 'Принять', disabled= country.doing_focus is not None)
+    select2.callback = lambda inter: accepted(inter, country, focus)
     view.add_item(select2)
 
     await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
