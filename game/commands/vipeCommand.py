@@ -29,7 +29,7 @@ class VipeCommand:
 
         cursor.execute(f"DELETE FROM country_factories")
         cursor.execute("""
-                       INSERT INTO country_factori
+                       INSERT INTO country_factories
                        SELECT *
                        FROM country_factories_default
                        """)
