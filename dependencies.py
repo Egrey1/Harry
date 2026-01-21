@@ -29,6 +29,8 @@ PAGE_SIZE: int = 25
 SPEED: int = 1 # В часах
 
 TOKEN: str
+TOKEN1: str
+TOKEN2: str
 intents: Intents
 PREFIX: str
     

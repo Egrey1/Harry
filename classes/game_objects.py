@@ -749,9 +749,11 @@ class Focus:
                 return False
         return True
     
-    def mark_as_completed(self, country_name: str | Country | None = None):
+    def mark_as_completed(self, country_name: str | Country | None = None, connect=None):
         country_name = country_name if isinstance(country_name, str) else (country_name.name if isinstance(country_name, Country) else self.owner.name)
-        connect = con(deps.DATABASE_FOCUS_PATH)
+        own_connect = connect is None
+        if own_connect:
+            connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         
         cursor.execute("""
@@ -759,8 +761,9 @@ class Focus:
                         SET completed = ?
                         WHERE name = ?
                         """, (self.name, country_name))
-        connect.commit()
-        connect.close()
+        if own_connect:
+            connect.commit()
+            connect.close()
     
     @property
     def is_completed(self) -> bool:
