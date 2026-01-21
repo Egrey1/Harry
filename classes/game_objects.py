@@ -94,11 +94,12 @@ class Country:
         fetch = cursor.fetchone()
         cursor.close()
 
-        if not fetch:
-            return None
+        self.doing_focus: Focus | None = None
+        self.current_focus: Focus | None = None
         
-        self.doing_focus = Focus(fetch[0], self) if fetch[0] else None # добавить в документацию
-        self.current_focus = Focus(fetch[1], self) # добавить в документацию
+        if fetch:
+            self.doing_focus = Focus(fetch[0], self) if fetch[0] else None
+            self.current_focus = Focus(fetch[1], self) if fetch[1] else None
     
     def __str__(self):
         return self.name
@@ -265,6 +266,9 @@ class Country:
         Returns:
             List[Focus]: Список доступных фокусов.
         """
+        if not self.current_focus:
+            return []
+        
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
 
@@ -719,7 +723,7 @@ class Focus:
         if not text:
             return
 
-        deps.rp_channels.get_event().send(text)
+        await deps.rp_channels.get_event().send(text)
     
     async def declare_war(self):
         if len(self.war) == 0:
@@ -763,7 +767,7 @@ class Focus:
         """Возвращает bool значение. True если фокус за страну выполнен и False, если self.owner не указзан или фокус не выполнен"""
         if self.owner is None:
             return False
-        connect = con(deps.DATABASE_FOCUSES_PATH)
+        connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         
         cursor.execute("""
@@ -784,7 +788,7 @@ class Focus:
         if self.owner is None:
             return
         
-        connect = con(deps.DATABASE_FOCUSES_PATH)
+        connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         
         cursor.execute("""
@@ -798,6 +802,8 @@ class Focus:
     async def complete_focus(self):
         self.send_factories()
         self.send_items()
+        await self.send_event()
+        await self.declare_war()
         await self.send_event()
         await self.declare_war()
 

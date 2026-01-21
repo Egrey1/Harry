@@ -4,7 +4,7 @@ class FocusesCommand:
     @hybrid_command(name='focuses', description='Показать доступные национальные фокусы')
     async def focuses(self, ctx: Context):
         country = deps.Country(ctx.author.mention)
-        if not country:
+        if not country.busy:
             await ctx.reply('Вы не страна!', ephemeral=True)
             return None
 
@@ -20,4 +20,4 @@ class FocusesCommand:
         select.callback = lambda interaction: focus_callback(interaction, country)
         view.add_item(select)
 
-        await ctx.reply('Вам представлен список доступных фокусов', ephemeral=True, view=view)
+        await ctx.reply('Вам представлен список доступных фокусов', ephemeral=True, view=view) 

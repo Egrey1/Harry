@@ -6,3 +6,4 @@ from discord.ui import View, Select, Button, button
 import dependencies as deps
 
 from sqlite3 import connect as con
+import logging

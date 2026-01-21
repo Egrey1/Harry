@@ -11,7 +11,7 @@ class BuyCallback:
         factory = deps.Factory(interaction.data['values'][0])        
         country = deps.Country(interaction.user.mention)
 
-        if not country:
+        if not country.busy:
             await interaction.response.edit_message(content= 'Вы не зарегистрированы!', embed= None)
             return None
 

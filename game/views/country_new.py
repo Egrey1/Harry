@@ -24,7 +24,7 @@ class CountryNewView(View):
         for item in self.children:
             try:
                 if getattr(item, 'label', None) == 'Принять фокус':
-                    item.disabled = not bool(self.country.doing_focus)
+                    item.disabled = not bool(self.country.doing_focus) and (self.country.doing_focus.req_news)
             except Exception:
                 pass
 

@@ -9,7 +9,7 @@ class UpdaterCog(Cog, UpdateInventory):
         self.bot = bot
         self.update_inventories.start()
     
-    def cod_unload(self):
+    def cog_unload(self):
         self.update_inventories.cancel()
     
     @command(name='collect')

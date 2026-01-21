@@ -1,5 +1,6 @@
 from ..library.modules import tasks, con, deps
 from ..library.functions import give_factories, to_items, set_upd, give_items
+import logging
 
 
 class UpdateInventory:
@@ -12,7 +13,7 @@ class UpdateInventory:
         if not deps.game_state['game_started']:
             return
         
-        print('Инвентарь обновляется')
+        logging.info('Инвентарь обновляется')
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
 

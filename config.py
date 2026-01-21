@@ -3,6 +3,11 @@ from discord.ext.commands import Context, Bot
 import discord.utils as utils
 from sqlite3 import connect as conyto
 import dependencies as deps
+import logging
+from dotenv import load_dotenv
+from os import getenv
+
+
 
 #Проверяет есть ли пользователь в списке стран. 
 # async def give_country(mention: str) -> deps.Country | bool:
@@ -152,8 +157,12 @@ def config_rpchannels():
 
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
+    load_dotenv()
+    deps.TOKEN = getenv('TOKEN2')
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     deps.intents = Intents.all()
-    deps.PREFIX = '!'
+    deps.PREFIX = 'айтек отстань '
     deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
     config_rpchannels
 

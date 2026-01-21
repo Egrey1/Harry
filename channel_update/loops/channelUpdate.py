@@ -1,5 +1,6 @@
 from ..library import Bot, deps, loop
 from ..library import increment_iteration
+import logging
 
 class ChannelUpdate:
     def __init__(self, bot: Bot):
@@ -11,6 +12,6 @@ class ChannelUpdate:
         if not deps.game_state['game_started']:
             return
         
-        print('Бзиньк')
+        logging.info('Канал обновляется')
         channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)
         await channel.edit(name= await increment_iteration(channel.name))
