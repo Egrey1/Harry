@@ -158,10 +158,10 @@ def config_rpchannels():
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
     load_dotenv()
-    deps.TOKEN2 = getenv('TOKEN2')
-    deps.TOKEN1 = getenv('TOKEN1')
-    deps.TOKEN = deps.TOKEN1
-    # deps.TOKEN = getenv('TOKEN')
+    # deps.TOKEN2 = getenv('TOKEN2')
+    # deps.TOKEN1 = getenv('TOKEN1')
+    # deps.TOKEN = deps.TOKEN1
+    deps.TOKEN = getenv('TOKEN')
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     deps.intents = Intents.all()
