@@ -1,9 +1,9 @@
 from .library import Cog, Bot
-from .commands import KillCommand
-from .commands import Quote
+from .commands import KillCommand, Quote
+from .events import FeedHarryEvent
 
-class RoflCommandsCog(Cog, KillCommand, Quote):
-    def __init__(self, bot : Bot):
+class RoflCommandsCog(Cog, KillCommand, Quote, FeedHarryEvent):
+    def __init__(self, bot: Bot):
         self.bot = bot
     
     

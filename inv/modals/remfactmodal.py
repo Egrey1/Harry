@@ -2,13 +2,13 @@ from ..library import Modal, TextInput, deps, Interaction
 
 class RemFactModal(Modal):
     def __init__(self, factory: deps.Factory):
-        super().__init__(title='Разрушение фабрик')
+        super().__init__(title=factory.name if len(factory.name) < 45 else 'Разрушение фабрик')
         
         self.factory = factory
 
         self.quantity = TextInput(
-            label=f'Сколько фабрик "{factory.name}" вы хотите разрушить? (У вас {factory.quantity})', 
-            placeholder='Введите количество',
+            label=f'Сколько фабрик разрушить?', 
+            placeholder=f'У вас {factory.quantity}',
             required=True
         )
         self.add_item(self.quantity)
