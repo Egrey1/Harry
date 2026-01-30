@@ -151,7 +151,8 @@ class Country:
         """Возвращает количество использованных строительных ячеек (общее количество фабрик)."""
         total = 0
         for factory in self.factories.values():
-            total += factory.quantity
+            if factory.name != 'Коммерческая зона': # ВРЕМЕННО! НАДО ИСПРАВИТЬ!
+                total += factory.quantity
         return total
     
     def get_available_building_slots(self) -> int:
