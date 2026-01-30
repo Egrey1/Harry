@@ -1,7 +1,4 @@
-from .modules import (con, 
-                      Row, Interaction, Embed,
-                      deps)
-
+from .modules import (con, Row, Interaction, Embed, deps)
 
 # Возвращает весь инвентарь страны в виде словаря
 async def inventory_list(country: str) -> dict:
@@ -72,7 +69,14 @@ async def give_enterprise(interaction: Interaction) -> None:
         if name != 'name' and int(qty):
             items.append(f"{name} - {qty}")
 
-    embed_desc = '\n\n'.join(items) if items else 'Пусто'
+    # Добавляем информацию о строительных ячейках
+    used_slots = country.get_used_building_slots()
+    available_slots = country.get_available_building_slots()
+    total_slots = country.building_slots
+    
+    slots_info = f"\n\n**Строительные ячейки:**\nИспользовано: {used_slots}/{total_slots}\nДоступно: {available_slots}"
+
+    embed_desc = ('\n\n'.join(items) if items else 'Пусто') + slots_info
     balance = getattr(country, 'balance', 0)
     embed = Embed(title=f"Баланс: {deps.CURRENCY}{balance}", description=embed_desc)
     await interaction.response.send_message(embed=embed, ephemeral=True)

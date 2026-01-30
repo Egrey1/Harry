@@ -6,11 +6,28 @@ class Buy(Modal):
     def __init__(self, money: int, cost: int, country: deps.Country, factory: deps.Factory):
         super().__init__(title='Введите количество')
         self.cost = cost
-        self.max_buy = int(money / cost) if cost != 0 else '∞'
+        
+        # Вычисляем максимум, который можно купить по деньгам
+        max_by_money = int(money / cost) if cost != 0 else float('inf')
+        
+        # Вычисляем максимум, который можно купить по строительным ячейкам
+        available_slots = country.get_available_building_slots()
+        max_by_slots = available_slots if available_slots > 0 else 0
+        
+        # Берём минимум из двух ограничений
+        self.max_buy = min(max_by_money, max_by_slots) if max_by_money != float('inf') else max_by_slots
+        self.max_buy = int(self.max_buy) if self.max_buy != float('inf') else '∞'
+        
         self.country = country
         self.factory = factory
 
-        self.quantity = TextInput(label=f'У вас ' + deps.CURRENCY + str(money), placeholder='Вы можете приобрести ' + str(self.max_buy) + 'шт.', required=True)
+        # Обновляем текст с информацией о доступных местах
+        slots_info = f' (Доступно ячеек: {available_slots}/{country.building_slots})'
+        self.quantity = TextInput(
+            label=f'У вас ' + deps.CURRENCY + str(money) + slots_info, 
+            placeholder='Вы можете приобрести ' + str(self.max_buy) + ' шт.', 
+            required=True
+        )
         self.add_item(self.quantity)
     
     async def on_submit(self, interaction: Interaction) -> None:
@@ -26,6 +43,13 @@ class Buy(Modal):
             if money < quantity * self.cost:
                 await interaction.followup.send('У твоей страны нет столько денег', ephemeral=True)
                 return None
+            
+            # Проверяем, есть ли достаточно строительных ячеек
+            available_slots = self.country.get_available_building_slots()
+            if quantity > available_slots:
+                await interaction.followup.send(f'Недостаточно строительных ячеек! Доступно: {available_slots}, требуется: {quantity}', ephemeral=True)
+                return None
+            
             if quantity < 0:
                 await interaction.followup.send('Самый хитрый думаешь?', ephemeral=True)
                 return None

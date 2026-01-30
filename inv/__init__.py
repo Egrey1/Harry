@@ -1,7 +1,7 @@
 from .library import Cog, Bot
 from .commands import *
 
-class InventoryCog(Cog, InvCommand, BalCommand):
+class InventoryCog(Cog, InvCommand, BalCommand, RemFactCommand):
     def __init__(self, bot: Bot):
         self.bot = bot
         

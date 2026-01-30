@@ -100,6 +100,112 @@ class Country:
         if fetch:
             self.doing_focus = Focus(fetch[0], self) if fetch[0] else None
             self.current_focus = Focus(fetch[1], self) if fetch[1] else None
+        
+        # Загружаем информацию о строительных ячейках
+        self.building_slots = self._load_building_slots()
+    
+    def _load_building_slots(self) -> int:
+        """Загружает количество доступных строительных ячеек из country_info."""
+        try:
+            connect = con(deps.DATABASE_COUNTRY_AI_PATH)
+            cursor = connect.cursor()
+            cursor.execute("""
+                            SELECT building_slots
+                            FROM country_info
+                            WHERE name = ?
+                            """, (self.name,))
+            fetch = cursor.fetchone()
+            connect.close()
+            
+            if fetch:
+                return int(fetch[0])
+            else:
+                # Нет записи в БД - логируем ошибку
+                import logging
+                logging.error(f'Нет записи country_info для {self.name}')
+                if deps.audit:
+                    try:
+                        from discord import Embed
+                        embed = Embed(title='⚠️ Ошибка загрузки building_slots', 
+                                    description=f'Нет записи country_info для {self.name}',
+                                    color=0xFF0000)
+                        deps.audit.send(embed=embed)
+                    except:
+                        pass
+                return 0
+        except Exception as e:
+            import logging
+            logging.error(f'Ошибка при загрузке building_slots для {self.name}: {e}')
+            if deps.audit:
+                try:
+                    from discord import Embed
+                    embed = Embed(title='⚠️ Ошибка загрузки building_slots', 
+                                description=f'{self.name}: {str(e)}',
+                                color=0xFF0000)
+                    deps.audit.send(embed=embed)
+                except:
+                    pass
+            return 0
+    
+    def get_used_building_slots(self) -> int:
+        """Возвращает количество использованных строительных ячеек (общее количество фабрик)."""
+        total = 0
+        for factory in self.factories.values():
+            total += factory.quantity
+        return total
+    
+    def get_available_building_slots(self) -> int:
+        """Возвращает количество доступных строительных ячеек."""
+        return self.building_slots - self.get_used_building_slots()
+    
+    def increase_building_slots(self, amount: int) -> bool:
+        """Увеличивает лимит строительных ячеек на указанное количество.
+        
+        Гарантирует, что новый лимит не будет меньше текущего количества фабрик.
+        Обновляет значение в БД и локальный объект.
+        
+        Args:
+            amount (int): Количество ячеек для добавления.
+            
+        Returns:
+            bool: True если успешно обновлено, False если произошла ошибка.
+        """
+        new_slots = self.building_slots + amount
+        used_slots = self.get_used_building_slots()
+        
+        # Гарантируем, что новый лимит не меньше текущего количества фабрик
+        if new_slots < used_slots:
+            import logging
+            logging.warning(f'Попытка установить building_slots={new_slots} для {self.name}, но используется {used_slots}. Устанавливаем минимум {used_slots}.')
+            new_slots = used_slots
+        
+        try:
+            connect = con(deps.DATABASE_COUNTRY_AI_PATH)
+            cursor = connect.cursor()
+            cursor.execute("""
+                            UPDATE country_info
+                            SET building_slots = ?
+                            WHERE name = ?
+                            """, (new_slots, self.name))
+            connect.commit()
+            connect.close()
+            
+            # Обновляем локальное значение
+            self.building_slots = new_slots
+            return True
+        except Exception as e:
+            import logging
+            logging.error(f'Ошибка при увеличении building_slots для {self.name}: {e}')
+            if deps.audit:
+                try:
+                    from discord import Embed
+                    embed = Embed(title='⚠️ Ошибка увеличения building_slots', 
+                                description=f'{self.name}: {str(e)}',
+                                color=0xFF0000)
+                    deps.audit.send(embed=embed)
+                except:
+                    pass
+            return False
     
     def __str__(self):
         return self.name
@@ -736,6 +842,8 @@ class Focus:
     def send_factories(self):
         for factory in self.factories:
             factory.edit_quantity(self.owner.factories[factory.name].quantity + factory.quantity, self.owner)
+            self.owner.increase_building_slots(factory.quantity)
+    
     def send_items(self):
         for item in self.items:
             item.edit_quantity(self.owner.inventory[item.name].quantity + item.quantity, self.owner)

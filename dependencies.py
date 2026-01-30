@@ -35,7 +35,7 @@ intents: Intents
 PREFIX: str
     
 audit: TextChannel
-    
+
 class RpChannels:
     def __init__(self, event: int | TextChannel = '📣┃события', war: int | ForumChannel = '🔥┃войны', news: int | TextChannel = '📰┃новости-стран'):
         self.event = guild.get_role(event) if isinstance(event, int) else event
