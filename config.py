@@ -7,86 +7,6 @@ import logging
 from dotenv import load_dotenv
 from os import getenv
 
-
-
-#Проверяет есть ли пользователь в списке стран. 
-# async def give_country(mention: str) -> deps.Country | bool:
-#     connect = con(deps.DATABASE_ROLE_PICKER.PATH)
-#     cursor = connect.cursor()
-#     cursor.execute(f"""
-#                     SELECT name
-#                     FROM roles
-#                     WHERE is_busy = '{mention}'
-#                     """)
-#     result = cursor.fetchone()
-#     connect.close()
-#     return deps.Country(result[0]) if result[0] else False
-
-# async def all_countries_option(context: Context, countries, page: int) -> int:
-#     return [SelectOption(label= countries[i], value=countries[i]) for i in range((page - 1) * deps.PAGE_SIZE, min((page) * deps.PAGE_SIZE, len(countries))) if i < len(countries)]
-
-# # Возвращает текущие деньги страны
-# async def get_money(country: str) -> int:
-#     connect = con(deps.DATABASE_COUNTRIES)
-#     cursor = connect.cursor()
-#     cursor.execute(f"""
-#                    SELECT "Деньги"
-#                    FROM countries_inventory
-#                    WHERE name = '{country}'
-#                    """)
-#     res = cursor.fetchone()[0]
-#     connect.close()
-
-#     return int(res)
-
-# # Возвращает стоимость товара
-# async def get_cost(item: str) -> int:
-#     connect = con(deps.DATABASE_COUNTRIES)
-#     cursor = connect.cursor()
-#     cursor.execute(f"""
-#                    SELECT cost
-#                    FROM factories
-#                    WHERE name = '{item}'
-#                    """)
-#     res = cursor.fetchone()[0]
-#     connect.close()
-
-#     return int(res)
-
-# # Возвращает инвентарь страны в виде словаря
-# async def get_inventory(country: str) -> dict:
-#     from sqlite3 import Row
-
-#     connect = con(deps.DATABASE_COUNTRIES)
-#     connect.row_factory = Row
-#     cursor = connect.cursor()
-#     cursor.execute(f"""
-#                     SELECT *
-#                     FROM countries_inventory
-#                     WHERE name = '{country}'
-#                    """)
-#     res = cursor.fetchone()
-#     connect.close()
-
-#     return dict(res) if res else {}
-
-# # Возвращает всю информацию по ролям для страны
-# async def get_country_info(country: str) -> dict:
-#     from sqlite3 import Row
-
-#     connect = con(deps.DATABASE_ROLE_PICKER)
-#     connect.row_factory = Row
-#     cursor = connect.cursor()
-#     cursor.execute(f"""
-#                     SELECT *
-#                     FROM roles
-#                     WHERE name = '{country}'
-#                    """)
-#     res = cursor.fetchone()
-#     connect.close()
-
-#     return dict(res) if res else {}
-
 def get_channel(name: str) -> TextChannel:
     from sqlite3 import connect as con
     connect = con(deps.DATABASE_CONFIG_PATH)
@@ -153,7 +73,7 @@ def config_rpchannels():
         self.news = new_channel
     deps.RpChannels.del_news = tmp
     
-    
+
 
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
