@@ -37,12 +37,10 @@ async def to_items(factories_have: tuple[dict[str, any]]) -> tuple[dict[str, any
     connect.row_factory = Row
     cursor = connect.cursor()
 
-
     cursor.execute(f"""
                     SELECT name, produces_key, count
                     FROM factories
                     """)
-    # 
     a = cursor.fetchall()
     connect.close()
     result = []
@@ -56,10 +54,30 @@ async def to_items(factories_have: tuple[dict[str, any]]) -> tuple[dict[str, any
     for j in factories_have:
         b = {}
         b['name'] = j['name']
+        
         for factory in a:
             if factory['produces_key'] != 'Деньги':
-                b[factory['produces_key']] = factory['count'] * j[factory['name']]
-        b['Деньги'] = a[-1]['count'] * j[a[-1]['name']] + a[-2]['count'] * j[a[-2]['name']]
+                # Получаем количество этой фабрики у страны
+                quantity = j.get(factory['name'], 0)
+                
+                # Рассчитываем производство с учетом убывающей отдачи
+                total_production = 0
+                for i in range(int(quantity)):
+                    # i-я фабрика производит: базовое_значение × 0.95^i
+                    factory_production = factory['count'] * (deps.diminishing_returns ** i)
+                    total_production += factory_production
+                
+                b[factory['produces_key']] = total_production
+        
+        # Рассчитываем деньги (они производятся двумя последними фабриками)
+        total_money = 0
+        # Обе последние фабрики производят деньги
+        for money_factory in [a[-2], a[-1]]:
+            qty = j.get(money_factory['name'], 0)
+            for i in range(int(qty)):
+                total_money += money_factory['count'] * (deps.diminishing_returns ** i)
+        
+        b['Деньги'] = total_money
         result.append(b)
         
     return tuple(result)

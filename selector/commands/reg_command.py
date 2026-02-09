@@ -5,7 +5,7 @@ from ..library.modules import (commands, app_commands,
 
 from ..library.callbacks.regCallback import picker_callback
 
-from ..library.functions import give_all_countries
+from ..library.functions import give_all_countries, can_register
 
 
 
@@ -16,8 +16,11 @@ class RegCoommand():
             return None
         
         if deps.Country(ctx.author.mention).busy:
-            await ctx.interaction.response.send_message('Чего это? За две страны одновременно поиграть захотелось? А вот нельзя, не разрешаю!')
+            await ctx.interaction.response.send_message('Чего это? За две страны одновременно поиграть захотелось? А вот нельзя, не разрешаю!', ephemeral=True)
             return None
+        
+        if not can_register(ctx.author) and not ctx.author.resolved_permissions.administrator:
+            await ctx.interaction.response.send_message('Подожди день, прежде чем ты сможешь снова зарегистрироваться')
 
         if not deps.game_state['game_started']:
             await ctx.interaction.response.send_message('Дождитесь начала вайпа!', ephemeral= True)

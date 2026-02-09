@@ -19,7 +19,7 @@ def has_focus() -> bool:
 
 class CountryNewView(View):
     def __init__(self, country: deps.Country):
-        super().__init__()
+        super().__init__(timeout=None)  # Отключаем таймаут для постоянного использования
         self.country = country
 
         # Настроим состояние кнопки принятия фокуса (если она присутствует в children)
@@ -74,7 +74,7 @@ class CountryNewView(View):
         embed = Embed(title=f'🔄 Откат новости от {interaction.user.global_name}', description=interaction.message.content)
         embed.set_footer(text=country_name)
 
-        return_new_view = View()
+        return_new_view = View(timeout=None)  # Кнопка будет работать бесконечно
         return_new_button = Button(label='Отменить', emoji='🚫')
         return_new_button.callback = self.return_new_button_callback
         return_new_view.add_item(return_new_button)

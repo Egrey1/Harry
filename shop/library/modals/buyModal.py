@@ -12,7 +12,7 @@ class Buy(Modal):
         
         # Вычисляем максимум, который можно купить по строительным ячейкам
         available_slots = country.get_available_building_slots()
-        max_by_slots = available_slots if available_slots > 0 else 0
+        max_by_slots = (available_slots if available_slots > 0 else 0) if factory.name != 'Коммерческая зона' else max_by_money # ВРЕМЕННО! НАДО ИСПРАВИТЬ!
         
         # Берём минимум из двух ограничений
         self.max_buy = min(max_by_money, max_by_slots) if max_by_money != float('inf') else max_by_slots
@@ -45,7 +45,7 @@ class Buy(Modal):
                 return None
             
             # Проверяем, есть ли достаточно строительных ячеек
-            available_slots = self.country.get_available_building_slots()
+            available_slots = self.country.get_available_building_slots() if self.factory.name != 'Коммерческая зона' else float('inf')  # ВРЕМЕННО! НАДО ИСПРАВИТЬ!
             if quantity > available_slots:
                 await interaction.followup.send(f'Недостаточно строительных ячеек! Доступно: {available_slots}, требуется: {quantity}', ephemeral=True)
                 return None
@@ -78,7 +78,7 @@ class Buy(Modal):
                            """)
             count = cursor.fetchone()[0]
 
-            money = self.country.balance
+            money = deps.Country(self.country.name).balance
             connect.close()
  
             await interaction.followup.send(f'Теперь у вас {count} зданий вида: {self.factory.name}\nИ {deps.CURRENCY}{money} на балансе', ephemeral=True)

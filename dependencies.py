@@ -26,13 +26,16 @@ guild: Guild
 
 game_state: dict
 PAGE_SIZE: int = 25
+register_cooldown: int = 1
+diminishing_returns: int = 0.95
+
 SPEED: int = 1 # В часах
 
 TOKEN: str
 TOKEN1: str
 TOKEN2: str
-intents: Intents
 PREFIX: str
+intents: Intents
     
 audit: TextChannel
 

@@ -1,5 +1,35 @@
-from selector.library.modules import con, deps, Row
+from selector.library.modules import con, deps, Row, datetime, Member
 
+def can_register(member: Member) -> bool:
+    connect = con(deps.DATABASE_CONFIG_PATH)
+    cursor = connect.cursor()
+    cursor.execute("""
+                    SELECT last_register
+                    FROM users
+                    WHERE id = ?
+    """, (member.id,))
+    result = cursor.fetchone()
+    current_time = datetime.datetime.now()
+    
+    if not result or not result[0]:
+        if not result:
+            cursor.execute("""
+                        INSERT INTO users (id, last_register)
+                        VALUES (?, ?)
+            """, (member.id, current_time.isoformat()))
+        else:
+            cursor.execute("""
+                            UPDATE users
+                            SET last_register = ?
+                            WHERE id = ?
+            """, (current_time.isoformat(), member.id))
+        connect.commit()
+        connect.close()
+        return True
+    
+    connect.close()
+    result = datetime.datetime.fromisoformat(result[0])
+    return (current_time - result).days >= deps.register_cooldown
 
 # Возвращает словарь где говорит какие роли нужно ставить
 async def give_roles(name: str) -> dict:
