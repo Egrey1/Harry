@@ -3,40 +3,7 @@ from discord import SelectOption
 from typing import Dict, Callable, Awaitable
 
 class ChooseMenu(View):
-    """
-    ## how to use? 
-    ```
-    async def on_choice_selected(interaction: Interaction, value: str):
-        await interaction.response.send_message(f"You have chosen: `{value}`", 
-                                                ephemeral=True)
-
-    # Somewhere in the code...:
-    values = {f"Country {i}": f"country_{i}" for i in range(1, 50)}
-    view = ChooseMenu(values, on_choice_selected)
-    view.message = await interaction.response.send_message(
-        "Select country:", 
-        view=view, 
-        ephemeral=True
-    )
-    ```
-    ⚠️ To make `view.message` work, you need to save a link to the message. In `discord.py`, you can do this:
-    ```
-    msg = await interaction.response.send_message("...", view=view)
-    view.message = msg
-    ```
-    Пагинированное выпадающее меню с навигацией между страницами.
-    
-    Поддерживает пагинацию опций через кнопки ⏮️ и ⏭️.
-    Обновляет Select при смене страницы.
-    Вызывает callback при выборе опции.
-    """
     def __init__(self, values: Dict[str, str], callback: Callable[[Interaction, str], Awaitable[None]]):
-        """
-        Инициализация меню выбора.
-        
-        :param values: Словарь {label: value} для отображения в Select.
-        :param callback: Асинхронная функция вида: async def callback(interaction, selected_value)
-        """
         super().__init__(timeout=None)
         self.values = values
         self.callback = callback
@@ -60,7 +27,6 @@ class ChooseMenu(View):
         # Кнопки (они уже добавлены через декоратор @button, не добавляем их дважды)
 
     def _create_select(self) -> Select:
-        """Создаёт новый Select с текущими опциями."""
         if not self.options:
             placeholder_option = SelectOption(label="Нет опций", value="", description="", default=True)
             return Select(placeholder=f"Выберите опцию (страница {self.current_page})", options=[placeholder_option], custom_id=f"choose_menu_select_{id(self)}", disabled=True)
@@ -91,7 +57,6 @@ class ChooseMenu(View):
             await self._update_menu(interaction)
 
     async def _update_menu(self, interaction: Interaction):
-        """Обновляет Select и состояние кнопок."""
         self.options, _ = get_options(self.values, self.current_page)
         
         # Пересоздаём Select
@@ -112,12 +77,6 @@ class ChooseMenu(View):
             pass
 
     async def select_callback(self, interaction: Interaction, select: Select | None = None):
-        """Вызывается при выборе опции.
-
-        Вызов может происходить двумя способами: через декоратор (framework передаёт select) или
-        через присвоение `Select.callback` (тогда передаётся только `interaction`).
-        Поэтому `select` здесь опционален.
-        """
         # Получаем выбранное значение безопасно
         if select and getattr(select, 'values', None):
             selected_value = select.values[0]
@@ -130,7 +89,6 @@ class ChooseMenu(View):
         await self.callback(interaction, selected_value)
 
     async def on_timeout(self) -> None:
-        """Отключает все компоненты при таймауте."""
         for item in self.children:
             item.disabled = True
         try:

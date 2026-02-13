@@ -6,6 +6,7 @@ import dependencies as deps
 import logging
 from dotenv import load_dotenv
 from os import getenv
+import classes as cl
 
 def get_channel(name: str) -> TextChannel:
     from sqlite3 import connect as con
@@ -88,7 +89,15 @@ def first_config():
     # deps.PREFIX = '& ' if deps.TOKEN == deps.TOKEN2 else ['!', '! ']
     deps.PREFIX = ['!', '! ']
     deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
-    config_rpchannels
+
+    deps.Country = cl.Country
+    deps.Item = cl.Item
+    deps.Market = cl.Market
+    deps.Focus = cl.Focus
+    deps.Factory = cl.Factory
+    deps.ChooseMenu = cl.ChooseMenu
+
+    config_rpchannels()
 
 async def second_config():
     """Присваивает остальным переменным их значения. Использовать функцию только после запуска"""
