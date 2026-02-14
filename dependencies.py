@@ -361,7 +361,7 @@ class Item:
     """
 
     def __init__(self, name: str, quantity: int | None = None, price: int = 0, 
-                 country: str | 'Country' | None = None) -> None:
+                 country: 'str | Country | None' = None) -> None:
         """Инициализирует объект игрового предмета.
         
         Если количество не указано, оно загружается из инвентаря страны. Атрибуты
@@ -385,7 +385,7 @@ class Item:
         """
         ...
 
-    def edit_quantity(self, quantity: int, country: str | 'Country') -> None:
+    def edit_quantity(self, quantity: int, country: 'str | Country') -> None:
         """Изменяет количество предмета в инвентаре страны и сохраняет в БД.
         
         Обновляет значение как в локальном объекте, так и в базе данных.
@@ -419,7 +419,7 @@ class Market:
             Каждое значение содержит информацию о количестве и цене предмета.
     """
 
-    def __init__(self, country: str | 'Country') -> None:
+    def __init__(self, country: 'str | Country') -> None:
         """Инициализирует объект рынка для указанной страны.
         
         Если запись о рынке страны отсутствует в БД, она создаётся автоматически.
@@ -535,7 +535,7 @@ class Factory:
     """
 
     def __init__(self, factory_name: str, quantity: int | None = None, 
-                 country: str | 'Country' | None = None) -> None:
+                 country: 'str | Country | None' = None) -> None:
         """Инициализирует объект фабрики.
         
         Если количество не указано, оно загружается из данных страны. Атрибуты фабрики
@@ -557,7 +557,7 @@ class Factory:
         """
         ...
 
-    def edit_quantity(self, quantity: int, country: str | 'Country') -> None:
+    def edit_quantity(self, quantity: int, country: 'str | Country') -> None:
         """Изменяет количество фабрик данного типа в стране и сохраняет в БД.
         
         Обновляет значение как в локальном объекте, так и в базе данных.
@@ -675,7 +675,7 @@ class Focus:
         """
         ...
 
-    def mark_as_completed(self, country_name: str | 'Country' | None = None, 
+    def mark_as_completed(self, country_name: 'str | Country | None' = None, 
                          connect = None) -> None:
         """Помечает фокус как завершённый в БД и обновляет current фокус страны.
         
