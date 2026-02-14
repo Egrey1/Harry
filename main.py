@@ -31,7 +31,6 @@ async def on_ready():
 
 if __name__ == "__main__":
     first_config()
-    logging.info('TOKEN = ' + deps.TOKEN)
     deps.bot.add_listener(on_ready)
     deps.bot.run(deps.TOKEN)
 
