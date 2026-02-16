@@ -11,26 +11,61 @@ import dependencies as deps
 
 
 class Country:
-    def __init__(self, name: str = 'Италия'):
-        from .library import getinv, getfact, getbalance
+    def __init__(self, id_: str = 'ITA'):
         self.busy = None
         self.is_country = True
-        if name.startswith('<@') and name.endswith('>'):
+
+        # Если передано упоминание
+        if id_.startswith('<@') and id_.endswith('>'):
             conn = con(deps.DATABASE_ROLE_PICKER_PATH)
             cursor = conn.cursor()
             
             cursor.execute(f"""
-                            SELECT name
+                            SELECT name, id
                             FROM roles
-                            WHERE is_busy = '{name}'
+                            WHERE is_busy = '{id_}'
             """)
             result = cursor.fetchone()
+            conn.close()
             if result:
-                name = result[0]
+                self.name = result[0]
+                id_ = result[1]
             else:
                 self.is_country = False
                 return
-            conn.close() 
+        # Если передано название страны или ее id
+        else:
+            connect = con(deps.DATABASE_ROLE_PICKER_PATH)
+            cursor = connect.cursor()
+
+            cursor.execute("""
+                           SELECT id
+                           FROM roles
+                           WHERE name = ?
+                           """, (id_, ))
+            fetch = cursor.fetchone()
+            connect.close()
+            if fetch:
+                self.name = id_
+                id_ = fetch[0]
+            # Если передано id
+            else:
+                connect = con(deps.DATABASE_ROLE_PICKER_PATH)
+                cursor = connect.cursor()
+
+                cursor.execute("""
+                               SELECT name
+                               FROM roles
+                               WHERE id = ?
+                               """, (id_, ))
+                fetch = cursor.fetchone()
+                connect.close()
+                if fetch:
+                    self.name = fetch[0]
+                else:
+                    self.is_country = False
+                    return
+
         
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
@@ -39,20 +74,20 @@ class Country:
         cursor.execute(f"""
                         SELECT *
                         FROM countries_inventory
-                        WHERE name = '{name}'
+                        WHERE country_id = '{id_}'
                         """)
         inventory_fetch = cursor.fetchone()
 
         cursor.execute(f"""
                         SELECT *
                         FROM country_factories
-                        WHERE name = '{name}'
+                        WHERE country_id = '{id_}'
                         """)
         factories_fetch = cursor.fetchone()
         connect.close()
 
-        self.name = name
-        self.market = Market(name)
+        self.id = id_
+        self.market = Market(self)
 
         self.inventory: dict[str, Item] = {}
         self.factories: dict[str, Factory] = {}
@@ -75,7 +110,7 @@ class Country:
         cursor.execute(f"""
                         SELECT *
                         FROM roles
-                        WHERE name = '{name}'
+                        WHERE id = '{self.id}'
                         """)
         fetch = dict(cursor.fetchone())
         connect.close()
@@ -85,18 +120,14 @@ class Country:
         self.sea = deps.guild.get_role(int(fetch['sea'])) if fetch and fetch['sea'] else None
         self.assembly = deps.guild.get_role(int(fetch['assembly'])) if fetch and fetch['assembly'] else None
         self.nickname = fetch['nickname'] if fetch and fetch['nickname'] is not None else ""
-        self.id = fetch['id'] if fetch and fetch['id'] is not None else None
 
-        if not self.id:
-            raise ValueError(f"У страны {name} нет уникального идентификатора в базе данных roles.")
         
-        # Добавить в документацию
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
                         SELECT doing, current
                         FROM countries
-                        WHERE name = '{name}'
+                        WHERE country_id = '{self.id}'
                         """)
         fetch = cursor.fetchone()
         cursor.close()
@@ -118,8 +149,8 @@ class Country:
             cursor.execute("""
                             SELECT building_slots
                             FROM country_info
-                            WHERE name = ?
-                            """, (self.name,))
+                            WHERE country_id = ?
+                            """, (self.id,))
             fetch = cursor.fetchone()
             connect.close()
             
@@ -179,8 +210,8 @@ class Country:
             cursor.execute("""
                             UPDATE country_info
                             SET building_slots = ?
-                            WHERE name = ?
-                            """, (new_slots, self.name))
+                            WHERE country_id = ?
+                            """, (new_slots, self.id))
             connect.commit()
             connect.close()
             
@@ -205,7 +236,7 @@ class Country:
         return self.name
 
     async def change_surrend(self, interaction: Interaction | None = None):
-        name = interaction.data['values'][0] if interaction else self.name
+        country = Country(interaction.data['values'][0]) if interaction else self
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
         
@@ -213,7 +244,7 @@ class Country:
             cursor.execute(f"""
                             UPDATE roles
                             SET surrender = NULL
-                            WHERE name = '{name}'
+                            WHERE country_id = '{country.id}'
             """)
             self.surrend = False
             connect.commit()
@@ -223,7 +254,7 @@ class Country:
             cursor.execute(f"""
                             UPDATE roles
                             SET surrender = '1'
-                            WHERE name = '{self.name}'
+                            WHERE country_id = '{self.id}'
             """)
             self.surrend = True
             connect.commit()
@@ -236,7 +267,7 @@ class Country:
         cursor.execute(f"""
                        UPDATE roles
                        SET nickname = '{new_nickname}'
-                       WHERE name = '{self.name}'
+                       WHERE country_id = '{self.id}'
                        """)
         connect.commit()
         connect.close()
@@ -297,7 +328,7 @@ class Country:
         cursor.execute("""
                         SELECT avatar 
                         FROM avatars 
-                        WHERE name = ?""", (self.name,))
+                        WHERE country_id = ?""", (self.id,))
         row = cursor.fetchone()
         conn.close()
         avatar_bytes = row[0] if row and row[0] else None
@@ -352,7 +383,7 @@ class Country:
         cursor.execute(f"""
                           UPDATE countries
                           SET doing = '{new_focus}'
-                          WHERE name = '{self.name}'
+                          WHERE country_id = '{self.id}'
                         """)
         connect.commit()
         connect.close()
@@ -386,7 +417,17 @@ class Item:
                         FROM items
                         WHERE name = '{name}'
                         """)
-        items_info = dict(cursor.fetchone())
+        fetch = cursor.fetchone()
+        if not fetch:
+            cursor.execute(f"""
+                           SELECT *
+                           FROM items
+                           WHERE id = ?
+                           """, (name, ))
+            fetch = cursor.fetchone()
+
+        items_info = dict(fetch)
+        name = items_info['name']
 
         if items_info is None:
             raise ValueError(f"Предмет с именем '{name}' не найдена в базе данных.")
@@ -395,11 +436,12 @@ class Item:
         self.is_ship = int(items_info['ship']) == 1
         self.is_ground = int(items_info['ground']) == 1
         self.is_air = int(items_info['air']) == 1
+        self.id = items_info['id']
 
         cursor.execute(f"""
                         SELECT name
                         FROM factories
-                        where produces_key = '{self.name}'
+                        WHERE produces_key = '{self.name}'
                        """)
         
         fetchs = cursor.fetchall()
@@ -411,14 +453,15 @@ class Item:
                 self.produced_by.append(Factory(fetch['name'], country=self.country))
 
     def edit_quantity(self, quantity: int, country: str | Country) -> None:
-        country_name = country.name if isinstance(country, Country) else country
+        country = Country(country) if not isinstance(country, Country) else country
+        country_id = country.id
         self.quantity = quantity
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
                         UPDATE countries_inventory
                         SET `{self.name}` = {quantity}
-                        WHERE `name` = '{country_name}'
+                        WHERE `country_id` = '{country_id}'
         """)
         connect.commit()
         connect.close()
@@ -426,8 +469,9 @@ class Item:
 
 class Market:
     def __init__(self, country: str | Country):
-        country_name = country.name if isinstance(country, Country) else country
-        self.name = country_name
+        self.country = Country(country) if not isinstance(country, Country) else country
+
+        self.name = country.name
         self.inventory: dict[str, Item] = {}
 
         connect = con(deps.DATABASE_COUNTRIES_PATH)
@@ -438,34 +482,34 @@ class Market:
             cursor.execute(f"""
                 SELECT *
                 FROM market
-                WHERE name = '{country_name}'
+                WHERE country_id = '{country.id}'
             """)
         except:
             # Если таблица или запись не существует, создаём запись
             cursor.execute(f"""
-                INSERT INTO market (name)
-                VALUES ('{country_name}')
+                INSERT INTO market (country_id)
+                VALUES ('{country.id}')
             """)
             connect.commit()
 
             cursor.execute(f"""
                 SELECT *
                 FROM market
-                WHERE name = '{country_name}'
+                WHERE country_id = '{country.id}'
             """)
         
         fetch = cursor.fetchone()
         if not fetch:
             cursor.execute(f"""
-                INSERT INTO market (name)
-                VALUES ('{country_name}')
+                INSERT INTO market (country_id)
+                VALUES ('{country.id}')
             """)
             connect.commit()
 
             cursor.execute(f"""
                 SELECT *
                 FROM market
-                WHERE name = '{country_name}'
+                WHERE country_id = '{country.id}'
             """)
             fetch = cursor.fetchone()
         
@@ -491,8 +535,8 @@ class Market:
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
-            INSERT INTO market (name, `{item.name}`)
-            VALUES ('{self.name}', '{item.quantity} {item.price}')
+            INSERT INTO market (country_id, `{item.name}`)
+            VALUES ('{self.country.id}', '{item.quantity} {item.price}')
         """)
         connect.commit()
         connect.close()
@@ -509,7 +553,7 @@ class Market:
         cursor.execute(f"""
             UPDATE market
             SET `{item.name}` = '{item.quantity} {item.price}'
-            WHERE name = '{self.name}'
+            WHERE country_id = '{self.country.id}'
         """)
         connect.commit()
         connect.close()
@@ -521,7 +565,7 @@ class Market:
         cursor.execute(f"""
             UPDATE market
             SET `{item_name}` = '0 0'
-            WHERE name = '{self.name}'
+            WHERE country_id = '{self.country.id}'
         """)
         connect.commit()
         connect.close()
@@ -537,12 +581,22 @@ class Factory:
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
+
         cursor.execute(f"""
                         SELECT *
                         FROM factories
                         WHERE name = '{factory_name}'
         """)
         fetch = cursor.fetchone()
+        if not fetch:
+            cursor.execute("""
+                           SELECT *
+                           FROM factories
+                           WHERE id = ?
+                           """, (factory_name, ))
+            fetch = cursor.fetchone()
+            self.name = fetch['name']
+            factory_name = self.name
         connect.close()
 
         if fetch is None:
@@ -556,14 +610,14 @@ class Factory:
         self.maintenance = int(fetch['maintenance'])
 
     def edit_quantity(self, quantity: int, country: str | Country) -> None:
-        country_name = country.name if isinstance(country, Country) else country
+        country = Country(country) if not isinstance(country, Country) else country
         self.quantity = quantity
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         cursor = connect.cursor()
         cursor.execute(f"""
                         UPDATE country_factories
                         SET `{self.name}` = {quantity}
-                        WHERE `name` = '{country_name}'
+                        WHERE `country_id` = '{country.id}'
         """)
         connect.commit()
         connect.close()
@@ -701,7 +755,7 @@ class Focus:
         return True
     
     def mark_as_completed(self, country_name: str | Country | None = None, connect=None):
-        country_name = country_name if isinstance(country_name, str) else (country_name.name if isinstance(country_name, Country) else self.owner.name)
+        country = Country(country)if isinstance(country_name, str) else (country if isinstance(country_name, Country) else self.owner)
         own_connect = connect is None
         if own_connect:
             connect = con(deps.DATABASE_FOCUS_PATH)
@@ -710,8 +764,8 @@ class Focus:
         cursor.execute("""
                         UPDATE countries
                         SET completed = ?
-                        WHERE name = ?
-                        """, (self.name, country_name))
+                        WHERE country_id = ?
+                        """, (self.name, country.id))
         if own_connect:
             connect.commit()
             connect.close()
@@ -727,8 +781,8 @@ class Focus:
         cursor.execute("""
                         SELECT doing, completed
                         from countries
-                        WHERE name = ?
-                        """, (self.owner.name,))
+                        WHERE country_id = ?
+                        """, (self.owner.id,))
         doing, completed = cursor.fetchone()
         connect.close()
         
@@ -748,8 +802,8 @@ class Focus:
         cursor.execute("""
                         UPDATE countries
                         SET completed = ?
-                        WHERE name = ?
-        """, (self.name if new_value else None, self.owner.name))
+                        WHERE country_id = ?
+        """, (self.name if new_value else None, self.owner.id))
         connect.commit()
         connect.close()
     

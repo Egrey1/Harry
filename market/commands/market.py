@@ -23,7 +23,7 @@ class Market():
 
         for row in rows:
             r = dict(row)
-            country = r.get('name')
+            country_2 = deps.Country(r.get('name'))
             for key, value in r.items():
                 if key == 'name' or not value:
                     continue
@@ -41,7 +41,7 @@ class Market():
                     market[key] = {'total': 0, 'sellers': []}
 
                 market[key]['total'] += qty
-                market[key]['sellers'].append({'country': country, 'price': price, 'qty': qty})
+                market[key]['sellers'].append({'country': country_2.name, 'price': price, 'qty': qty})
 
         if not market:
             await ctx.send("Пока что никто ничего не продает", ephemeral=True)

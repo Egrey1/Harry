@@ -1,5 +1,5 @@
 from ..library.modules import tasks, con, deps, List, Row
-from ..library.functions import give_factories, to_items, set_upd, give_items
+from ..library.functions import give_items
 import logging
 
 
@@ -26,8 +26,8 @@ class UpdateInventory:
                 if item != 'name' and count != 0:
                     cursor.execute(f"""
                                     UPDATE countries_inventory
-                                    SET "{item}" = "{item}" + {float(count)}
-                                    WHERE name = "{country['name']}"
+                                    SET `{item}` = "{item}" + {float(count)}
+                                    WHERE country_id = "{country['country_id']}"
                                     """)
         connect.commit()
         connect.row_factory = Row
@@ -72,12 +72,12 @@ class UpdateInventory:
                                     (no_fine_count * factory.count) + 
                                     factory.count * (1 - deps.diminishing_returns ** (factory.quantity - no_fine_count)) / 
                                     (1 - deps.diminishing_returns) }"
-                                WHERE name = "{current_country.name}"
+                                WHERE country_id = "{current_country.id}"
                                 """)
             cursor.execute(f"""
                            UPDATE countries_inventory_add
                            SET "Деньги" = "{total_money}"
-                           WHERE name = "{current_country.name}"
+                           WHERE country_id = "{current_country.id}"
                            """)
 
         connect.commit()

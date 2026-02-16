@@ -60,21 +60,21 @@ class Buy(Modal):
             cursor.execute(f"""
                             UPDATE country_factories
                             SET "{self.factory.name}" = "{self.factory.name}" + {quantity}
-                            WHERE name = "{self.country}"
+                            WHERE country_id = "{self.country.id}"
                            """)
             connect.commit()
 
             cursor.execute(f"""
                             UPDATE countries_inventory
                             SET "Деньги" = "Деньги" - {int(quantity * self.cost)}
-                            WHERE name = "{self.country}"
+                            WHERE country_id = "{self.country.id}"
                            """)
             connect.commit()
 
             cursor.execute(f"""
                             SELECT "{self.factory.name}"
                             FROM country_factories
-                            WHERE name = '{self.country}'
+                            WHERE country_id = '{self.country.id}'
                            """)
             count = cursor.fetchone()[0]
 

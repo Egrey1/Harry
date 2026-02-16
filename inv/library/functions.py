@@ -1,28 +1,30 @@
 from .modules import (con, Row, Interaction, Embed, deps)
 
 # Возвращает весь инвентарь страны в виде словаря
-async def inventory_list(country: str) -> dict:
+async def inventory_list(country: str | deps.Country) -> dict:
+    country = deps.Country(country) if not isinstance(country, deps.Country) else country
     connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
     cursor.execute(f"""
                     SELECT *
                     FROM countries_inventory
-                    WHERE name = '{country}'
+                    WHERE country_id = '{country.id}'
                     """)
     result = cursor.fetchone()
     connect.close()
     return dict(result) if result else {}
 
 # Возвращает все фабрики страны в виде словаря
-async def factory_list(country: str) -> dict:
+async def factory_list(country: str | deps.Country) -> dict:
+    country = deps.Country(country) if not isinstance(country, deps.Country) else country
     connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
     cursor.execute(f"""
                     SELECT *
                     FROM country_factories
-                    WHERE name = '{country}'
+                    WHERE country_id = '{country.id}'
                     """)
     result = cursor.fetchone()
     connect.close()

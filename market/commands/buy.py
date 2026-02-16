@@ -26,7 +26,7 @@ class Buy():
 
         for row in rows:
             r = dict(row)
-            country_name = r.get('name')
+            country_2 = deps.Country(r.get('country_id'))
             for name, value in r.items():
                 if name == 'name' or not value:
                     continue
@@ -44,7 +44,7 @@ class Buy():
                     positions[name] = {'total': 0, 'sellers': []}
 
                 positions[name]['total'] += qty
-                positions[name]['sellers'].append({'country': country_name, 'price': price, 'qty': qty})
+                positions[name]['sellers'].append({'country': country_2.name, 'price': price, 'qty': qty})
 
         if not positions:
             await ctx.send(f'На рынке нет доступных позиций для покупки!')

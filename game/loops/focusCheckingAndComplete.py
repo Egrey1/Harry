@@ -12,7 +12,7 @@ class FocusesLoop():
         cursor = connect.cursor()
         
         cursor.execute("""
-                        SELECT name
+                        SELECT country_id
                         FROM countries
                         """)
         fetches = cursor.fetchall()
@@ -31,8 +31,8 @@ class FocusesLoop():
                 cursor.execute("""
                                 UPDATE countries
                                 SET doing = ?, completed = ?, current = ?
-                                WHERE name = ?
-                                """, (None, None, country.doing_focus.name, country.name))
+                                WHERE country_id = ?
+                                """, (None, None, country.doing_focus.name, country.id))
         connect.commit()
         connect.close()
             

@@ -50,7 +50,7 @@ def get_options(values: Dict[str, str], page: int = 1) -> Tuple[List[SelectOptio
     return options, total_pages
 
 def getbalance(country: str | 'Country') -> int:
-    name = country.name if hasattr(country, 'name') else country
+    id_ = country.id if hasattr(country, 'id') else country
     
     connect = con(deps.DATABASE_COUNTRIES_PATH)
     cursor = connect.cursor()
@@ -58,7 +58,7 @@ def getbalance(country: str | 'Country') -> int:
     cursor.execute(f"""
                     SELECT Деньги
                     FROM countries_inventory
-                    WHERE name = '{name}'
+                    WHERE name = '{id_}'
     """)
     res = cursor.fetchone()[0]
     connect.close()
@@ -66,7 +66,7 @@ def getbalance(country: str | 'Country') -> int:
     return int(res)
 
 def getfact(country: str | 'Country', give_factory: str | 'Factory' | None = None) -> dict[str, 'Factory'] | 'Factory':
-    name = country.name if hasattr(country, 'name') else country
+    id_ = country.id if hasattr(country, 'id') else country
     
     connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
@@ -76,7 +76,7 @@ def getfact(country: str | 'Country', give_factory: str | 'Factory' | None = Non
     cursor.execute(f"""
                     SELECT *
                     FROM country_factories
-                    WHERE name = '{name}'
+                    WHERE name = '{id_}'
     """)
     fetch = dict(cursor.fetchone())
     connect.close()
@@ -92,7 +92,7 @@ def getfact(country: str | 'Country', give_factory: str | 'Factory' | None = Non
     return res
 
 def getinv(name: str | 'Country', give_item: str | 'Item' | None = None) -> dict[str, 'Item'] | 'Item':
-    name = name.name if hasattr(name, 'name') else name
+    id_ = name.id if hasattr(name, 'id') else name
     connect = con(deps.DATABASE_COUNTRIES_PATH)
     connect.row_factory = Row
     cursor = connect.cursor()
@@ -100,7 +100,7 @@ def getinv(name: str | 'Country', give_item: str | 'Item' | None = None) -> dict
     cursor.execute(f"""
                     SELECT *
                     FROM countries_inventory
-                    WHERE name = '{name}'
+                    WHERE id = '{id_}'
     """)
     fetch = dict(cursor.fetchone())
     connect.close()

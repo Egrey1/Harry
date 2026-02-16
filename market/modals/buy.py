@@ -80,13 +80,13 @@ class Buy(Modal):
         cursor.execute('''
                        UPDATE countries_inventory
                        SET "Деньги" = "Деньги" - ?
-                       WHERE name = ?
-                       ''', (total_price, buyer_country.name))
+                       WHERE country_id = ?
+                       ''', (total_price, buyer_country.id))
         cursor.execute('''
                        UPDATE countries_inventory
                        SET "Деньги" = "Деньги" + ?
-                       WHERE name = ?
-                       ''', (total_price, seller_country.name))
+                       WHERE country_id = ?
+                       ''', (total_price, seller_country.id))
         connect.commit()
         connect.close()
 

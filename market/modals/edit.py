@@ -5,7 +5,7 @@ class Edit(Modal):
         super().__init__(title='Тут можешь отредактировать свою позицию!')
         self.item_name = item if isinstance(item, str) else item.name
         self.on_market = on_market.split()
-        self.country_name = country if isinstance(country, str) else country.name
+        self.country = country if isinstance(country, deps.Country) else deps.Country(country)
         self.have = have
 
 
@@ -45,14 +45,14 @@ class Edit(Modal):
         cursor.execute(f"""
                        UPDATE market 
                        SET `{col}` = ? 
-                       WHERE name = ?
-                       """, (new_value, self.country_name))
+                       WHERE country_id = ?
+                       """, (new_value, self.country.id))
         
         cursor.execute(f"""
                        UPDATE countries_inventory
                        SET `{col}` = `{col}` - ?
-                       WHERE name = ?
-                       """, (delta_count, self.country_name))
+                       WHERE country_id = ?
+                       """, (delta_count, self.country.id))
 
         connect.commit()
         connect.close()

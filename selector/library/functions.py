@@ -67,12 +67,13 @@ async def give_all_countries() -> tuple:
 # Заносим пользователя в страну как занятого
 async def set_is_busy(mention: str, country_name: str | None = None):
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
+        country = deps.Country(country_name)
         cursor = connect.cursor()
         if country_name:
             cursor.execute(f"""
                         UPDATE roles
                         SET is_busy = '{mention}'
-                        WHERE name = '{country_name}'
+                        WHERE id = '{country.id}'
                         """) 
         else:
              cursor.execute(f"""

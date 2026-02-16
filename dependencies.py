@@ -36,7 +36,7 @@ TOKEN1: str
 TOKEN2: str
 PREFIX: str
 intents: Intents
-    
+
 audit: TextChannel
 
 class Country:
@@ -410,6 +410,7 @@ class Item:
         is_air (bool): Является ли предмет воздушным (самолётом) (флаг air).
         country (Country | None): Объект страны, если был передан при инициализации.
         produced_by (List[Factory] | None): Фабрики, которые производят этот предмет (None если не привязан).
+        id (str): Уникальный идентификатор предмета из БД items таблицы
     """
 
     def __init__(self, name: str, quantity: int | None = None, price: int = 0, 
@@ -453,6 +454,8 @@ class Item:
         """Объект страны, если был передан при инициализации."""
         self.produced_by: 'List[Factory] | None'
         """Фабрики, которые производят этот предмет (None если не привязан)."""
+        self.id: str
+        """Уникальный идентификатор предмета из БД items таблицы"""
         ...
 
     def edit_quantity(self, quantity: int, country: 'str | Country') -> None:
@@ -608,6 +611,7 @@ class Factory:
         cost (int): Стоимость постройки одной единицы этой фабрики.
         max_size (int): Максимальное количество фабрик, которые можно построить прежде чем начнется убывающая отдача
         maintenance (int): Стоимость обслуживания одной единицы этой фабрики за период
+        id (str): Уникальный идентификатор фабрики из БД factories таблицы
     """
 
     def __init__(self, factory_name: str, quantity: int | None = None, 

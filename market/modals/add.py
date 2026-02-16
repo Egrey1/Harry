@@ -3,7 +3,8 @@ from ..library import Modal, TextInput, Interaction, con, deps
 class Add(Modal):
     def __init__(self, country: deps.Country, item: deps.Item, item_count: int):
         super().__init__(title='Добавление позиции на рынок')
-        self.country = country.name
+        self.country = country
+        self.country_name = country.name
         self.item = str(item)
         self.item_count = item_count
 
@@ -34,8 +35,8 @@ class Add(Modal):
         cursor.execute(f"""
                        SELECT `{col}` 
                        FROM market 
-                       WHERE name = ?
-                       """, (self.country,))
+                       WHERE country_id = ?
+                       """, (self.country.id,))
         row = cursor.fetchone()
 
         new_value = f"{count} {price}"
@@ -43,17 +44,17 @@ class Add(Modal):
         if row is None:
             # No row for this country yet -> insert a new row with this item
             cursor.execute(f"""
-                           INSERT INTO market (name, `{col}`) 
+                           INSERT INTO market (country_id, `{col}`) 
                            VALUES (?, ?)
-                           """, (self.country, new_value))
+                           """, (self.country.id, new_value))
         else:
             existing = row[0]
             if not existing:
                 # Column empty -> just set it
                 cursor.execute(f"""
                                UPDATE market SET `{col}` = ? 
-                               WHERE name = ?
-                               """, (new_value, self.country))
+                               WHERE country_id = ?
+                               """, (new_value, self.country.id))
             else:
                 # Merge quantities: parse existing as "qty price"
                 try:
@@ -69,15 +70,17 @@ class Add(Modal):
                 cursor.execute(f"""
                                UPDATE market 
                                SET `{col}` = ? 
-                               WHERE name = ?
-                               """, (merged_value, self.country))
+                               WHERE country_id = ?
+                               """, (merged_value, self.country.id))
 
         # Now subtract the items from the country's inventory atomically.
         # If the inventory doesn't contain enough items, rollback and inform the user.
         if count > 0:
-            cursor.execute(
-                f"UPDATE countries_inventory SET `{col}` = `{col}` - ? WHERE name = ? AND `{col}` >= ?",
-                (count, self.country, count),
+            cursor.execute(f"""
+                           UPDATE countries_inventory 
+                           SET `{col}` = `{col}` - ? 
+                           WHERE country_id = ? AND `{col}` >= ?
+                           """, (count, self.country.id, count),
             )
             if cursor.rowcount == 0:
                 connect.rollback()

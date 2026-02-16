@@ -2,7 +2,7 @@ from ..library import Interaction, deps, con
 
 async def rem(interaction: Interaction, country: deps.Country):
     item_name = interaction.data['values'][0]
-    country = str(country)
+    country = country
 
     connect = con(deps.DATABASE_COUNTRIES_PATH)
     cursor = connect.cursor()
@@ -10,20 +10,20 @@ async def rem(interaction: Interaction, country: deps.Country):
     cursor.execute(f"""
                    SELECT `{item_name}`
                    FROM market
-                   WHERE name = '{country}'
+                   WHERE country_id = '{country.id}'
                    """)
     have = (cursor.fetchone()[0]).split()[0]
 
     cursor.execute(f"""
                     UPDATE market
                     SET `{item_name}` = 0
-                    WHERE name = ?
-                    """, (country,))
+                    WHERE country_id = ?
+                    """, (country.id,))
     
     cursor.execute(f"""
                    UPDATE countries_inventory
                    SET `{item_name}` = `{item_name}` + {have}
-                   WHERE name = '{country}'
+                   WHERE country_id = '{country.id}'
                    """)
     connect.commit()
     connect.close()
