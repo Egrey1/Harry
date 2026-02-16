@@ -32,28 +32,63 @@ class Country:
                 return
             conn.close() 
         
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
+        connect.row_factory = Row
+        cursor = connect.cursor()
+
+        cursor.execute(f"""
+                        SELECT *
+                        FROM countries_inventory
+                        WHERE name = '{name}'
+                        """)
+        inventory_fetch = cursor.fetchone()
+
+        cursor.execute(f"""
+                        SELECT *
+                        FROM country_factories
+                        WHERE name = '{name}'
+                        """)
+        factories_fetch = cursor.fetchone()
+        connect.close()
+
         self.name = name
         self.market = Market(name)
-        self.inventory = getinv(name)
-        self.factories = getfact(name)
-        self.balance = getbalance(name)
+
+        self.inventory: dict[str, Item] = {}
+        self.factories: dict[str, Factory] = {}
+        self.balance: int = 0
+
+        for i in inventory_fetch.keys():
+            if i != 'name' and i != 'Деньги':
+                self.inventory[i] = Item(i, int(inventory_fetch[i]), country=self)
+        
+        for i in factories_fetch.keys():
+            if i != 'name':
+                self.factories[i] = Factory(i, int(factories_fetch[i]), country=self)
+        
+        self.balance = int(inventory_fetch['Деньги'])
 
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
+        connect.row_factory = Row
         cursor = connect.cursor()
         
         cursor.execute(f"""
-                        SELECT is_busy, surrender, sea, assembly, nickname
+                        SELECT *
                         FROM roles
                         WHERE name = '{name}'
                         """)
-        fetch = cursor.fetchone()
+        fetch = dict(cursor.fetchone())
         connect.close()
         
-        self.busy = deps.guild.get_member(int(fetch[0][2:-1])) if fetch and fetch[0] else None
-        self.surrend = bool(fetch[1]) if fetch else False
-        self.sea = deps.guild.get_role(int(fetch[2])) if fetch and fetch[2] else None
-        self.assembly = deps.guild.get_role(int(fetch[3])) if fetch and fetch[3] else None
-        self.nickname = fetch[4] if fetch and fetch[4] is not None else ""
+        self.busy = deps.guild.get_member(int(fetch['is_busy'][2:-1])) if fetch and fetch['is_busy'] else None
+        self.surrend = bool(fetch['surrender']) if fetch else False
+        self.sea = deps.guild.get_role(int(fetch['sea'])) if fetch and fetch['sea'] else None
+        self.assembly = deps.guild.get_role(int(fetch['assembly'])) if fetch and fetch['assembly'] else None
+        self.nickname = fetch['nickname'] if fetch and fetch['nickname'] is not None else ""
+        self.id = fetch['id'] if fetch and fetch['id'] is not None else None
+
+        if not self.id:
+            raise ValueError(f"У страны {name} нет уникального идентификатора в базе данных roles.")
         
         # Добавить в документацию
         connect = con(deps.DATABASE_FOCUS_PATH)
@@ -322,6 +357,18 @@ class Country:
         connect.commit()
         connect.close()
         self.doing_focus = focus if isinstance(focus, Focus) else Focus(focus, self)
+    
+    def get_expenses(self) -> int:
+        total_expenses = 0
+        for factory in self.factories.values():
+            total_expenses += factory.maintenance * factory.quantity
+        return total_expenses
+    
+    def get_earnings(self) -> int:
+        total_earnings = 0
+        for factory in self.inventory['Деньги'].produced_by:
+            total_earnings += factory.count * factory.quantity
+        return total_earnings
 
 class Item:
     def __init__(self, name: str, quantity: int | None = None, price: int = 0, country: str | Country | None = None):
@@ -340,7 +387,6 @@ class Item:
                         WHERE name = '{name}'
                         """)
         items_info = dict(cursor.fetchone())
-        connect.close()
 
         if items_info is None:
             raise ValueError(f"Предмет с именем '{name}' не найдена в базе данных.")
@@ -349,6 +395,20 @@ class Item:
         self.is_ship = int(items_info['ship']) == 1
         self.is_ground = int(items_info['ground']) == 1
         self.is_air = int(items_info['air']) == 1
+
+        cursor.execute(f"""
+                        SELECT name
+                        FROM factories
+                        where produces_key = '{self.name}'
+                       """)
+        
+        fetchs = cursor.fetchall()
+        connect.close()
+
+        self.produced_by: List[Factory] | None = None if (not fetchs) or (not self.country) else []
+        if isinstance(self.produced_by, list):
+            for fetch in fetchs:
+                self.produced_by.append(Factory(fetch['name'], country=self.country))
 
     def edit_quantity(self, quantity: int, country: str | Country) -> None:
         country_name = country.name if isinstance(country, Country) else country
@@ -492,6 +552,8 @@ class Factory:
         self.count = float(fetch['count'])
         self.desc = fetch['desc']
         self.cost = int(fetch['cost'])
+        self.max_size = int(fetch['max_size'])
+        self.maintenance = int(fetch['maintenance'])
 
     def edit_quantity(self, quantity: int, country: str | Country) -> None:
         country_name = country.name if isinstance(country, Country) else country

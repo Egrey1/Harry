@@ -1,6 +1,6 @@
 """Здесь хранятся глобальные переменные и объекты, используемые в боте."""
 
-from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment
+from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment, Member
 from discord.ext.commands import Bot, Context
 from discord.ui import Button, Select
 from typing import List, Callable, Awaitable
@@ -48,6 +48,7 @@ class Country:
     
     Attributes:
         name (str): Название страны. Загружается из БД roles таблицы.
+        id (str): Уникальный идентификатор страны из БД roles таблицы.
         market (Market): Объект рынка страны для торговых операций.
         inventory (dict[str, Item]): Словарь предметов инвентаря {название: Item}.
         factories (dict[str, Factory]): Словарь фабрик страны {название: Factory}.
@@ -93,6 +94,36 @@ class Country:
             - getfact(name): получение фабрик страны
             - getbalance(name): получение баланса страны
         """
+        self.name: str
+        """Название страны. Загружается из БД roles таблицы."""
+        self.id: str
+        """Уникальный идентификатор страны из БД roles таблицы."""
+        self.market: Market
+        """Объект рынка страны для торговых операций."""
+        self.inventory: dict[str, Item]
+        """Словарь предметов инвентаря {название: Item}."""
+        self.factories: dict[str, Factory]
+        """Словарь фабрик страны {название: Factory}."""
+        self.balance: int
+        """Текущий денежный баланс страны."""
+        self.busy: 'Member | None'
+        """Discord участник, привязанный к стране (None если не привязан)."""
+        self.is_country: bool
+        """Флаг валидности страны (True если страна существует и валидна)."""
+        self.surrend: bool
+        """Флаг капитуляции (True если страна капитулировала)."""
+        self.sea: 'Role | None'
+        """Discord роль морского флота страны (None если не имеется)."""
+        self.assembly: 'Role | None'
+        """Discord роль членства в Лиге Наций (None если не имеется)."""
+        self.nickname: str
+        """Отображаемое имя игрока в контексте страны."""
+        self.doing_focus: 'Focus | None'
+        """Текущий выполняемый национальный фокус (None если нет)."""
+        self.current_focus: 'Focus | None'
+        """Последний завершённый национальный фокус (None если нет)."""
+        self.building_slots: int
+        """Количество строительных ячеек для размещения фабрик."""
         ...
 
     def _load_building_slots(self) -> int:
@@ -341,6 +372,26 @@ class Country:
         """
         ...
 
+    def get_expenses(self) -> int:
+        """Вычисляет общие расходы страны на поддержание фабрик.
+        
+        Суммирует maintenance всех фабрик, умноженных на их количество.
+        
+        Returns:
+            int: Общая сумма расходов на поддержание фабрик.
+        """
+        ...
+    
+    def get_earnings(self) -> int:
+        """Вычисляет общие доходы страны (в деньгах) от производства фабрик.
+        
+        Суммирует count всех фабрик, умноженных на их количество.
+        
+        Returns:
+            int: Общая сумма доходов от производства фабрик.
+        """
+        ...
+
 
 class Item:
     """Представляет игровой предмет с его свойствами и количеством в инвентаре страны.
@@ -358,6 +409,7 @@ class Item:
         is_ground (bool): Является ли предмет наземной техникой (флаг ground).
         is_air (bool): Является ли предмет воздушным (самолётом) (флаг air).
         country (Country | None): Объект страны, если был передан при инициализации.
+        produced_by (List[Factory] | None): Фабрики, которые производят этот предмет (None если не привязан).
     """
 
     def __init__(self, name: str, quantity: int | None = None, price: int = 0, 
@@ -383,6 +435,24 @@ class Item:
             - DATABASE_COUNTRIES_PATH: таблица items
                 SELECT tradable, ship, ground, air WHERE name = {name}
         """
+        self.name: str
+        """Название предмета."""
+        self.quantity: int
+        """Количество предмета в инвентаре страны."""
+        self.price: int
+        """Стоимость предмета на рынке."""
+        self.purchasable: bool
+        """Можно ли покупать предмет на рынке (из поля tradable)."""
+        self.is_ship: bool
+        """Является ли предмет морским кораблём (флаг ship)."""
+        self.is_ground: bool
+        """Является ли предмет наземной техникой (флаг ground)."""
+        self.is_air: bool
+        """Является ли предмет воздушным (самолётом) (флаг air)."""
+        self.country: 'Country | None'
+        """Объект страны, если был передан при инициализации."""
+        self.produced_by: 'List[Factory] | None'
+        """Фабрики, которые производят этот предмет (None если не привязан)."""
         ...
 
     def edit_quantity(self, quantity: int, country: 'str | Country') -> None:
@@ -442,6 +512,10 @@ class Market:
             - Каждый столбец предмета содержит строку формата: "количество цена"
             - Парсится при инициализации в объекты Item
         """
+        self.name: str
+        """Название страны, чей рынок представлен."""
+        self.inventory: dict[str, Item]
+        """Словарь предметов на рынке {название: Item}. Каждое значение содержит информацию о количестве и цене."""
         ...
 
     def get_inv(self, quest: bool = False) -> dict:
@@ -532,6 +606,8 @@ class Factory:
         count (float): Количество единиц продукции, производимых одной фабрикой за период.
         desc (str): Описание и название фабрики.
         cost (int): Стоимость постройки одной единицы этой фабрики.
+        max_size (int): Максимальное количество фабрик, которые можно построить прежде чем начнется убывающая отдача
+        maintenance (int): Стоимость обслуживания одной единицы этой фабрики за период
     """
 
     def __init__(self, factory_name: str, quantity: int | None = None, 
@@ -555,6 +631,24 @@ class Factory:
             - DATABASE_COUNTRIES_PATH: таблица factories
                 SELECT produces_key, count, desc, cost WHERE name = {factory_name}
         """
+        self.name: str
+        """Название фабрики."""
+        self.quantity: int
+        """Количество фабрик данного типа в стране."""
+        self.country: 'Country | None'
+        """Объект страны, которой принадлежат фабрики (None если не привязана)."""
+        self.produces: str
+        """Ключ производимого предмета (например, название товара или 'Деньги')."""
+        self.count: float
+        """Количество единиц продукции, производимых одной фабрикой за период."""
+        self.desc: str
+        """Описание и название фабрики."""
+        self.cost: int
+        """Стоимость постройки одной единицы этой фабрики."""
+        self.max_size: int
+        """Максимальное количество фабрик, которые можно построить прежде чем начнется убывающая отдача."""
+        self.maintenance: int
+        """Стоимость обслуживания одной единицы этой фабрики за период."""
         ...
 
     def edit_quantity(self, quantity: int, country: 'str | Country') -> None:
@@ -619,6 +713,28 @@ class Focus:
                        reward_items, reward_factories, building_slots_reward
                 WHERE name = {name}
         """
+        self.name: str
+        """Название фокуса."""
+        self.description: str
+        """Описание фокуса и его эффектов."""
+        self.emoji: 'str | None'
+        """Эмодзи, отображаемое рядом с названием фокуса (None если нет)."""
+        self.owner: 'Country | None'
+        """Страна, владеющая этим фокусом (None если не привязан)."""
+        self.req_items: 'List[Item] | None'
+        """Требуемые предметы для выполнения фокуса."""
+        self.req_factories: 'list[Factory] | None'
+        """Требуемые фабрики для выполнения фокуса."""
+        self.req_news: 'str | None'
+        """Требуется ли новостное сообщение для выполнения (None если нет)."""
+        self.event: 'str | None'
+        """ID события, которое происходит при выполнении фокуса (None если нет)."""
+        self.reward_items: 'List[Item] | None'
+        """Предметы, получаемые при завершении фокуса."""
+        self.reward_factories: 'list[Factory] | None'
+        """Фабрики, получаемые при завершении фокуса."""
+        self.building_slots_reward: int
+        """Количество строительных ячеек, получаемых при завершении."""
         ...
 
     async def send_event(self) -> None:

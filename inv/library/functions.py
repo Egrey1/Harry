@@ -47,6 +47,7 @@ async def give_army(interaction: Interaction) -> None:
     embed_desc = '\n\n'.join(items) if items else 'Пусто'
     balance = getattr(country, 'balance', 0)
     embed = Embed(title=f"Баланс: {deps.CURRENCY}{balance}", description=embed_desc)
+    embed.footer = "Вы можете посмотреть больше деталей о своем балансе при помощи команды /bal"
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
@@ -79,4 +80,5 @@ async def give_enterprise(interaction: Interaction) -> None:
     embed_desc = ('\n\n'.join(items) if items else 'Пусто') + slots_info
     balance = getattr(country, 'balance', 0)
     embed = Embed(title=f"Баланс: {deps.CURRENCY}{balance}", description=embed_desc)
+    embed.footer = "Вы можете посмотреть больше деталей о своем балансе при помощи команды /bal"
     await interaction.response.send_message(embed=embed, ephemeral=True)

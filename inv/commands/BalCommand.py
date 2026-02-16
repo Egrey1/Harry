@@ -1,4 +1,4 @@
-from ..library.modules import Context, hybrid_command, deps
+from ..library.modules import Context, hybrid_command, deps, Embed
 
 
 class BalCommand:
@@ -19,9 +19,17 @@ class BalCommand:
         
 
         money = country.balance
+        embed = Embed()
+        embed.title = f'Ваш баланс равен: {deps.CURRENCY}{money}'
+        embed.description = f"""
+        Вы зарабатываете {deps.CURRENCY}{country.get_earnings} в месяц
+        Вы тратите {deps.CURRENCY}{country.get_expenses} в месяц\nВаш чистый доход: {deps.CURRENCY}{country.get_earnings - country.get_expenses} в месяц
+        
+        {'О нет! Похоже, что вы теряете деньги каждый месяц! Это означает, что производительность ваших фабрик замедлено. Производство самых совершенных боевых единиц и вовсе остановлено! Срочно исправьте это, создав офисы или открыв промышленные зоны!' if country.get_earnings - country.get_expenses < 0 else ''}"""
+        embed.footer = 'Вы можете посмотреть свой инвентарь с помощью команды /inv'
         
         if ctx.interaction:
-            await ctx.interaction.followup.send(f'Ваш баланс равен {deps.CURRENCY}{money}', ephemeral= True)
+            await ctx.interaction.followup.send(embed=embed, ephemeral= True)
         else:
-            await ctx.reply(f'Ваш баланс равен {deps.CURRENCY}{money}')
+            await ctx.reply(embed=embed)
         return None
