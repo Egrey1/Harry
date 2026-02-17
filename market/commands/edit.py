@@ -8,6 +8,10 @@ class Edit():
     @hybrid_command(name="market_edit", description="Редактирует одну из ваших позиций на рынке")
     async def edit(self, ctx: Context):
         country = deps.Country(ctx.author.mention)
+        
+        if ctx.interaction:
+            await ctx.interaction.response.defer(ephemeral=True)
+
         if not country:
             await ctx.send("Вы не зарегистрированы!", ephemeral=True)
             return

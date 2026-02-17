@@ -8,6 +8,9 @@ class Rem():
     @hybrid_command(name="market_rem", description="Удаляет одну из ваших позиций на рынке")
     async def remove(self, ctx: Context):
         country = deps.Country(ctx.author.mention)
+        if ctx.interaction:
+            await ctx.interaction.response.defer(ephemeral=True)
+            
         if not country:
             await ctx.reply("Ты даже не страна!")
             return

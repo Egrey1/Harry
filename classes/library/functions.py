@@ -76,7 +76,7 @@ def getfact(country: str | 'Country', give_factory: str | 'Factory' | None = Non
     cursor.execute(f"""
                     SELECT *
                     FROM country_factories
-                    WHERE name = '{id_}'
+                    WHERE country_id = '{id_}'
     """)
     fetch = dict(cursor.fetchone())
     connect.close()
@@ -84,7 +84,7 @@ def getfact(country: str | 'Country', give_factory: str | 'Factory' | None = Non
     # Импортируем `Factory` локально, чтобы избежать циклического импорта
     from ..game_objects import Factory
     for factory_name, quantity in fetch.items():
-        if factory_name != 'name':
+        if factory_name != 'country_id':
             res[factory_name] = Factory(factory_name, quantity)
     
     if give_factory:

@@ -9,6 +9,8 @@ class Buy():
     @hybrid_command(name="market_buy", description="Покупка вооружения с рынка")
     async def buy(self, ctx: Context):
         country = deps.Country(ctx.author.mention)
+        if ctx.interaction:
+            await ctx.interaction.response.defer(ephemeral=True)
 
         # Inline market summary
         connect = con(deps.DATABASE_COUNTRIES_PATH)

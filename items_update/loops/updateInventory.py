@@ -23,7 +23,7 @@ class UpdateInventory:
 
         for country in inv_update:
             for item, count in country.items():
-                if item != 'name' and count != 0:
+                if item != 'country_id' and count != 0:
                     cursor.execute(f"""
                                     UPDATE countries_inventory
                                     SET `{item}` = "{item}" + {float(count)}
@@ -47,13 +47,13 @@ class UpdateInventory:
 
         # цикл по всем странам
         for fetch in fetchs:
-            current_country = deps.Country(fetch['name'])
+            current_country = deps.Country(fetch['country_id'])
             for factory in [list(current_country.factories.values())[-2], list(current_country.factories.values())[-1]]: # две последние фабрики производят деньги
                 total_money += factory.count * factory.quantity
 
             # цикл по всем предметам в инвентаре страны
             for row in fetch.keys():
-                if row in ('name', 'Деньги'):
+                if row in ('country_id', 'Деньги'):
                     continue
 
                 factories = current_country.inventory[row].produced_by

@@ -6,7 +6,7 @@ async def give_all_countries() -> tuple:
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
-                    SELECT id
+                    SELECT name
                     FROM roles
                     """)
     result = tuple([row[0] for row in cursor.fetchall()])  
@@ -18,7 +18,7 @@ async def give_all_no_surrend_countries() -> tuple:
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
-                    SELECT id
+                    SELECT name
                     FROM roles
                     WHERE surrender IS NULL
                     """)
@@ -31,7 +31,7 @@ async def give_all_surrend_countries() -> tuple:
     connect = con(ROLE_PICKER_PATH)
     cursor = connect.cursor()
     cursor.execute(f"""
-                    SELECT id
+                    SELECT name
                     FROM roles
                     WHERE surrender IS NOT NULL
                     """)
@@ -45,7 +45,7 @@ async def give_all_factories() -> tuple:
     connect.row_factory = Row
     cursor = connect.cursor()
     cursor.execute("""
-                SELECT id, cost, `desc`
+                SELECT name, cost, `desc`
                 FROM factories
                 """)
     a = cursor.fetchall()

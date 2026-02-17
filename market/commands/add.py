@@ -9,6 +9,9 @@ class Add():
     async def add(self, ctx: Context):
         country = deps.Country(ctx.author.mention)
 
+        if ctx.interaction:
+            await ctx.interaction.response.defer(ephemeral=True)
+
         if not country:
             await ctx.send('Ты не зарегистрирован!', ephemeral=True)
             return

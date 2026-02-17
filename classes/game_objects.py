@@ -94,11 +94,11 @@ class Country:
         self.balance: int = 0
 
         for i in inventory_fetch.keys():
-            if i != 'name' and i != 'Деньги':
+            if i != 'country_id' and i != 'Деньги':
                 self.inventory[i] = Item(i, int(inventory_fetch[i]), country=self)
         
         for i in factories_fetch.keys():
-            if i != 'name':
+            if i != 'country_id':
                 self.factories[i] = Factory(i, int(factories_fetch[i]), country=self)
         
         self.balance = int(inventory_fetch['Деньги'])
@@ -397,8 +397,9 @@ class Country:
     
     def get_earnings(self) -> int:
         total_earnings = 0
-        for factory in self.inventory['Деньги'].produced_by:
-            total_earnings += factory.count * factory.quantity
+        for factory in self.factories.values():
+            if factory.produces == 'Деньги':
+                total_earnings += factory.count * factory.quantity
         return total_earnings
 
 class Item:
@@ -518,7 +519,7 @@ class Market:
 
         # Парсим поля: каждое поле (кроме 'name') содержит строку вида "количество цена"
         for name, value in result.items():
-            if name != 'name' and value:
+            if name != 'country_id' and value:
                 parts = value.split()
                 quantity = int(parts[0]) if len(parts) > 0 else 0
                 price = int(parts[1]) if len(parts) > 1 else 0
@@ -589,6 +590,7 @@ class Factory:
         """)
         fetch = cursor.fetchone()
         if not fetch:
+            print(country)
             cursor.execute("""
                            SELECT *
                            FROM factories

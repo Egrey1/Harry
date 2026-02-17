@@ -8,6 +8,8 @@ class Market():
     @hybrid_command(name="market", description="Просмотр рынка")
     async def dmarket(self, ctx: Context):
         # Inline summary of market table
+        if ctx.interaction:
+            await ctx.interaction.response.defer(ephemeral=True)
         connect = con(deps.DATABASE_COUNTRIES_PATH)
         connect.row_factory = Row
         cursor = connect.cursor()
@@ -23,7 +25,7 @@ class Market():
 
         for row in rows:
             r = dict(row)
-            country_2 = deps.Country(r.get('name'))
+            country_2 = deps.Country(r.get('country_id'))
             for key, value in r.items():
                 if key == 'name' or not value:
                     continue
