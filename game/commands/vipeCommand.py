@@ -42,7 +42,49 @@ class VipeCommand:
                        FROM countries_inventory_default
                        """)
         connect.commit()
+
+        cursor.execute("""
+                        DELETE FROM market
+                        """)
+        connect.commit()
         connect.close()
+
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       DELETE FROM roles
+                       """)
+        cursor.execute("""
+                       INSERT INTO roles
+                       SLECT *
+                       FROM roles_default
+                       """)
+        connect.commit()
+        connect.close()
+
+        connect = con(deps.DATABASE_FOCUS_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       DELETE FROM countries
+                       """)
+        cursor.execute("""
+                       INSERT INTO countries
+                       SELECT *
+                       FROM countries_default
+                       """)
+        connect.commit()
+        connect.close()
+
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE users
+                       SET last_register = NULL
+                       """)
+
 
         deps.game_state['game_started'] = not deps.game_state['game_started']
 
