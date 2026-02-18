@@ -65,7 +65,7 @@ class UpdateInventory:
                 for factory in factories:
                     total_money -= factory.maintenance * factory.quantity
                     no_fine_count = min(factory.quantity, factory.max_size)
-                    if total_money >= 0:
+                    if current_country.balance + total_money >= 0:
                         cursor.execute(f"""
                                 UPDATE countries_inventory_add
                                 SET "{row}" = "{

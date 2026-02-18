@@ -14,7 +14,7 @@ class ShopCommand(BuyCallback):
 
 		# Добавляем все фабрики вместе с ценой и описанием
         for factory in factories:
-            embed_desc += '### ' + factory[0] + ' - '+ deps.CURRENCY + str(factory[1]) + '\n```' + factory[2] + '``` \n\n\n'
+            embed_desc += '### ' + factory[0] + ' - '+ deps.CURRENCY + str(factory[1]) + '\n```' + factory[2] + '\n\n' + f'Расходы - {deps.CURRENCY}{int(factory[3])} за единицу времени' '``` \n\n\n'
         
         embed = Embed(title='Все предприятия на продажу: ', description=embed_desc)
         view = View()

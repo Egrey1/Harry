@@ -6,7 +6,7 @@ async def give_all_factories() -> tuple:
     connect.row_factory = Row
     cursor = connect.cursor()
     cursor.execute("""
-                SELECT name, cost, desc
+                SELECT name, cost, desc, maintenance
                 FROM factories
                 """)
     result = cursor.fetchall()
