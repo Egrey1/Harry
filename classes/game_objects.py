@@ -318,7 +318,7 @@ class Country:
 
     async def send_news(self, news: str, attachments: List[Attachment], view):
         files = [await file.to_file() for file in attachments]
-        channel = deps.guild.get_channel(1429571616982958222)
+        channel = deps.rp_channels.get_news()
 
         # Попытка загрузить аватар из БД
         avatar_bytes = None

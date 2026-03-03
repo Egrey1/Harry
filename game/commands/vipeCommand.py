@@ -88,6 +88,13 @@ class VipeCommand:
 
         deps.game_state['game_started'] = not deps.game_state['game_started']
 
+        deps.rp_channels.del_event()
+        deps.rp_channels.del_war()
+        deps.rp_channels.del_news()
+
+        channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)
+        await channel.edit(name='📅┃1/12 1933 год')
+
         if ctx.interaction:
             await ctx.interaction.followup.send('Новый вайп начался!' if deps.game_state['game_started'] else 'Этот вайп закончился!', ephemeral=False)
         else:

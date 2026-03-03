@@ -27,7 +27,7 @@ guild: Guild
 game_state: dict
 PAGE_SIZE: int = 25
 register_cooldown: int = 1
-diminishing_returns: int = 0.95
+diminishing_returns: float = 0.95
 
 SPEED: int = 1 # В часах
 
@@ -36,7 +36,7 @@ TOKEN1: str
 TOKEN2: str
 PREFIX: str
 intents: Intents
-
+ 
 audit: TextChannel
 
 class Country:
@@ -1008,10 +1008,13 @@ class ChooseMenu:
         ...
 
 class RpChannels:
-    def __init__(self, event: int | TextChannel = '📣┃события', war: int | ForumChannel = '🔥┃войны', news: int | TextChannel = '📰┃новости-стран'):
-        self.event = guild.get_role(event) if isinstance(event, int) else event
-        self.war = guild.get_role(war) if isinstance(war, int) else war
-        self.news = guild.get_role(news) if isinstance(news, int) else news
+    def __init__(
+            self, 
+            event: int | TextChannel | str = '📣┃события', 
+            war: int | ForumChannel | str = '🔥┃войны', 
+            news: int | str | TextChannel = '📰┃новости-стран'
+            ):
+        pass
         
     def get_event(self) -> TextChannel:
         """Возвращает канал для ивентов"""

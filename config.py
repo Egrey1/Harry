@@ -23,57 +23,11 @@ def get_channel(name: str) -> TextChannel:
         return role
     
     names = {
-        'event': '📣┃события',
-        'war': '📰┃новости-стран',
+        'events': '📣┃события',
+        'wars': '📰┃новости-стран',
         'news': '🔥┃войны'
     }
     return utils.get(deps.guild.channels, names[name])
-
-def config_rpchannels():
-    def tmp(self):
-        return self.event
-    deps.RpChannels.get_event = tmp
-    
-    async def tmp(self, event):
-        self.event = deps.guild.get_role(event) if type(event) == int else (utils.get(deps.guild.channels, event) if type(event) == str else event)
-    deps.RpChannels.set_event = tmp
-    
-    async def tmp(self):
-        new_channel = await self.event.clone()
-        await self.event.delete()
-        self.event = new_channel
-    deps.RpChannels.del_event = tmp
-    
-    
-    def tmp(self):
-        return self.war
-    deps.RpChannels.get_war = tmp
-    
-    async def tmp(self, war):
-        self.war = await deps.guild.get_role(war) if type(war) == int else (await utils.get(deps.guild.channels, war) if type(war) == str else war)
-    deps.RpChannels.set_war = tmp
-    
-    async def tmp(self):
-        new_channel = await self.war.clone()
-        await self.war.delete()
-        self.war = new_channel
-    deps.RpChannels.del_war = tmp
-    
-    
-    def tmp(self):
-        return self.news
-    deps.RpChannels.get_news = tmp
-    
-    async def tmp(self, news):
-        self.news = await deps.guild.get_role(news) if type(news) == int else (await utils.get(deps.guild.channels, news) if type(news) == str else news)
-    deps.RpChannels.set_news = tmp
-    
-    async def tmp(self):
-        new_channel = await self.news.clone()
-        await self.news.delete()
-        self.news = new_channel
-    deps.RpChannels.del_news = tmp
-    
 
 
 def first_config():
@@ -85,7 +39,7 @@ def first_config():
     #deps.TOKEN = getenv('TOKEN')
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    deps.intents = Intents.all()
+    deps.intents = Intents.default()
     deps.PREFIX = ['&', '& '] if deps.TOKEN == deps.TOKEN2 else ['!', '! ']
     # deps.PREFIX = ['!', '! ']
     deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
@@ -96,8 +50,7 @@ def first_config():
     deps.Focus = cl.Focus
     deps.Factory = cl.Factory
     deps.ChooseMenu = cl.ChooseMenu
-
-    config_rpchannels()
+    deps.RpChannels = cl.RpChannels
 
 async def second_config():
     """Присваивает остальным переменным их значения. Использовать функцию только после запуска"""

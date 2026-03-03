@@ -1,4 +1,4 @@
-from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button
+from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button, deps, con, utils, ForumChannel
 from discord import SelectOption
 from typing import Dict, Callable, Awaitable
 
@@ -96,3 +96,108 @@ class ChooseMenu(View):
                 await self.message.edit(view=self)
         except:
             pass
+
+class RpChannels:
+    def __init__(self):
+        pass
+
+    async def get_war(self) -> ForumChannel:
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       SELECT wars
+                       FROM channels
+                       """)
+        fetch = cursor.fetchone()[0]
+        connect.close()
+
+        role = await deps.guild.fetch_role(fetch)
+        if role is None:
+            role = utils.get(deps.guild.channels, '🔥┃войны')
+        return role
+
+    async def set_war(self, id_: int):
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE channels
+                       SET wars = ?
+                       """, (id_, ))
+        connect.commit()
+        connect.close()
+    
+    async def del_war(self) -> ForumChannel:
+        old_channel = await self.get_war()
+        new_channel: ForumChannel = await old_channel.clone()
+        await old_channel.delete()
+        self.set_war(new_channel.id)
+        
+
+    async def get_news(self) -> ForumChannel:
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       SELECT news
+                       FROM channels
+                       """)
+        fetch = cursor.fetchone()[0]
+        connect.close()
+
+        role = await deps.guild.fetch_role(fetch)
+        if role is None:
+            role = utils.get(deps.guild.channels, '📰┃новости-стран')
+        return role
+
+    async def set_news(self, id_: int):
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE channels
+                       SET news = ?
+                       """, (id_, ))
+        connect.commit()
+        connect.close()
+    
+    async def del_news(self) -> ForumChannel:
+        old_channel = await self.get_new()
+        new_channel: ForumChannel = await old_channel.clone()
+        await old_channel.delete()
+        self.set_new(new_channel.id)
+
+        
+    async def get_event(self) -> ForumChannel:
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       SELECT events
+                       FROM channels
+                       """)
+        fetch = cursor.fetchone()[0]
+        connect.close()
+
+        role = await deps.guild.fetch_role(fetch)
+        if role is None:
+            role = utils.get(deps.guild.channels, '📣┃события')
+        return role
+
+    async def set_event(self, id_: int):
+        connect = con(deps.DATABASE_CONFIG_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE channels
+                       SET events = ?
+                       """, (id_, ))
+        connect.commit()
+        connect.close()
+    
+    async def del_event(self) -> ForumChannel:
+        old_channel = await self.get_event()
+        new_channel: ForumChannel = await old_channel.clone()
+        await old_channel.delete()
+        self.set_event(new_channel.id)
