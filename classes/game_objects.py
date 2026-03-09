@@ -4,7 +4,7 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import Row, Interaction, Context, List, Attachment
+from .library import Row, Interaction, Context, List, Attachment, Thread, View
 from .library import connect as con
 import dependencies as deps
 
@@ -120,6 +120,8 @@ class Country:
         self.sea = deps.guild.get_role(int(fetch['sea'])) if fetch and fetch['sea'] else None
         self.assembly = deps.guild.get_role(int(fetch['assembly'])) if fetch and fetch['assembly'] else None
         self.nickname = fetch['nickname'] if fetch and fetch['nickname'] is not None else ""
+        self.thread_id = int(fetch['thread_id']) if fetch and fetch['thread_id'] else None
+        self.thread_name = fetch['thread_name'] if fetch and fetch['thread_name'] else None
 
         
         connect = con(deps.DATABASE_FOCUS_PATH)
@@ -132,12 +134,12 @@ class Country:
         fetch = cursor.fetchone()
         cursor.close()
 
-        self.doing_focus: Focus | None = None
-        self.current_focus: Focus | None = None
+        self.doing_focus: deps.Focus | None = None
+        self.current_focus: deps.Focus | None = None
         
         if fetch:
-            self.doing_focus = Focus(fetch[0], self) if fetch[0] else None
-            self.current_focus = Focus(fetch[1], self) if fetch[1] else None
+            self.doing_focus = deps.Focus(fetch[0], self) if fetch[0] else None
+            self.current_focus = deps.Focus(fetch[1], self) if fetch[1] else None
         
         # Загружаем информацию о строительных ячейках
         self.building_slots = self._load_building_slots()
@@ -316,9 +318,33 @@ class Country:
         connect.close()
         self.busy = None
 
-    async def send_news(self, news: str, attachments: List[Attachment], view):
+    async def create_news_thread(self) -> Thread:
+        channel = deps.rp_channels.get_news()
+        thread, _ = (await channel.create_thread(name=self.thread_name))
+        connect = con(deps.DATABASE_ROLE_PICKER_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE roles
+                       SET thread_id = ?
+                       WHERE id = ?
+                       """, (thread.id, self.id))
+        connect.commit()
+        connect.close()
+        
+        self.thread_id = thread.id
+        return thread
+
+    async def send_news(self, news: str, attachments: List[Attachment], view: View, focus_autocomplete: bool):
         files = [await file.to_file() for file in attachments]
         channel = deps.rp_channels.get_news()
+        if not self.thread_id:
+            await self.create_news_thread()
+        
+        thread = channel.get_thread(self.thread_id)
+
+        if focus_autocomplete and self.doing_focus is not None:
+            self.doing_focus.mark_as_completed()
 
         # Попытка загрузить аватар из БД
         avatar_bytes = None
@@ -328,7 +354,8 @@ class Country:
         cursor.execute("""
                         SELECT avatar 
                         FROM avatars 
-                        WHERE country_id = ?""", (self.id,))
+                        WHERE country_id = ?
+                       """, (self.id,))
         row = cursor.fetchone()
         conn.close()
         avatar_bytes = row[0] if row and row[0] else None
@@ -340,7 +367,7 @@ class Country:
             if not avatar_bytes:
                 webhooks = await channel.webhooks()
                 if webhooks:
-                    await webhooks[0].send(content=news, username=self.name, files=files, view=view)
+                    await webhooks[0].send(content=news, username=self.name, files=files, view=view, thread=thread)
                     return
 
             # Создаём временный вебхук (с аватаром, если он есть) и отправляем сообщение
@@ -349,7 +376,7 @@ class Country:
             else:
                 webhook = await channel.create_webhook(name=self.name)
 
-            await webhook.send(content=news, username=self.name, files=files, view=view)
+            await webhook.send(content=news, username=self.name, files=files, view=view, thread=thread)
         finally:
             # Удаляем временный вебхук, если он был создан
             try:

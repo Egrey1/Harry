@@ -1,8 +1,8 @@
 """Здесь хранятся глобальные переменные и объекты, используемые в боте."""
 
-from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment, Member
+from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment, Member, Thread
 from discord.ext.commands import Bot, Context
-from discord.ui import Button, Select
+from discord.ui import Button, Select, View
 from typing import List, Callable, Awaitable
 
 bot: Bot = Bot('!', intents=Intents.all())
@@ -30,6 +30,7 @@ register_cooldown: int = 1
 diminishing_returns: float = 0.95
 
 SPEED: int = 1 # В часах
+autovipe: float = 24 * 7 # В часах
 
 TOKEN: str
 TOKEN1: str
@@ -62,9 +63,11 @@ class Country:
         doing_focus (Focus | None): Текущий выполняемый национальный фокус (None если нет).
         current_focus (Focus | None): Последний завершённый национальный фокус (None если нет).
         building_slots (int): Количество строительных ячеек для размещения фабрик.
+        thread_id (int): ID форумного потока в канале новостей
+        thread_name (str): Название форумного потока
     """
 
-    def __init__(self, name: str = 'Италия') -> None:
+    def __init__(self, id_: str = 'ITA') -> None:
         """Инициализирует объект страны по названию или упоминанию Discord.
         
         Загружает все данные страны из базы данных:
@@ -76,8 +79,8 @@ class Country:
         из поля is_busy в БД. Если страна не найдена, устанавливается is_country=False.
         
         Args:
-            name (str): Название страны или упоминание Discord участника (формат '<@ID>').
-                По умолчанию 'Италия'.
+            id_ (str): Название страны, ее идентификатор или упоминание Discord участника (формат '<@ID>').
+                По умолчанию 'ITA'.
         
         Returns:
             None
@@ -85,7 +88,7 @@ class Country:
         Note:
             Используемые БД:
             - DATABASE_ROLE_PICKER_PATH: таблица roles (поля: name, is_busy, surrender, 
-              sea, assembly, nickname)
+              sea, assembly, nickname, thread_id, thread_name)
             - DATABASE_FOCUS_PATH: таблица countries (поля: name, doing, current)
             - DATABASE_COUNTRY_AI_PATH: таблица country_info (поле: building_slots)
             
@@ -124,6 +127,10 @@ class Country:
         """Последний завершённый национальный фокус (None если нет)."""
         self.building_slots: int
         """Количество строительных ячеек для размещения фабрик."""
+        self.thread_id: int
+        """ID форумного потока в канале новостей"""
+        self.thread_name: str
+        """Название форумного потока"""
         ...
 
     def _load_building_slots(self) -> int:
@@ -291,7 +298,18 @@ class Country:
         """
         ...
 
-    async def send_news(self, news: str, attachments: 'List[Attachment]', view) -> None:
+    async def create_news_thread(self) -> Thread:
+        """Создает новый поток для страны и сохраняет его в БД
+        Returns:
+            Thread. Созданный поток
+        
+        Note:
+            Используемые БД:
+            - DATABASE_ROLE_PICKER_PATH: таблица roles
+                Для сохранения нового значения
+        """
+
+    async def send_news(self, news: str, attachments: 'List[Attachment]', view: View, focus_autocomplete: bool) -> None:
         """Отправляет новостное сообщение в канал новостей стран.
         
         Создаёт временный Discord вебхук с аватаром страны (если имеется в БД)
@@ -301,7 +319,8 @@ class Country:
         Args:
             news (str): Текст новости для отправки.
             attachments (List[Attachment]): Список attachments для отправки с новостью.
-            view: Discord View объект с кнопками для взаимодействия с новостью.
+            view (View): Discord View объект с кнопками для взаимодействия с новостью.
+            focus_autocomplete: Флаг включения автовыполнения фокуса.
         
         Returns:
             None
@@ -312,7 +331,7 @@ class Country:
                 SELECT avatar WHERE name = self.name
             
             Discord каналы:
-            - Отправляет в канал с ID: 1429571616982958222 (канал новостей)
+            - Отправляет в поток с ID из self.thread_id в канале новостей
             
             Логика:
             - Если нет аватара и есть вебхуки: использует существующий вебхук
@@ -1030,9 +1049,9 @@ class RpChannels:
     async def del_war(self):
         """Пересоздает канал войн"""
         
-    def get_news(self) -> TextChannel:
+    def get_news(self) -> ForumChannel:
         """Возвращает канал для новостей"""
-    async def set_news(self, event: int | str | TextChannel = '📰┃новости-стран'):
+    async def set_news(self, event: int | str | ForumChannel = '📰┃новости-стран'):
         """Присвает полю self.news новое значение"""
     async def del_news(self):
         """Пересоздает канал новостей"""

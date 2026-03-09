@@ -7,7 +7,7 @@ class NewEvent():
     
     @Cog.listener()
     async def on_message(self, message: Message):
-        if message.author.bot or message.channel.id != deps.guild.get_channel(1429571616982958222).id:
+        if message.author.bot or message.channel.id != deps.rp_channels.get_news():
             return
             
         
@@ -16,12 +16,12 @@ class NewEvent():
             return
         
         if not message.attachments:
-            await message.channel.send(content='Для отправки новости вы должны прикрепить хотя бы один медиафайл', delete_after=30)
+            await message.thread.send(content='Для отправки новости вы должны прикрепить хотя бы один медиафайл', delete_after=30)
             await message.delete()
             return
             
         if len(message.content.split(' ')) < 25:
-            await message.channel.send(content='Твоя новость слишком маленького размера. Она должна иметь примерно 25 слов, чуть больше или чуть меньше', delete_after=30)
+            await message.thread.send(content='Твоя новость слишком маленького размера. Она должна иметь примерно 25 слов, чуть больше или чуть меньше', delete_after=30)
             await message.delete()
             return
             

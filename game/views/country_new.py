@@ -7,7 +7,7 @@ def has_focus() -> bool:
     def dec(func):
         async def wrapper(self, interaction: Interaction, butt: Button | None = None, *args, **kwargs):
             # Проверяем наличие фокуса и требование новости
-            if self.country.doing_focus is None or self.country.doing_focus.req_news is None:
+            if self.country.doing_focus is None or not self.country.doing_focus.req_news:
                 if butt:
                     butt.disabled = True
                     butt.emoji = '❎'

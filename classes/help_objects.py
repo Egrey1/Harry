@@ -1,4 +1,4 @@
-from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button, deps, con, utils, ForumChannel
+from .library import View, Select, Button, ButtonStyle, Interaction, NotFound, Lock, get_options, button, deps, con, utils, ForumChannel, TextChannel
 from discord import SelectOption
 from typing import Dict, Callable, Awaitable
 
@@ -163,13 +163,13 @@ class RpChannels:
         connect.close()
     
     async def del_news(self) -> ForumChannel:
-        old_channel = await self.get_new()
+        old_channel = await self.get_news()
         new_channel: ForumChannel = await old_channel.clone()
         await old_channel.delete()
         self.set_new(new_channel.id)
 
         
-    async def get_event(self) -> ForumChannel:
+    async def get_event(self) -> TextChannel:
         connect = con(deps.DATABASE_CONFIG_PATH)
         cursor = connect.cursor()
 
