@@ -111,11 +111,19 @@ class RpChannels:
                        """)
         fetch = cursor.fetchone()[0]
         connect.close()
-
-        role = await deps.guild.fetch_role(fetch)
-        if role is None:
-            role = utils.get(deps.guild.channels, '🔥┃войны')
-        return role
+        channel = None
+        try:
+            channel = await deps.guild.fetch_channel(int(fetch))
+        except:
+            for channel in deps.guild.channels:
+                if (
+                    ('🔥┃войны' in channel.name) or
+                    ('🔥 ┃войны' in channel.name) or
+                    ('🔥┃ войны' in channel.name) or
+                    ('🔥 ┃ войны' in channel.name)):
+                    await self.set_news(channel.id)
+                    return channel
+        return channel
 
     async def set_war(self, id_: int):
         connect = con(deps.DATABASE_CONFIG_PATH)
@@ -130,9 +138,9 @@ class RpChannels:
     
     async def del_war(self) -> ForumChannel:
         old_channel = await self.get_war()
-        new_channel: ForumChannel = await old_channel.clone()
+        new_channel: ForumChannel = await old_channel.clone(category=old_channel.category)
         await old_channel.delete()
-        self.set_war(new_channel.id)
+        await self.set_war(new_channel.id)
         
 
     async def get_news(self) -> ForumChannel:
@@ -145,11 +153,19 @@ class RpChannels:
                        """)
         fetch = cursor.fetchone()[0]
         connect.close()
-
-        role = await deps.guild.fetch_role(fetch)
-        if role is None:
-            role = utils.get(deps.guild.channels, '📰┃новости-стран')
-        return role
+        channel = None
+        try:
+            channel = await deps.guild.fetch_channel(int(fetch))
+        except:
+            for channel in deps.guild.channels:
+                if (
+                    ('📰┃новости-стран' in channel.name) or 
+                    ('📰 ┃новости-стран' in channel.name) or 
+                    ('📰┃ новости-стран' in channel.name) or 
+                    ('📰 ┃ новости-стран' in channel.name)):
+                    await self.set_news(channel.id)
+                    return channel
+        return channel
 
     async def set_news(self, id_: int):
         connect = con(deps.DATABASE_CONFIG_PATH)
@@ -164,9 +180,9 @@ class RpChannels:
     
     async def del_news(self) -> ForumChannel:
         old_channel = await self.get_news()
-        new_channel: ForumChannel = await old_channel.clone()
+        new_channel: ForumChannel = await old_channel.clone(category=old_channel.category)
         await old_channel.delete()
-        self.set_new(new_channel.id)
+        await self.set_news(new_channel.id)
 
         
     async def get_event(self) -> TextChannel:
@@ -179,11 +195,19 @@ class RpChannels:
                        """)
         fetch = cursor.fetchone()[0]
         connect.close()
-
-        role = await deps.guild.fetch_role(fetch)
-        if role is None:
-            role = utils.get(deps.guild.channels, '📣┃события')
-        return role
+        channel = None
+        try:
+            channel = await deps.guild.fetch_channel(int(fetch))
+        except:
+            for channel in deps.guild.channels:
+                if (
+                    ('📣┃события' in channel.name) or 
+                    ('📣 ┃события' in channel.name) or 
+                    ('📣┃ события' in channel.name) or 
+                    ('📣 ┃ события' in channel.name)):
+                    await self.set_news(channel.id)
+                    return channel
+        return channel
 
     async def set_event(self, id_: int):
         connect = con(deps.DATABASE_CONFIG_PATH)
@@ -198,6 +222,6 @@ class RpChannels:
     
     async def del_event(self) -> ForumChannel:
         old_channel = await self.get_event()
-        new_channel: ForumChannel = await old_channel.clone()
+        new_channel: ForumChannel = await old_channel.clone(category=old_channel.category)
         await old_channel.delete()
-        self.set_event(new_channel.id)
+        await self.set_event(new_channel.id)

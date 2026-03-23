@@ -1,8 +1,14 @@
-from ..library import loop, deps, con
+from ..library import loop, deps, con, logging
 
 class Autovipe:
     @loop(hours= deps.autovipe)
     async def autovipe(self):
+        logging.info('Происходит автовайп')
+
+        deps.game_state['game_started'] = not deps.game_state['game_started']
+        if deps.game_state['game_started']:
+            return
+
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
@@ -50,7 +56,7 @@ class Autovipe:
                        """)
         cursor.execute("""
                        INSERT INTO roles
-                       SLECT *
+                       SELECT *
                        FROM roles_default
                        """)
         connect.commit()
@@ -77,10 +83,16 @@ class Autovipe:
                        UPDATE users
                        SET last_register = NULL
                        """)
+        connect.commit()
+        connect.close()
 
-        deps.rp_channels.del_event()
-        deps.rp_channels.del_war()
-        deps.rp_channels.del_news()
+        await deps.rp_channels.del_event()
+        await deps.rp_channels.del_news()
+        await deps.rp_channels.del_war()
+
+        logging.info('Создаем потоки...')
+        for country in deps.Country.all():
+            await country.create_news_thread()
 
         channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)
         await channel.edit(name='📅┃1/12 1933 год')

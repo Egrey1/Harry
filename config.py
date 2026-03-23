@@ -29,7 +29,6 @@ def get_channel(name: str) -> TextChannel:
     }
     return utils.get(deps.guild.channels, names[name])
 
-
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
     load_dotenv()
@@ -75,6 +74,6 @@ async def second_config():
                         'curator': deps.guild.get_role(1345434049027506187), 'zamcur': deps.guild.get_role(1345434049027506187),
                         'curpers': deps.guild.get_role(1344824766737027182),}
     deps.audit = deps.guild.get_channel(1454735211647733917) # #гарри text channelnnels()
-    deps.rp_channels = deps.RpChannels(news=1429571616982958222)
+    deps.rp_channels = deps.RpChannels()
 
 

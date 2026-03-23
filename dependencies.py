@@ -133,6 +133,21 @@ class Country:
         """Название форумного потока"""
         ...
 
+    @classmethod
+    def all(cls) -> list['Country']:
+        """
+        Возвращает список всех стран
+
+        Returns:
+            List[Country]: Список стран
+
+        Note:
+            Используемые БД:
+            - DATABASE_COUNTRIES_PATH: таблица roles (поле id)
+            
+            Используется стадартный конструктор Country
+        """
+
     def _load_building_slots(self) -> int:
         """Загружает лимит строительных ячеек из базы данных.
         
@@ -1027,29 +1042,24 @@ class ChooseMenu:
         ...
 
 class RpChannels:
-    def __init__(
-            self, 
-            event: int | TextChannel | str = '📣┃события', 
-            war: int | ForumChannel | str = '🔥┃войны', 
-            news: int | str | TextChannel = '📰┃новости-стран'
-            ):
+    def __init__(self):
         pass
         
-    def get_event(self) -> TextChannel:
+    async def get_event(self) -> TextChannel:
         """Возвращает канал для ивентов"""
     async def set_event(self, event: int | str | TextChannel = '📣┃события'):
         """Присвает полю self.event новое значение"""
     async def del_event(self):
         """Пересоздает канал ивента"""
         
-    def get_war(self) -> ForumChannel:
+    async def get_war(self) -> ForumChannel:
         """Возвращает канал для войн"""
     async def set_war(self, event: int | str | ForumChannel = '🔥┃войны'):
         """Присвает полю self.war новое значение"""
     async def del_war(self):
         """Пересоздает канал войн"""
         
-    def get_news(self) -> ForumChannel:
+    async def get_news(self) -> ForumChannel:
         """Возвращает канал для новостей"""
     async def set_news(self, event: int | str | ForumChannel = '📰┃новости-стран'):
         """Присвает полю self.news новое значение"""

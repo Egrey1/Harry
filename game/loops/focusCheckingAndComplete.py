@@ -3,10 +3,10 @@ from ..library import deps, loop, con, logging
 class FocusesLoop():
     @loop(hours=deps.SPEED)
     async def focus_loop(self):
-        logging.info('Проверка фокусов и их завершение')
 
         if not deps.game_state['game_started']:
             return
+        logging.info('Проверка фокусов и их завершение')
         
         connect = con(deps.DATABASE_FOCUS_PATH)
         cursor = connect.cursor()

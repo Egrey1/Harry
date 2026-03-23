@@ -74,11 +74,13 @@ class UpdateInventory:
                                     (1 - deps.diminishing_returns) }"
                                 WHERE country_id = "{current_country.id}"
                                 """)
+                        connect.commit()
             cursor.execute(f"""
                            UPDATE countries_inventory_add
                            SET "Деньги" = "{total_money}"
                            WHERE country_id = "{current_country.id}"
                            """)
+            connect.commit()
 
         connect.commit()
         connect.close()

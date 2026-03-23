@@ -1,4 +1,4 @@
-from ..library.modules import hybrid_command, has_permissions, Context, con, deps, Guild
+from ..library.modules import hybrid_command, has_permissions, Context, con, deps, Guild, logging
 
 class VipeCommand:
     def __init__(self, guild: Guild):
@@ -7,8 +7,14 @@ class VipeCommand:
     @hybrid_command(description='Начинает или заканчивает вайп')
     @has_permissions(administrator=True)
     async def vipe(self, ctx: Context):
+        logging.info('Вызвана команда вайпа')
         if ctx.interaction:
             await ctx.interaction.response.defer(ephemeral=True)
+
+        deps.game_state['game_started'] = not deps.game_state['game_started']
+        if deps.game_state['game_started']:
+            await ctx.send('Новый вайп начался!', ephemeral=False)
+            return
 
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
@@ -57,7 +63,7 @@ class VipeCommand:
                        """)
         cursor.execute("""
                        INSERT INTO roles
-                       SLECT *
+                       SELECT *
                        FROM roles_default
                        """)
         connect.commit()
@@ -84,18 +90,18 @@ class VipeCommand:
                        UPDATE users
                        SET last_register = NULL
                        """)
+        connect.commit()
+        connect.close()
 
+        await deps.rp_channels.del_event()
+        await deps.rp_channels.del_news()
+        await deps.rp_channels.del_war()
 
-        deps.game_state['game_started'] = not deps.game_state['game_started']
-
-        deps.rp_channels.del_event()
-        deps.rp_channels.del_war()
-        deps.rp_channels.del_news()
+        logging.info('Создаем потоки...')
+        for country in deps.Country.all():
+            await country.create_news_thread()
 
         channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)
         await channel.edit(name='📅┃1/12 1933 год')
 
-        if ctx.interaction:
-            await ctx.interaction.followup.send('Новый вайп начался!' if deps.game_state['game_started'] else 'Этот вайп закончился!', ephemeral=False)
-        else:
-            await ctx.send('Новый вайп начался!' if deps.game_state['game_started'] else 'Этот вайп закончился!')
+        await ctx.send('Этот вайп закончился!', ephemeral=False)
