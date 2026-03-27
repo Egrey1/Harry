@@ -8,11 +8,11 @@ class GameCog(Cog, VipeCommand, FocusesCommand, FocusesLoop, Autovipe, NewEvent)
         self.bot = bot
         self.guild = deps.guild
         self.focus_loop.start()
-        self.autovipe.start()
+        # self.autovipe.start()
         
     def cog_unload(self):
         self.focus_loop.cancel()
-        self.autovipe.cancel()
+        # self.autovipe.cancel()
     
 
 async def setup(bot: Bot):

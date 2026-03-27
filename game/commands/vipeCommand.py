@@ -15,6 +15,8 @@ class VipeCommand:
         if deps.game_state['game_started']:
             await ctx.send('Новый вайп начался!', ephemeral=False)
             return
+        else:
+            mes = await ctx.send('Ожидайте!', ephemeral= True)
 
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
@@ -98,10 +100,9 @@ class VipeCommand:
         await deps.rp_channels.del_war()
 
         logging.info('Создаем потоки...')
-        for country in deps.Country.all():
+        for country in await deps.Country.all(mes):
             await country.create_news_thread()
 
         channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)
         await channel.edit(name='📅┃1/12 1933 год')
-
-        await ctx.send('Этот вайп закончился!', ephemeral=False)
+        await mes.edit('Этот вайп закончился!', ephemeral= True)

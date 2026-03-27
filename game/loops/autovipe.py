@@ -91,7 +91,7 @@ class Autovipe:
         await deps.rp_channels.del_war()
 
         logging.info('Создаем потоки...')
-        for country in deps.Country.all():
+        for country in await deps.Country.all():
             await country.create_news_thread()
 
         channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)

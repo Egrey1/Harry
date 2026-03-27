@@ -20,14 +20,13 @@ class NewEvent():
             await message.delete()
             await message.channel.send('Ты не страна!', delete_after=5)
             return
-        
-        country = deps.Country(message.author.mention)
 
         if message.channel.id != country.thread_id:
             logging.info('Попытка писать в чужом потоке')
             await message.delete()
             thread = deps.guild.get_thread(country.thread_id)
-            await message.channel.send('Это не твой форум! ' + f'Твой поток находится здесь -> {thread.jump_url}' if thread else '', delete_after=30)
+            await message.channel.send('Это не твой форум! ' + (f'Твой поток находится здесь -> {thread.jump_url}' if thread else ''), delete_after=30)
+            return
         
         if not message.attachments:
             logging.info('Нет файлов')

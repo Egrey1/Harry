@@ -39,6 +39,8 @@ def first_config():
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     deps.intents = Intents.default()
+    deps.intents.members = True
+    deps.intents.message_content = True
     deps.PREFIX = ['&', '& '] if deps.TOKEN == deps.TOKEN2 else ['!', '! ']
     # deps.PREFIX = ['!', '! ']
     deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)

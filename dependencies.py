@@ -1,6 +1,6 @@
 """Здесь хранятся глобальные переменные и объекты, используемые в боте."""
 
-from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment, Member, Thread
+from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment, Member, Thread, Message
 from discord.ext.commands import Bot, Context
 from discord.ui import Button, Select, View
 from typing import List, Callable, Awaitable
@@ -134,9 +134,12 @@ class Country:
         ...
 
     @classmethod
-    def all(cls) -> list['Country']:
+    async def all(cls, process_message: Message | None = None) -> list['Country']:
         """
         Возвращает список всех стран
+
+        Params:
+            process_message (Message | None): Сообщение, которое вызвало запрос. Нужно для редактирования
 
         Returns:
             List[Country]: Список стран
@@ -324,7 +327,7 @@ class Country:
                 Для сохранения нового значения
         """
 
-    async def send_news(self, news: str, attachments: 'List[Attachment]', view: View, focus_autocomplete: bool) -> None:
+    async def send_news(self, news: str, attachments: 'List[Attachment]', view: View, focus_autocomplete: bool = False) -> None:
         """Отправляет новостное сообщение в канал новостей стран.
         
         Создаёт временный Discord вебхук с аватаром страны (если имеется в БД)

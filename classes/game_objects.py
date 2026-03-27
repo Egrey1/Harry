@@ -4,7 +4,7 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import Row, Interaction, Context, List, Attachment, Thread, View, Webhook
+from .library import Row, Interaction, Context, List, Attachment, Thread, View, Message
 from .library import connect as con
 import dependencies as deps
 
@@ -115,7 +115,11 @@ class Country:
         fetch = dict(cursor.fetchone())
         connect.close()
         
-        self.busy = deps.guild.get_member(int(fetch['is_busy'][2:-1])) if fetch and fetch['is_busy'] else None
+        self.busy = None
+        if fetch and fetch['is_busy'] and deps.guild:
+            member_id: str = fetch['is_busy'].replace('<@', '').replace('!', '').replace('>', '')
+            if member_id.isdigit():
+                self.busy = deps.guild.get_member(int(member_id))
         self.surrend = bool(fetch['surrender']) if fetch else False
         self.sea = deps.guild.get_role(int(fetch['sea'])) if fetch and fetch['sea'] else None
         self.assembly = deps.guild.get_role(int(fetch['assembly'])) if fetch and fetch['assembly'] else None
@@ -145,12 +149,12 @@ class Country:
         self.building_slots = self._load_building_slots()
     
     @classmethod
-    def all(cls) -> list['Country']:
+    async def all(cls, process_message: Message | None = None) -> list['Country']:
         connect = con(deps.DATABASE_ROLE_PICKER_PATH)
         cursor = connect.cursor()
 
         cursor.execute("""
-                       SELECT id
+                       SELECT id, name
                        FROM roles
                        """)
         fetches = cursor.fetchall()
@@ -159,6 +163,8 @@ class Country:
         countries: List[deps.Country] = []
         for fetch in fetches:
             if fetch[0]:
+                if process_message:
+                    await process_message.edit(content='Создание ' + fetch[1])
                 countries.append(cls(fetch[0]))
         return countries
 
@@ -353,7 +359,7 @@ class Country:
         self.thread_id = thread.id
         return thread
 
-    async def send_news(self, news: str, attachments: List[Attachment], view: View, focus_autocomplete: bool):
+    async def send_news(self, news: str, attachments: List[Attachment], view: View, focus_autocomplete: bool = False):
         files = [await file.to_file() for file in attachments]
         channel = await deps.rp_channels.get_news()
         thread = None
@@ -858,8 +864,6 @@ class Focus:
     async def complete_focus(self):
         self.send_factories()
         self.send_items()
-        await self.send_event()
-        await self.declare_war()
         await self.send_event()
         await self.declare_war()
 
