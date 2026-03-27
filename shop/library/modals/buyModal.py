@@ -54,23 +54,10 @@ class Buy(Modal):
                 await interaction.followup.send('Самый хитрый думаешь?', ephemeral=True)
                 return None
             
-            # Делаем SQL запросы
+            self.country.buy_factory(self.factory, quantity)
+
             connect = con(deps.DATABASE_COUNTRIES_PATH)
             cursor = connect.cursor()
-            cursor.execute(f"""
-                            UPDATE country_factories
-                            SET "{self.factory.name}" = "{self.factory.name}" + {quantity}
-                            WHERE country_id = "{self.country.id}"
-                           """)
-            connect.commit()
-
-            cursor.execute(f"""
-                            UPDATE countries_inventory
-                            SET "Деньги" = "Деньги" - {int(quantity * self.cost)}
-                            WHERE country_id = "{self.country.id}"
-                           """)
-            connect.commit()
-
             cursor.execute(f"""
                             SELECT "{self.factory.name}"
                             FROM country_factories

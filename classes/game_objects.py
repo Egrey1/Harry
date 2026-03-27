@@ -454,6 +454,43 @@ class Country:
                 total_earnings += factory.count * factory.quantity
         return total_earnings
 
+    def buy_factory(self, factory: deps.Factory | str, quantity: int = -1):
+        if isinstance(factory, str) and quantity == -1:
+            raise ValueError('Введена строка в поле factory, но quantity остался пустым')
+        
+        quantity = quantity if quantity != -1 else factory.quantity
+        name = factory.name if isinstance(factory, deps.Factory) else factory
+        cost = factory.cost if isinstance(factory, deps.Factory) else Factory(factory).cost
+
+        if quantity * cost > self.balance:
+            raise ValueError('Недостаточно денег для покупки фабрики')
+
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
+        cursor = connect.cursor()
+        cursor.execute(f"""
+                        UPDATE country_factories
+                        SET "{name}" = "{name}" + {quantity}
+                        WHERE country_id = "{self.id}"
+                        """)
+        connect.commit()
+        self.factories[name].quantity += quantity
+
+        cursor.execute(f"""
+                        UPDATE countries_inventory
+                        SET "Деньги" = "Деньги" - {int(quantity * cost)}
+                        WHERE country_id = "{self.id}"
+                        """)
+        connect.commit()
+        self.balance -= int(quantity * cost)
+        
+        connect.close()
+        
+    def max_to_buy(self, factory: deps.Factory | str) -> int:
+        if isinstance(factory, str):
+            factory = Factory(factory)
+        return int(self.balance // factory.cost)
+
+
 class Item:
     def __init__(self, name: str, quantity: int | None = None, price: int = 0, country: str | Country | None = None):
         from .library import getinv
