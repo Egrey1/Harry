@@ -1,7 +1,12 @@
-from ..library.modules import hybrid_command, Context, deps, View, Select, SelectOption
+from ..library.modules import hybrid_command, Context, deps, View, Select, SelectOption, Interaction, Button
 from ..callbacks import focus_callback
 class FocusesCommand:
-    @hybrid_command(name='focuses', description='Показать доступные национальные фокусы')
+
+    async def on_canceled(self, interaction: Interaction):
+        country = deps.Country(interaction.user.mention)
+        country.doing_focus.cancel()
+
+    @hybrid_command(name='focuses', description='Показать доступные национальные фокусы. Здесь так же можно отменить выполнение фокуса')
     async def focuses(self, ctx: Context):
         country = deps.Country(ctx.author.mention)
         if not country.busy:
@@ -18,6 +23,10 @@ class FocusesCommand:
         options = [SelectOption(label=focus.name, value=focus.name) for focus in available_focuses]
         select = Select(placeholder='Выберите фокус', options=options)
         select.callback = lambda interaction: focus_callback(interaction, country)
+        button = Button(label='Отменить выполнение')
+        button.callback = self.on_canceled
         view.add_item(select)
+        if country.doing_focus:
+            view.add_item(button)
 
         await ctx.reply('Вам представлен список доступных фокусов', ephemeral=True, view=view) 

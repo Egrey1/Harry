@@ -877,6 +877,13 @@ class Focus:
         """
         ...
 
+    def cancel(self):
+        """Отменяет выполнение фокуса. Для этого действия self.owner обязательно должен быть не None
+        
+        Note:
+            Используемые БД:
+                - Изменяется таблица countries из файла deps.DATABASE_FOCUS_PATH."""
+
     @property
     def is_completed(self) -> bool:
         """Проверяет, завершён ли фокус для страны-владельца.

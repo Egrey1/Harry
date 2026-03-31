@@ -865,6 +865,21 @@ class Focus:
             connect.commit()
             connect.close()
     
+    def cancel(self):
+        if self.owner is None:
+            return
+        connect = con(deps.DATABASE_FOCUS_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE countries
+                       SET doing = NULL, completed = NULL
+                       WHERE country_id = ?
+                       """, (self.owner.id))
+        connect.commit()
+        connect.close()
+        self.owner = None
+
     @property
     def is_completed(self) -> bool:
         """Возвращает bool значение. True если фокус за страну выполнен и False, если self.owner не указзан или фокус не выполнен"""
