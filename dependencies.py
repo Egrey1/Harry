@@ -755,7 +755,10 @@ class Focus:
         req_items (List[Item] | None): Требуемые предметы для выполнения фокуса.
         req_factories (list[Factory] | None): Требуемые фабрики для выполнения фокуса.
         req_news (str | None): Требуется ли новостное сообщение для выполнения (None если нет).
-        event (str | None): ID события, которое происходит при выполнении фокуса (None если нет).
+        news (str | None): Содержание новостного сообщения (None если нет).
+        news_img (bytes | None): Изображение для новостного сообщения (None если нет).
+        event (str | None): Содержание события, которое происходит при выполнении фокуса (None если нет).
+        event_img (bytes | None): Изображение для события (None если нет).
         reward_items (List[Item] | None): Предметы, получаемые при завершении фокуса.
         reward_factories (list[Factory] | None): Фабрики, получаемые при завершении фокуса.
         building_slots_reward (int): Количество строительных ячеек, получаемых при завершении.
@@ -782,27 +785,19 @@ class Focus:
                 WHERE name = {name}
         """
         self.name: str
-        """Название фокуса."""
         self.description: str
-        """Описание фокуса и его эффектов."""
         self.emoji: 'str | None'
-        """Эмодзи, отображаемое рядом с названием фокуса (None если нет)."""
         self.owner: 'Country | None'
-        """Страна, владеющая этим фокусом (None если не привязан)."""
         self.req_items: 'List[Item] | None'
-        """Требуемые предметы для выполнения фокуса."""
         self.req_factories: 'list[Factory] | None'
-        """Требуемые фабрики для выполнения фокуса."""
         self.req_news: 'str | None'
-        """Требуется ли новостное сообщение для выполнения (None если нет)."""
+        self.news: 'str | None'
+        self.news_img: 'bytes | None'
         self.event: 'str | None'
-        """ID события, которое происходит при выполнении фокуса (None если нет)."""
+        self.event_img: 'bytes | None'
         self.reward_items: 'List[Item] | None'
-        """Предметы, получаемые при завершении фокуса."""
         self.reward_factories: 'list[Factory] | None'
-        """Фабрики, получаемые при завершении фокуса."""
         self.building_slots_reward: int
-        """Количество строительных ячеек, получаемых при завершении."""
         ...
 
     async def send_event(self) -> None:

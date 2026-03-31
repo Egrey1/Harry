@@ -2,4 +2,3 @@ discord
 dotenv
 pillow
 requests
-textwrap

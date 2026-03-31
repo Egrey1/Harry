@@ -4,7 +4,7 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import Row, Interaction, Context, List, Attachment, Thread, View, Message
+from .library import Row, Interaction, Context, List, Attachment, Thread, View, Message, File
 from .library import connect as con
 import dependencies as deps
 
@@ -359,8 +359,8 @@ class Country:
         self.thread_id = thread.id
         return thread
 
-    async def send_news(self, news: str, attachments: List[Attachment], view: View, focus_autocomplete: bool = False):
-        files = [await file.to_file() for file in attachments]
+    async def send_news(self, news: str, attachments: List[Attachment] | List[File], view: View, focus_autocomplete: bool = False):
+        files = [await file.to_file() if isinstance(file, Attachment) else file for file in attachments] if isinstance(attachments, list) else attachments
         channel = await deps.rp_channels.get_news()
         thread = None
         if not self.thread_id:
@@ -730,36 +730,40 @@ class Focus:
         connect.close()
 
         self.owner: Country | None = owner
-        self.name: str = fetch['name']
+        self.name: str = fetch.get('name', None)
         """Название фокуса"""
 
-        self.description: str = fetch['desc']
+        self.description: str = fetch.get('desc', None)
         """Описание фокуса"""
 
-        self.emoji: str | None = fetch['emoji']
+        self.emoji: str | None = fetch.get('emoji', None)
         """Эмодзи фокуса"""
 
 
-        self.req_items: List[Item] | None = fetch['req_items']
+        self.req_items: List[Item] | None = fetch.get('req_items', None)
         """Требуемые предметы для выполнения фокуса"""
 
-        self.req_factories: list[Factory] | None = fetch['req_factories']
+        self.req_factories: list[Factory] | None = fetch.get('req_factories', None)
         """Требуемые фабрики для выполнения фокуса"""
 
-        self.req_news: str | None = fetch['req_news'] if fetch['req_news'] else None
+        self.req_news: str | None = fetch.get('req_news', None)
         """Требуется ли новостное сообщение для выполнения фокуса"""
+        
+        self.news: str | None = fetch.get('news', None)
+        self.news_img: bytes | None = fetch.get('news_img', None)
 
-        self.event: str | None = fetch['event']
+        self.event: str | None = fetch.get('event', None)
         """Событие, которое происходит при выполнении фокуса"""
+        self.event_img: bytes | None = fetch.get('event_img', None)
 
 
-        self.factories: List[Factory] | None = fetch['factories']
+        self.factories: List[Factory] | None = fetch.get('factories')
         """Фабрики, которые даёт фокус"""
 
-        self.items: List[Item] | None = fetch['items']
+        self.items: List[Item] | None = fetch.get('items', None)
         """Предметы, которые даёт фокус"""
 
-        self.war: List[Country] | None = fetch['war']
+        self.war: List[Country] | None = fetch.get('war', None)
         """Страны, с которыми объявляется война при выполнении фокуса"""
         
         self.items = self.items.split('; ') if self.items else []
@@ -817,7 +821,7 @@ class Focus:
         if not text:
             return
 
-        await deps.rp_channels.get_event().send(text)
+        await deps.rp_channels.get_event().send(content=text, files=[File(self.event_img)])
     
     async def declare_war(self):
         if len(self.war) == 0:

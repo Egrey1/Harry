@@ -1,4 +1,4 @@
-from discord import Member, Guild, Message, SelectOption, Interaction, Embed, Thread
+from discord import Member, Guild, Message, SelectOption, Interaction, Embed, Thread, File
 from discord.ext.commands import hybrid_command, has_permissions, Context, Cog, Bot
 from discord.ext.tasks import loop
 from discord.ui import View, Select, Button, button

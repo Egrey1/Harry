@@ -1,4 +1,4 @@
-from discord import Interaction, Member, TextChannel, Role, SelectOption, ButtonStyle, NotFound, Attachment, utils, ForumChannel, Thread, Webhook, Message
+from discord import Interaction, Member, TextChannel, Role, SelectOption, ButtonStyle, NotFound, Attachment, utils, ForumChannel, Thread, Webhook, Message, File
 from discord.ext.commands import Context
 from discord.ui import View, Select, Button, button, select
 
