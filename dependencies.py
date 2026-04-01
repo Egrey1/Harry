@@ -4,6 +4,7 @@ from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction
 from discord.ext.commands import Bot, Context
 from discord.ui import Button, Select, View
 from typing import List, Callable, Awaitable
+from sqlite3 import Connection
 
 bot: Bot = Bot('!', intents=Intents.all())
 DATABASE_ROLE_PICKER_PATH: str
@@ -11,6 +12,8 @@ DATABASE_COUNTRIES_PATH: str
 DATABASE_FOCUS_PATH: str
 DATABASE_CONFIG_PATH: str
 DATABASE_COUNTRY_AI_PATH: str
+DATABASE_CELLS_PATH: str
+cells_db: Connection
 
 CURRENCY: str
 RP_ROLES: dict
@@ -65,6 +68,7 @@ class Country:
         building_slots (int): Количество строительных ячеек для размещения фабрик.
         thread_id (int): ID форумного потока в канале новостей
         thread_name (str): Название форумного потока
+        cells (List[Cell]): Все территории страны
     """
 
     def __init__(self, id_: str = 'ITA') -> None:
@@ -98,39 +102,23 @@ class Country:
             - getbalance(name): получение баланса страны
         """
         self.name: str
-        """Название страны. Загружается из БД roles таблицы."""
         self.id: str
-        """Уникальный идентификатор страны из БД roles таблицы."""
         self.market: Market
-        """Объект рынка страны для торговых операций."""
         self.inventory: dict[str, Item]
-        """Словарь предметов инвентаря {название: Item}."""
         self.factories: dict[str, Factory]
-        """Словарь фабрик страны {название: Factory}."""
         self.balance: int
-        """Текущий денежный баланс страны."""
         self.busy: 'Member | None'
-        """Discord участник, привязанный к стране (None если не привязан)."""
         self.is_country: bool
-        """Флаг валидности страны (True если страна существует и валидна)."""
         self.surrend: bool
-        """Флаг капитуляции (True если страна капитулировала)."""
         self.sea: 'Role | None'
-        """Discord роль морского флота страны (None если не имеется)."""
         self.assembly: 'Role | None'
-        """Discord роль членства в Лиге Наций (None если не имеется)."""
         self.nickname: str
-        """Отображаемое имя игрока в контексте страны."""
         self.doing_focus: 'Focus | None'
-        """Текущий выполняемый национальный фокус (None если нет)."""
         self.current_focus: 'Focus | None'
-        """Последний завершённый национальный фокус (None если нет)."""
         self.building_slots: int
-        """Количество строительных ячеек для размещения фабрик."""
         self.thread_id: int
-        """ID форумного потока в канале новостей"""
         self.thread_name: str
-        """Название форумного потока"""
+        self.cells: List[Cell]
         ...
 
     @classmethod
@@ -924,6 +912,10 @@ class Focus:
         """
         ...
 
+class Cell:
+    """"""
+    def __init__(self, id_: str | int):
+        """"""
 
 class ChooseMenu:
     """Пагинированное выпадающее меню с навигацией между страницами.

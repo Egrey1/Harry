@@ -4,7 +4,8 @@
 #                      guild, roles_id, Context,
 #                      Member, TextChannel, Role,
 #                      FOCUS_PATH, List, get_channel)
-from .library import Row, Interaction, Context, List, Attachment, Thread, View, Message, File
+
+from .library import Row, Interaction, Context, List, Attachment, Thread, View, Message, File, Tuple, logging
 from .library import connect as con
 import dependencies as deps
 
@@ -136,7 +137,7 @@ class Country:
                         WHERE country_id = '{self.id}'
                         """)
         fetch = cursor.fetchone()
-        cursor.close()
+        connect.close()
 
         self.doing_focus: deps.Focus | None = None
         self.current_focus: deps.Focus | None = None
@@ -147,6 +148,27 @@ class Country:
         
         # Загружаем информацию о строительных ячейках
         self.building_slots = self._load_building_slots()
+
+        self.cells: List[deps.Cell] = []
+        try:
+            with deps.cells_db as connect:
+                cursor = connect.cursor()
+
+                cursor.execute("""
+                               SELECT id
+                               FROM Map
+                               WHERE owner = ?
+                               """, self.id)
+                fetches = cursor.fetchall()
+                cursor.close()
+            if not fetches:
+                return
+            
+            for fetch in fetches:
+                if fetch and fetch['id']:
+                    self.cells.append(deps.Cell(fetch['id']))
+        except Exception as e:
+            logging.error(f'Ошибка в Country: {e}')
     
     @classmethod
     async def all(cls, process_message: Message | None = None) -> list['Country']:
@@ -922,4 +944,33 @@ class Focus:
         self.send_items()
         await self.send_event()
         await self.declare_war()
+
+class Cell:
+    def __init__(self, id_: str | int):
+        try:
+            with deps.cells_db as connect:
+                cursor = connect.cursor()
+                cursor.execute("""
+                               SELECT *
+                               FROM Map
+                               WHERE id = ?
+                               """, (id_))
+                fetch = cursor.fetchone()
+                cursor.close()
+            if not fetch: 
+                return
+            fetch = dict(fetch)
+            self.id = int(id_)
+            self.cords: List[Tuple[int, int]] = [(int(cord.split(',')[0]), int(cord.split(',')[1])) for cord in fetch['cords'].split(';')] if fetch['cords'] else None
+            self.color: str = fetch.get('color', None)
+            self.border: str = fetch.get('border', None)
+            class __Neighbors:
+                _neighbors = [int(cell) for cell in fetch.get('neighbors', '').split(';')]
+                def __getitem__(self, index):
+                    return self._neighbors[index]
+            self.neighbors: List[int] = __Neighbors()
+            self.owner: deps.Country | None = Country(fetch.get('owner', None)) if fetch.get('owner', None) else None
+        except Exception as e:
+            logging.error(f'Ошибка в Cell: {e}')
+            raise e
 

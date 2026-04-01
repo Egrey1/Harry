@@ -1,7 +1,8 @@
 from discord import Intents, SelectOption, TextChannel
 from discord.ext.commands import Context, Bot
 import discord.utils as utils
-from sqlite3 import connect as conyto
+from sqlite3 import connect as con
+from sqlite3 import Row
 import dependencies as deps
 import logging
 from dotenv import load_dotenv
@@ -66,6 +67,9 @@ async def second_config():
     deps.DATABASE_COUNTRY_AI_PATH = 'databases/country_ai.db'
     deps.DATABASE_FOCUS_PATH = 'databases/focuses.db'
     deps.DATABASE_CONFIG_PATH = 'databases/config.db'
+    deps.DATABASE_CELLS_PATH = 'databases/cells.db'
+    deps.cells_db = con(deps.DATABASE_CELLS_PATH, check_same_thread=False)
+    deps.cells_db.row_factory = Row
     deps.RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 
             'sea': 1357681946276266044, 'assambley': 1357679628243959862, 
             'LEAGUE': 1353894726847430766, 'gensec': 1358783484046348471, 
