@@ -179,7 +179,7 @@ class Country:
                 def __iter__(self):
                     return iter(self.states)
                 
-            self.states = __states()
+            self.states: List[State] = __states()
         except Exception as e:
             logging.error(f'Ошибка в Country: {e}')
     
@@ -1030,3 +1030,39 @@ class State:
         except Exception as e:
             logging.error(f'Ошибка в owner.setter: {e}')
             raise e
+
+class CommandPallete:
+    def __init__(self, name: str, params: str, context):
+        self.name = name
+        self.params = params
+        self.context = context
+    
+    async def run(self) -> True:
+        try:
+            if self.name == 'annex_country':
+                self.context: Country = Country(self.context) if not isinstance(self.context, Country) else self.context
+                for country_id in self.params.split(';'):
+                    self.context.annex_country(country_id)
+                return True
+            if self.name == 'annex_state':
+                if self.context:
+                    self.context = Country(self.context) if not isinstance(self.context, Country) else self.context
+                    group = self.params.split(';')[0]
+                    for state_id in group.split(','):
+                        State(state_id).owner = self.context
+                    for group in self.params.split(';')[1:]:
+                        country_id = group.split(':')[0]
+                        country = Country(country_id)
+                        for state_id in group.split(':')[1].split(','):
+                            State(state_id).owner = country
+                else:
+                    for group in self.params.split(';'):
+                        country_id = group.split(':')[0]
+                        for state_id in group.split(':')[1].split(','):
+                            State(state_id).owner = Country(country_id)
+                return True
+            
+            return False
+        except Exception as e:
+            logging.error(f'Ошибка в run: {e}')
+            return None

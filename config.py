@@ -46,13 +46,15 @@ def first_config():
     # deps.PREFIX = ['!', '! ']
     deps.bot = Bot(command_prefix=deps.PREFIX, intents=deps.intents)
 
-    deps.Country = cl.Country
-    deps.Item = cl.Item
-    deps.Market = cl.Market
-    deps.Focus = cl.Focus
-    deps.Factory = cl.Factory
-    deps.ChooseMenu = cl.ChooseMenu
-    deps.RpChannels = cl.RpChannels
+    deps.Country            = cl.Country
+    deps.Item               = cl.Item
+    deps.Market             = cl.Market
+    deps.Focus              = cl.Focus
+    deps.Factory            = cl.Factory
+    deps.ChooseMenu         = cl.ChooseMenu
+    deps.RpChannels         = cl.RpChannels
+    deps.State              = cl.State
+    deps.CommandPallete     = cl.CommandPallete
 
 async def second_config():
     """Присваивает остальным переменным их значения. Использовать функцию только после запуска"""
