@@ -13,7 +13,7 @@ DATABASE_FOCUS_PATH: str
 DATABASE_CONFIG_PATH: str
 DATABASE_COUNTRY_AI_PATH: str
 DATABASE_CELLS_PATH: str
-cells_db: Connection
+states_db: Connection
 
 CURRENCY: str
 RP_ROLES: dict
@@ -68,7 +68,7 @@ class Country:
         building_slots (int): Количество строительных ячеек для размещения фабрик.
         thread_id (int): ID форумного потока в канале новостей
         thread_name (str): Название форумного потока
-        cells (List[Cell]): Все территории страны
+        states (List[State]): Все территории страны
     """
 
     def __init__(self, id_: str = 'ITA') -> None:
@@ -118,7 +118,7 @@ class Country:
         self.building_slots: int
         self.thread_id: int
         self.thread_name: str
-        self.cells: List[Cell]
+        self.states: List[State]
         ...
 
     @classmethod
@@ -912,7 +912,7 @@ class Focus:
         """
         ...
 
-class Cell:
+class State:
     """"""
     def __init__(self, id_: str | int):
         """"""

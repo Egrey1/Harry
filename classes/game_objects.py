@@ -149,9 +149,9 @@ class Country:
         # Загружаем информацию о строительных ячейках
         self.building_slots = self._load_building_slots()
 
-        self.cells: List[deps.Cell] = []
+        self.states: List[deps.State] = []
         try:
-            with deps.cells_db as connect:
+            with deps.states_db as connect:
                 cursor = connect.cursor()
 
                 cursor.execute("""
@@ -164,9 +164,22 @@ class Country:
             if not fetches:
                 return
             
-            for fetch in fetches:
-                if fetch and fetch['id']:
-                    self.cells.append(deps.Cell(fetch['id']))
+            class __states:
+                states: List[deps.State] = []
+                for fetch in fetches:
+                    if fetch and fetch['id']:
+                        states.append(fetch['id'])
+
+                def __getitem__(self, index):
+                    return State(self.states[index])
+                
+                def __len__(self):
+                    return len(self.states)
+                
+                def __iter__(self):
+                    return iter(self.states)
+                
+            self.states = __states()
         except Exception as e:
             logging.error(f'Ошибка в Country: {e}')
     
@@ -511,6 +524,23 @@ class Country:
         if isinstance(factory, str):
             factory = Factory(factory)
         return int(self.balance // factory.cost)
+
+    def annex_country(self, country: 'Country' | str):
+        country = country if isinstance(country, Country) else Country(country)
+        if country.id == self.id:
+            return
+        
+        for state in country.states:
+            state.owner = self
+    
+    def annex_states(self, states: List['State'] | List[int]):
+        for state in states:
+            if isinstance(state, int) or isinstance(state, str):
+                State(state).owner = self
+            if isinstance(state, State):
+                state.owner = self
+        
+
 
 
 class Item:
@@ -945,10 +975,10 @@ class Focus:
         await self.send_event()
         await self.declare_war()
 
-class Cell:
+class State:
     def __init__(self, id_: str | int):
         try:
-            with deps.cells_db as connect:
+            with deps.states_db as connect:
                 cursor = connect.cursor()
                 cursor.execute("""
                                SELECT *
@@ -964,13 +994,39 @@ class Cell:
             self.cords: List[Tuple[int, int]] = [(int(cord.split(',')[0]), int(cord.split(',')[1])) for cord in fetch['cords'].split(';')] if fetch['cords'] else None
             self.color: str = fetch.get('color', None)
             self.border: str = fetch.get('border', None)
+
             class __Neighbors:
-                _neighbors = [int(cell) for cell in fetch.get('neighbors', '').split(';')]
+                _neighbors = [int(state) for state in fetch.get('neighbors', '').split(';')]
                 def __getitem__(self, index):
                     return self._neighbors[index]
+                
+                def __len__(self):
+                    return len(self._neighbors)
+                
+                def __iter__(self):
+                    return iter(self._neighbors)
+                
             self.neighbors: List[int] = __Neighbors()
-            self.owner: deps.Country | None = Country(fetch.get('owner', None)) if fetch.get('owner', None) else None
+            self._owner: deps.Country | None = Country(fetch.get('owner', None)) if fetch.get('owner', None) else None
         except Exception as e:
-            logging.error(f'Ошибка в Cell: {e}')
+            logging.error(f'Ошибка в State: {e}')
             raise e
 
+    @property
+    def owner(self):
+        return self._owner
+    
+    @owner.setter()
+    def owner(self, new_owner: deps.Country):
+        try:
+            with deps.states_db as connect:
+                cursor = connect.cursor()
+
+                cursor.execute("""
+                               UPDATE Map
+                               SET owner = ?
+                               WHERE id = ?
+                               """, (new_owner.name, self.id))
+        except Exception as e:
+            logging.error(f'Ошибка в owner.setter: {e}')
+            raise e
