@@ -165,7 +165,8 @@ class Country:
                 return
             
             class __states:
-                states: List[deps.State] = []
+                _index = 0
+                states: List[str] = []
                 for fetch in fetches:
                     if fetch and fetch['id']:
                         states.append(fetch['id'])
@@ -177,7 +178,16 @@ class Country:
                     return len(self.states)
                 
                 def __iter__(self):
-                    return iter(self.states)
+                    self._index = 0
+                    return self
+                
+                def __next__(self):
+                    if self._index < len(self):
+                        result = self[self._index]
+                        self._index+= 1
+                        return result
+                    else:
+                        raise StopIteration
                 
             self.states: List[State] = __states()
         except Exception as e:
@@ -202,6 +212,21 @@ class Country:
                     await process_message.edit(content='Создание ' + fetch[1])
                 countries.append(cls(fetch[0]))
         return countries
+
+    def get_extreme_points(self) -> Tuple[int, int, int, int]:
+        if not self.states:
+            return
+        
+        state = self.states[0].get_extreme_points()
+        result = [state[0], state[1], state[2], state[3]]
+        for state in self.states:
+            state = state.get_extreme_points()
+            result[0] = result[0] * (result[0] > state[0]) + state[0] * (result[0] <= state[0])
+            result[1] = result[1] * (result[1] < state[1]) + state[1] * (result[1] >= state[1])
+            result[2] = result[2] * (result[2] > state[2]) + state[2] * (result[2] <= state[2])
+            result[3] = result[3] * (result[3] < state[3]) + state[3] * (result[3] >= state[3])
+        return tuple(state)
+
 
     def _load_building_slots(self) -> int:
         try:
@@ -525,7 +550,7 @@ class Country:
             factory = Factory(factory)
         return int(self.balance // factory.cost)
 
-    def annex_country(self, country: 'Country' | str):
+    def annex_country(self, country: 'Country | str'):
         country = country if isinstance(country, Country) else Country(country)
         if country.id == self.id:
             return
@@ -817,6 +842,13 @@ class Focus:
 
         self.war: List[Country] | None = fetch.get('war', None)
         """Страны, с которыми объявляется война при выполнении фокуса"""
+
+        self.pallete: List[deps.CommandPallete] | None = []
+        command_pallete = fetch.get('command_pallete', None)
+        
+        for command in command_pallete.split():
+            command_line = command.split('=')
+            self.pallete.append(CommandPallete(command_line[0], command_line[1], self.owner))
         
         self.items = self.items.split('; ') if self.items else []
         for i in range(len(self.items)):
@@ -835,6 +867,10 @@ class Focus:
             self.req_factories[i] = Factory(self.req_factories[i].split(':')[0], int(self.req_factories[i].split(':')[1]))
         
         self.war = [Country(i) for i in self.war.split('; ')] if self.war else []
+
+    async def run_pallete(self):
+        for command in self.pallete:
+            await command.run()
 
     async def send_event(self):
         """Отправляет событие в текстовый канал, заменяя переменные {страна} на упоминания участников, если они заняты."""
@@ -974,6 +1010,7 @@ class Focus:
         self.send_items()
         await self.send_event()
         await self.declare_war()
+        await self.run_pallete()
 
 class State:
     def __init__(self, id_: str | int):
@@ -997,6 +1034,7 @@ class State:
 
             class __Neighbors:
                 _neighbors = [int(state) for state in fetch.get('neighbors', '').split(';')]
+                _index = 0
                 def __getitem__(self, index):
                     return self._neighbors[index]
                 
@@ -1004,7 +1042,17 @@ class State:
                     return len(self._neighbors)
                 
                 def __iter__(self):
-                    return iter(self._neighbors)
+                    self._index = 0
+                    return self
+                
+                def __next__(self):
+                    if self._index < len(self):
+                        result = self[self._index]
+                        self._index+= 1
+                        return result
+                    else:
+                        raise StopIteration
+
                 
             self.neighbors: List[int] = __Neighbors()
             self._owner: deps.Country | None = Country(fetch.get('owner', None)) if fetch.get('owner', None) else None
@@ -1012,11 +1060,23 @@ class State:
             logging.error(f'Ошибка в State: {e}')
             raise e
 
+    def get_extreme_points(self) -> Tuple[int, int, int, int]:
+        if not self.cords:
+            return
+        
+        result = [self.cords[0], self.cords[0], self.cords[1], self.cords[1]]
+        for cord in self.cords:
+            result[0] = result[0] * (result[0] > cord[0]) + cord[0] * (result[0] <= cord[0])
+            result[1] = result[1] * (result[1] < cord[0]) + cord[0] * (result[1] >= cord[0])
+            result[2] = result[2] * (result[2] > cord[1]) + cord[1] * (result[2] <= cord[1])
+            result[3] = result[3] * (result[3] < cord[1]) + cord[1] * (result[3] >= cord[1])
+        return tuple(result)
+
     @property
     def owner(self):
         return self._owner
     
-    @owner.setter()
+    @owner.setter
     def owner(self, new_owner: deps.Country):
         try:
             with deps.states_db as connect:

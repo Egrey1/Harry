@@ -3,7 +3,7 @@
 from discord import Guild, Intents, TextChannel, ForumChannel, Role, Interaction, Attachment, Member, Thread, Message
 from discord.ext.commands import Bot, Context
 from discord.ui import Button, Select, View
-from typing import List, Callable, Awaitable
+from typing import List, Callable, Awaitable, Tuple
 from sqlite3 import Connection
 
 bot: Bot = Bot('!', intents=Intents.all())
@@ -138,6 +138,12 @@ class Country:
             
             Используется стадартный конструктор Country
         """
+
+    def get_extreme_points(self) -> Tuple[int, int, int, int]:
+        """Возвращает крайние точки этой страны
+        
+        Returns:
+            Tuple[int, int, int, int]: x, -x, y, -y. Правая, левая, нижняя, верхняя"""
 
     def _load_building_slots(self) -> int:
         """Загружает лимит строительных ячеек из базы данных.
@@ -417,7 +423,7 @@ class Country:
         """
         ...
 
-    def buy_factory(self, factory: 'Factory' | str, quantity: int = -1):
+    def buy_factory(self, factory: 'Factory | str', quantity: int = -1):
         """Операция покупки завода
         
         Params:
@@ -434,7 +440,7 @@ class Country:
             - Любые изменения тоже сохраняются локально 
         """
 
-    def max_to_buy(self, factory: 'Factory' | str) -> int:
+    def max_to_buy(self, factory: 'Factory | str') -> int:
         """
         Максимальное количество фабрик factory, которое может купить страна
 
@@ -750,6 +756,7 @@ class Focus:
         reward_items (List[Item] | None): Предметы, получаемые при завершении фокуса.
         reward_factories (list[Factory] | None): Фабрики, получаемые при завершении фокуса.
         building_slots_reward (int): Количество строительных ячеек, получаемых при завершении.
+        pallete: (List[CommandPallete] | None): Список всех команд фокуса.
     """
 
     def __init__(self, name: str, owner: 'Country | None' = None) -> None:
@@ -917,6 +924,12 @@ class State:
     def __init__(self, id_: str | int):
         """"""
 
+    def get_extreme_points(self) -> Tuple[int, int, int, int]:
+        """Возвращает крайние координаты этой области
+        
+        Returns:
+            Tuple[int, int, int, int]: x, -x, y, -y. Правая, левая, нижняя, верхняя"""
+
 class CommandPallete:
     """
     Класс представляет командную паллету для работы с фокусами
@@ -956,11 +969,15 @@ class CommandPallete:
 
     def __init__(self, command: str, params: str, context):
         """
-        
         Params:
             command (str): annex_country, annex_state
             params (str): Параметры. Какие именно зависит от названия команды
             context (Any): контекст вызова командной паллеты, например команда выполняется по отношению к какой-либо стране"""
+    
+    async def run(self):
+        """
+        Запустить команду
+        """
 
 
 class ChooseMenu:
