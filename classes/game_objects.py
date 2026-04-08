@@ -846,8 +846,8 @@ class Focus:
         self.pallete: List[deps.CommandPallete] | None = []
         command_pallete = fetch.get('command_pallete', None)
         
-        for command in command_pallete.split():
-            command_line = command.split('=')
+        for command in command_pallete.split('\\ '):
+            command_line = command.split('\\=')
             self.pallete.append(CommandPallete(command_line[0], command_line[1], self.owner))
         
         self.items = self.items.split('; ') if self.items else []
@@ -1101,24 +1101,24 @@ class CommandPallete:
         try:
             if self.name == 'annex_country':
                 self.context: Country = Country(self.context) if not isinstance(self.context, Country) else self.context
-                for country_id in self.params.split(';'):
+                for country_id in self.params.split('\\;'):
                     self.context.annex_country(country_id)
                 return True
             if self.name == 'annex_state':
                 if self.context:
                     self.context = Country(self.context) if not isinstance(self.context, Country) else self.context
-                    group = self.params.split(';')[0]
-                    for state_id in group.split(','):
+                    group = self.params.split('\\;')[0]
+                    for state_id in group.split('\\,'):
                         State(state_id).owner = self.context
-                    for group in self.params.split(';')[1:]:
-                        country_id = group.split(':')[0]
+                    for group in self.params.split('\\;')[1:]:
+                        country_id = group.split('\\:')[0]
                         country = Country(country_id)
-                        for state_id in group.split(':')[1].split(','):
+                        for state_id in group.split('\\:')[1].split('\\,'):
                             State(state_id).owner = country
                 else:
-                    for group in self.params.split(';'):
-                        country_id = group.split(':')[0]
-                        for state_id in group.split(':')[1].split(','):
+                    for group in self.params.split('\\;'):
+                        country_id = group.split('\\:')[0]
+                        for state_id in group.split('\\:')[1].split('\\,'):
                             State(state_id).owner = Country(country_id)
                 return True
             

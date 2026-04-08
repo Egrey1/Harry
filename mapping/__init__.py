@@ -1,6 +1,7 @@
 from .library import Cog
+from .commands import *
 
-class MappingCog(Cog):
+class MappingCog(Cog, MapCommand, ShowCountryCommand):
     def __init__(self, bot):
         self.bot = bot
 

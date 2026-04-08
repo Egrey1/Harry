@@ -70,6 +70,7 @@ async def second_config():
     deps.DATABASE_FOCUS_PATH = 'databases/focuses.db'
     deps.DATABASE_CONFIG_PATH = 'databases/config.db'
     deps.DATABASE_CELLS_PATH = 'databases/cells.db'
+    deps.ASSETS_PATH = 'assets/'
     deps.states_db = con(deps.DATABASE_CELLS_PATH, check_same_thread=False)
     deps.states_db.row_factory = Row
     deps.RP_ROLES = {'COUNTRY': 1353608772458905671, 'surrender': 1361802354059378708, 
