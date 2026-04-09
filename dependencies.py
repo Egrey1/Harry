@@ -70,6 +70,8 @@ class Country:
         thread_id (int): ID форумного потока в канале новостей
         thread_name (str): Название форумного потока
         states (List[State]): Все территории страны
+        color (str): HEX-код цвета страны. Нужно для отображения на карте мира
+        border (str): HEX-код цвета границ стран. Нужна для отображения на карте мира
     """
 
     def __init__(self, id_: str = 'ITA') -> None:
@@ -921,15 +923,23 @@ class Focus:
         ...
 
 class State:
-    """"""
+    """Представляет отдельный регион на игровой карте."""
     def __init__(self, id_: str | int):
-        """"""
+        """Загружает регион по его ID из таблицы `Map`."""
 
     def get_extreme_points(self) -> Tuple[int, int, int, int]:
         """Возвращает крайние координаты этой области
         
         Returns:
             Tuple[int, int, int, int]: x, -x, y, -y. Правая, левая, нижняя, верхняя"""
+
+    @property
+    def owner(self):
+        """Возвращает текущего владельца региона."""
+
+    @owner.setter
+    def owner(self, new_owner: 'Country'):
+        """Меняет владельца региона и сохраняет изменение в БД."""
 
 class CommandPallete:
     """

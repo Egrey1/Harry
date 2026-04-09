@@ -127,6 +127,8 @@ class Country:
         self.nickname = fetch['nickname'] if fetch and fetch['nickname'] is not None else ""
         self.thread_id = int(fetch['thread_id']) if fetch and fetch['thread_id'] else None
         self.thread_name = fetch['thread_name'] if fetch and fetch['thread_name'] else self.name
+        self.color = fetch['color'] if fetch and fetch['color'] else '#000000B0'
+        self.border = fetch['border'] if fetch and fetch['border'] else '#000000'
 
         
         connect = con(deps.DATABASE_FOCUS_PATH)
@@ -158,7 +160,7 @@ class Country:
                                SELECT id
                                FROM Map
                                WHERE owner = ?
-                               """, self.id)
+                               """, (self.id, ))
                 fetches = cursor.fetchall()
                 cursor.close()
             if not fetches:
@@ -564,7 +566,15 @@ class Country:
                 State(state).owner = self
             if isinstance(state, State):
                 state.owner = self
-        
+    
+    def __eq__(self, other: deps.Country):
+        if isinstance(other, deps.Country) or isinstance(other, Country):
+            return self.id == other.id
+    
+    def __ne__(self, other: deps.Country):
+        if isinstance(other, deps.Country) or isinstance(other, Country):
+            return self.id != other.id
+
 
 
 
@@ -846,9 +856,10 @@ class Focus:
         self.pallete: List[deps.CommandPallete] | None = []
         command_pallete = fetch.get('command_pallete', None)
         
-        for command in command_pallete.split('\\ '):
-            command_line = command.split('\\=')
-            self.pallete.append(CommandPallete(command_line[0], command_line[1], self.owner))
+        if command_pallete:
+            for command in command_pallete.split('\\ '):
+                command_line = command.split('\\=')
+                self.pallete.append(CommandPallete(command_line[0], command_line[1], self.owner))
         
         self.items = self.items.split('; ') if self.items else []
         for i in range(len(self.items)):
@@ -1029,8 +1040,6 @@ class State:
             fetch = dict(fetch)
             self.id = int(id_)
             self.cords: List[Tuple[int, int]] = [(int(cord.split(',')[0]), int(cord.split(',')[1])) for cord in fetch['cords'].split(';')] if fetch['cords'] else None
-            self.color: str = fetch.get('color', None)
-            self.border: str = fetch.get('border', None)
 
             class __Neighbors:
                 _neighbors = [int(state) for state in fetch.get('neighbors', '').split(';')]
