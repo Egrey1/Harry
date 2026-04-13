@@ -102,6 +102,7 @@ class VipeCommand:
         logging.info('Создаем потоки...')
         for country in await deps.Country.all(mes):
             await country.create_news_thread()
+        logging.info('Потоки созданы')
 
         channel = deps.guild.get_channel(deps.CHANNEL_FOR_UPDATE_ID)
         await channel.edit(name='📅┃1/12 1933 год')

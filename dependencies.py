@@ -33,12 +33,13 @@ PAGE_SIZE: int = 25
 register_cooldown: int = 1
 diminishing_returns: float = 0.95
 
-SPEED: int = 1 # В часах
+SPEED: int = 1/12 # В часах
 autovipe: float = 24 * 7 # В часах
 
 TOKEN: str
 TOKEN1: str
 TOKEN2: str
+testmode: str
 PREFIX: str
 intents: Intents
  
@@ -452,6 +453,16 @@ class Country:
         Returns:
             int: Максимальное количество фабрик, которое может купить страна
         """
+
+    def set_balance(self, new_balance: int) -> None:
+        """Устанавливает для страны новый баланс 
+        
+        Params:
+            new_balance (int): новый баланс
+        
+        Note:
+            Используемые БД:
+                Таблица countries_inventory из COUNTRIES_PATH для изменения баланса"""
 
 
 class Item:

@@ -4,7 +4,7 @@ class FocusesLoop():
     @loop(hours=deps.SPEED)
     async def focus_loop(self):
 
-        if not deps.game_state['game_started']:
+        if not deps.game_state['game_started'] and not deps.testmode:
             return
         logging.info('Проверка фокусов и их завершение')
         

@@ -566,7 +566,20 @@ class Country:
                 State(state).owner = self
             if isinstance(state, State):
                 state.owner = self
-    
+
+    def set_balance(self, new_balance):
+        self.balance = new_balance
+        connect = con(deps.DATABASE_COUNTRIES_PATH)
+        cursor = connect.cursor()
+
+        cursor.execute("""
+                       UPDATE countries_inventory
+                       SET "Деньги" = ?
+                       WHERE country_id = ?
+                       """, (new_balance, self.id))
+        connect.commit()
+        connect.close()
+
     def __eq__(self, other: deps.Country):
         if isinstance(other, deps.Country) or isinstance(other, Country):
             return self.id == other.id

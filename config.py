@@ -33,9 +33,10 @@ def get_channel(name: str) -> TextChannel:
 def first_config():
     """Создает экземпляр бота для последующего запуска"""
     load_dotenv()
-    deps.TOKEN2 = getenv('TOKEN2')
-    deps.TOKEN1 = getenv('TOKEN1')
-    deps.TOKEN = deps.TOKEN2
+    deps.TOKEN2     = getenv('TOKEN2')
+    deps.TOKEN1     = getenv('TOKEN1')
+    deps.testmode   = getenv('testmode')
+    deps.TOKEN = deps.TOKEN2 if deps.testmode else deps.TOKEN1
     #deps.TOKEN = getenv('TOKEN')
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
